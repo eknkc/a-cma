@@ -1,5 +1,5 @@
 package edu.atilim.acma;
 
 public class Test {
-boolean commitleniyormu;
+boolean commitleniyormu=true; // :)
 }
