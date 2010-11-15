@@ -27,8 +27,8 @@ public abstract class Type extends AccessibleElement {
 	}
 	
 	public void setPackage(Package value) {
-		if (getParent() == null)
-			getDeps().add(Dependency.PACKAGE, value);
+		getDeps().add(Dependency.PARENT, null);
+		getDeps().add(Dependency.PACKAGE, value);
 	}
 	
 	public Type getParent() {
