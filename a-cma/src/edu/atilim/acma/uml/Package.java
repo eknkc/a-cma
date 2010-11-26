@@ -44,17 +44,6 @@ public class Package extends Element {
 		getDeps().add(Dependency.PACKAGE, parent);
 	}
 	
-	@Override
-	public Element getChild(String name) {
-		for (Package p : packages()) {
-			if (p.getName().equals(name)) return p;
-		}
-		for (Type t: types()) {
-			if (t.getName().equals(name)) return t;
-		}
-		return null;
-	}
-	
 	public Package(String name, Design design) {
 		super(name, design);
 	}

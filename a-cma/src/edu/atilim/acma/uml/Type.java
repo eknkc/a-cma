@@ -6,7 +6,7 @@ public abstract class Type extends AccessibleElement {
 	@Override
 	public String getFullName() {
 		Type parent = getParent();
-		if (parent != null) return parent.getFullName() + "." +  getName();
+		if (parent != null) return parent.getFullName() + "$" +  getName();
 		Package pack = getPackage();
 		if (pack != null) return pack.getFullName() + "." + getName();
 		return getName();

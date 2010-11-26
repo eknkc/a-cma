@@ -69,6 +69,15 @@ public class Design implements Serializable {
 		return list;
 	}
 	
+	public <T extends Element> T get(String signature, Class<T> cls) {
+		LinkedList<T> list = get(cls);
+		for (T t : list) {
+			if (t.getFullName().equals(signature))
+				return t;
+		}
+		return null;
+	}
+	
 	public Package getPackage(String name) {
 		return getPackage(name, false);
 	}

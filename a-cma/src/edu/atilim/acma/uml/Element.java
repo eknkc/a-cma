@@ -81,10 +81,6 @@ public abstract class Element implements Serializable {
 		getDeps().clear();
 	}
 	
-	public Element getChild(String name) {
-		return null;
-	}
-	
 	@Override
 	public int hashCode() {
 		return serial.hashCode();
