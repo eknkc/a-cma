@@ -20,6 +20,10 @@ public class ClassType extends Type {
 		return getDeps().get(Dependency.EXTEND, ClassType.class, true);
 	}
 	
+	public Iterable<Field> fields() {
+		return getDeps().get(Dependency.PARENT, Field.class, true);
+	}
+	
 	public boolean isAbstract() {
 		return getFlag(Element.Flags.ABSTRACT);
 	}

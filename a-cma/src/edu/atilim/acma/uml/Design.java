@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.Stack;
 
 import edu.atilim.acma.uml.Transaction.Action;
+import edu.atilim.acma.uml.io.DesignTreeGenerator;
 import edu.atilim.acma.util.Selector;
 
 public class Design implements Serializable {
@@ -24,6 +25,10 @@ public class Design implements Serializable {
 		
 		root = new Package("", this);
 		transaction = null;
+	}
+	
+	public Package getRootPackage() {
+		return root;
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -129,5 +134,10 @@ public class Design implements Serializable {
 			e.printStackTrace();
 		}
 		return null;
+	}
+	
+	@Override
+	public String toString() {
+		return new DesignTreeGenerator(this).toString();
 	}
 }

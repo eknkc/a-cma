@@ -3,7 +3,7 @@ package edu.atilim.acma;
 import edu.atilim.acma.uml.ClassType;
 import edu.atilim.acma.uml.Design;
 import edu.atilim.acma.uml.Method;
-import edu.atilim.acma.uml.Type;
+import edu.atilim.acma.uml.io.DesignTreeGenerator;
 
 
 public class Core {
@@ -24,10 +24,8 @@ public class Core {
 		System.out.println("Adding Rectangle class as a nested type of Point class");	
 		asd.setParent(point);
 		
-		System.out.println("Printing all class names:");	
-		for (Type t : d.get(Type.class)) {
-			System.out.println(t.getFullName());
-		}
+		System.out.println("Printing design:");	
+		System.out.println(d);
 		
 		System.out.println("Beginning new transaction");
 		d.beginTrans();
@@ -35,17 +33,15 @@ public class Core {
 		System.out.println("Moving rectangle to edu.test.complex package");
 		asd.setPackage(d.getPackage("edu.test.complex", true));
 		
-		System.out.println("Printing all class names:");	
-		for (Type t : d.get(Type.class)) {
-			System.out.println(t.getFullName());
-		}
+		System.out.println("Printing design:");	
+		System.out.println(d);
 		
 		System.out.println("Rolling back transaction");
 		d.rollbackTrans();
 		
-		System.out.println("Printing all class names:");	
-		for (Type t : d.get(Type.class)) {
-			System.out.println(t.getFullName());
-		}
+		System.out.println("Printing design:");	
+		System.out.println(d);
+		
+		System.out.println(new DesignTreeGenerator(d).toString());
 	}
 }
