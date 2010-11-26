@@ -10,6 +10,14 @@ public class HillClimbing implements Algorithm {
 	
 	Solution curBest;
 	
+	public long getMaxIterations() {
+		return maxIterations;
+	}
+
+	public void setMaxIterations(long maxIterations) {
+		this.maxIterations = maxIterations;
+	}
+
 	public HillClimbing() {
 		this(0, 0);
 	}
