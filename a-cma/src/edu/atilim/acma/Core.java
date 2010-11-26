@@ -1,47 +1,58 @@
 package edu.atilim.acma;
 
-import edu.atilim.acma.uml.ClassType;
-import edu.atilim.acma.uml.Design;
-import edu.atilim.acma.uml.Method;
-import edu.atilim.acma.uml.io.DesignTreeGenerator;
+import java.util.Random;
 
+import edu.atilim.acma.search.HillClimbing;
+import edu.atilim.acma.test.RastriginSolution;
+import edu.atilim.acma.util.Log;
 
 public class Core {
 	public static void main(String[] args) {
-		Design d = new Design();
+		Random rand = new Random();
 		
-		//Sample design
-		System.out.println("Creating Point Class");		
-		ClassType point = d.create("Point", ClassType.class);
-		point.setPackage(d.getPackage("edu.test", true));
-		System.out.println("Adding method setX");	
-		Method method = d.create("setX", Method.class);
-		method.setParent(point);
+		/*
+		 * Rastrigin's function has a global optimum at (0, 0) with score 0.
+		 * This test creates a random solution in a square, around (0, 0), from (-50, -50) to (50, 50)
+		 * then executes hill climbing on it to find an optimal solution.
+		 * RastriginSolution is an example solution implementation but the Hill Climbing
+		 * implementation should run with anything implementing "Solution" interface,
+		 * which we will implement in edu.atilim.acma.uml.Design eventually.
+		 * This one should just provide a decent testing environment for all algorithm implementations.
+		 * 
+		 * A detailed LOG of Hill Climbing is generated in acma.log file within the project directory.
+		 * Hill Climbing can be modified according to needs, the two constructor parameters are
+		 * restart count and restart depth respectively.
+		 * 
+		 * This one with 200 on both runs pretty fast on my desktop with a significant reach to global optimum.
+		 * 
+		 * Best I got:
+		 * Score of initial solution (22,137127, 7,110455): -1036,464253
+		 * Score of final solution (-0,010443, 0,000279): -0,021752
+		 * 
+		 * Holaleya!
+		 * 
+		 * - Ekin
+		 */
 		
-		System.out.println("Creating Rectangle Class");	
-		ClassType asd = d.create("Rectangle", ClassType.class);
+		// Add output log, to see details
+		Log.addOutput("acma.log");
 		
-		System.out.println("Adding Rectangle class as a nested type of Point class");	
-		asd.setParent(point);
+		// Get a starting point between (-50, -50) and (50, 50)
+		double x = (rand.nextDouble() * 100) - 50.0;
+		double y = (rand.nextDouble() * 100) - 50.0;
 		
-		System.out.println("Printing design:");	
-		System.out.println(d);
+		// Create the initial solution
+		RastriginSolution initial = new RastriginSolution(x, y);
 		
-		System.out.println("Beginning new transaction");
-		d.beginTrans();
+		// Print score
+		System.out.printf("Score of initial solution (%f, %f): %f\n", initial.getX(), initial.getY(), initial.score());
+		System.out.println("Patience now.. Go get a coffee or something.");
 		
-		System.out.println("Moving rectangle to edu.test.complex package");
-		asd.setPackage(d.getPackage("edu.test.complex", true));
+		// Run Hill Climbing
+		HillClimbing hc = new HillClimbing(200, 200);
+		RastriginSolution finl = (RastriginSolution)hc.run(initial);
 		
-		System.out.println("Printing design:");	
-		System.out.println(d);
-		
-		System.out.println("Rolling back transaction");
-		d.rollbackTrans();
-		
-		System.out.println("Printing design:");	
-		System.out.println(d);
-		
-		System.out.println(new DesignTreeGenerator(d).toString());
+		// Print score
+		System.out.printf("Score of final solution (%f, %f): %f\n", finl.getX(), finl.getY(), finl.score());
 	}
 }
