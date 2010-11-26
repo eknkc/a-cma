@@ -2,6 +2,7 @@ package edu.atilim.acma;
 
 import java.util.Random;
 
+import edu.atilim.acma.search.BeamSearch;
 import edu.atilim.acma.search.HillClimbing;
 import edu.atilim.acma.test.RastriginSolution;
 import edu.atilim.acma.util.Log;
@@ -50,9 +51,11 @@ public class Core {
 		
 		// Run Hill Climbing
 		HillClimbing hc = new HillClimbing(200, 200);
+		BeamSearch bc = new BeamSearch(500, 2000);
 		RastriginSolution finl = (RastriginSolution)hc.run(initial);
-		
+		RastriginSolution finl2 = (RastriginSolution)hc.run(initial);
 		// Print score
 		System.out.printf("Score of final solution (%f, %f): %f\n", finl.getX(), finl.getY(), finl.score());
+		System.out.printf("Score of final solution (%f, %f): %f\n", finl2.getX(), finl2.getY(), finl2.score());
 	}
 }
