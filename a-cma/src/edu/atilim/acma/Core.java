@@ -55,7 +55,7 @@ public class Core {
 		RastriginSolution finl = (RastriginSolution)hc.run(initial);
 		RastriginSolution finl2 = (RastriginSolution)bc.run(initial);
 		// Print score
-		System.out.printf("Score of final solution of Hill Climbing (%f, %f): %f\n", finl.getX(), finl.getY(), finl.score());
-		System.out.printf("Score of final solution of Beam Search (%f, %f): %f\n", finl2.getX(), finl2.getY(), finl2.score());
+		System.out.printf("Score of final solution of Hill Climbing (%f, %f): %f\n", finl.getX(), finl.getY(), finl.score()); //Dere tepe týrmanýr
+		System.out.printf("Score of final solution of Beam Search (%f, %f): %f\n", finl2.getX(), finl2.getY(), finl2.score()); //Fasülyeden algoritma
 	}
 }
