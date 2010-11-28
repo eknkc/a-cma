@@ -4,6 +4,7 @@ import java.util.Random;
 
 import edu.atilim.acma.search.BeamSearch;
 import edu.atilim.acma.search.HillClimbing;
+import edu.atilim.acma.search.ModSimAnn;
 import edu.atilim.acma.test.RastriginSolution;
 import edu.atilim.acma.util.Log;
 
@@ -50,12 +51,15 @@ public class Core {
 		System.out.println("Patience now.. Go get a coffee or something.");
 		
 		// Run Hill Climbing
-		HillClimbing hc = new HillClimbing(200, 200);
-		BeamSearch bc = new BeamSearch(500, 200);
-		RastriginSolution finl = (RastriginSolution)hc.run(initial);
-		RastriginSolution finl2 = (RastriginSolution)bc.run(initial);
+		// HillClimbing hc = new HillClimbing(200, 200);
+		// BeamSearch bc = new BeamSearch(500, 200);
+		ModSimAnn msa = new ModSimAnn(10000, 4);
+		// RastriginSolution finl = (RastriginSolution)hc.run(initial);
+		// RastriginSolution finl2 = (RastriginSolution)bc.run(initial);
+		RastriginSolution finl3 = (RastriginSolution)msa.run(initial);
 		// Print score
-		System.out.printf("Score of final solution of Hill Climbing (%f, %f): %f\n", finl.getX(), finl.getY(), finl.score()); //Dere tepe týrmanýr
-		System.out.printf("Score of final solution of Beam Search (%f, %f): %f\n", finl2.getX(), finl2.getY(), finl2.score()); //Fasülyeden algoritma
+		// System.out.printf("Score of final solution of Hill Climbing (%f, %f): %f\n", finl.getX(), finl.getY(), finl.score()); //Dere tepe týrmanýr
+		// System.out.printf("Score of final solution of Beam Search (%f, %f): %f\n", finl2.getX(), finl2.getY(), finl2.score()); //Fasülyeden algoritma
+		System.out.printf("Score of final solution of Mod Sim Annealing (%f, %f): %f\n", finl3.getX(), finl3.getY(), finl3.score()); //Dengesiz algoritma
 	}
 }
