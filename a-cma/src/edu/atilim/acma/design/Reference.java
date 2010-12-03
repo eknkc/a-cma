@@ -9,7 +9,7 @@ public abstract class Reference implements Serializable {
 	
 	private Node source;
 	private int tag;
-	private boolean array;
+	private int dimension;
 	
 	static Reference get(Node from, Node to, int tag) {
 		return new InnerReference(from, to, tag);
@@ -22,7 +22,7 @@ public abstract class Reference implements Serializable {
 	public Reference(Node source, int tag) {
 		this.source = source;
 		this.tag = tag;
-		this.array = false;
+		this.dimension = 1;
 	}
 	
 	public Node getSource() {
@@ -32,13 +32,13 @@ public abstract class Reference implements Serializable {
 	public int getTag() {
 		return tag;
 	}
-	
-	public boolean isArray() {
-		return array;
+
+	public int getDimension() {
+		return dimension;
 	}
 
-	public void setArray(boolean array) {
-		this.array = array;
+	public void setDimension(int dimension) {
+		this.dimension = dimension;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -55,6 +55,14 @@ public abstract class Reference implements Serializable {
 	
 	public void release() {
 		
+	}
+	
+	public String toString(String inner) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(inner);
+		for (int i = 0; i < dimension; i++)
+			sb.append("[]");
+		return sb.toString();
 	}
 	
 	static class InnerReference extends Reference {
@@ -84,7 +92,7 @@ public abstract class Reference implements Serializable {
 		
 		@Override
 		public String toString() {
-			return target.toString();
+			return super.toString(target.toString());
 		}
 	}
 	
@@ -110,7 +118,7 @@ public abstract class Reference implements Serializable {
 		
 		@Override
 		public String toString() {
-			return typeName;
+			return super.toString(typeName);
 		}
 	}
 	

@@ -76,6 +76,22 @@ public class Type extends Node {
 		}
 	}
 	
+	public Field getField(String name) {
+		for (Field f : getFields()) {
+			if (name.equals(f.getName()))
+				return f;
+		}
+		return null;
+	}
+	
+	public Method getMethod(String name) {
+		for (Method m : getMethods()) {
+			if (name.equals(m.getName()) || name.equals(m.getSignature()))
+				return m;
+		}
+		return null;
+	}
+	
 	public List<Method> getMethods() {
 		return getReferers(Tags.REF_PARENT, Method.class);
 	}
@@ -105,13 +121,13 @@ public class Type extends Node {
 	}
 	
 	public Method createMethod(String name) {
-		Method m = new Method(name);
+		Method m = new Method(name, getDesign());
 		m.setOwnerType(this);
 		return m;
 	}
 	
 	public Field createField(String name) {
-		Field f = new Field(name);
+		Field f = new Field(name, getDesign());
 		f.setOwnerType(this);
 		return f;
 	}
@@ -129,8 +145,13 @@ public class Type extends Node {
 		return name.substring(0, lastDot);
 	}
 
-	public Type(String name) {
-		super(name);
+	public Type(String name, Design design) {
+		super(name, design);
 		this.interfaces = new LinkedList<Reference>();
+	}
+	
+	@Override
+	public String toString() {
+		return getName();
 	}
 }

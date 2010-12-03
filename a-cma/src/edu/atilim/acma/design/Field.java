@@ -34,8 +34,8 @@ public class Field extends Node {
 		return getReferers(Tags.REF_DEPEND, Method.class);
 	}
 
-	public Field(String name) {
-		super(name);
+	public Field(String name, Design design) {
+		super(name, design);
 	}
 	
 	@Override

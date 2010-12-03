@@ -9,9 +9,14 @@ public abstract class Node implements Serializable {
 	private ReferenceList incomingReferences;
 	private String name;
 	private int flags;
+	private Design design;
 	
 	public String getName() {
 		return name;
+	}
+	
+	public Design getDesign() {
+		return design;
 	}
 	
 	protected boolean getFlag(int flag) {
@@ -29,23 +34,25 @@ public abstract class Node implements Serializable {
 			flags &= ~flag;
 	}
 
-	Node(String name) {
+	Node(String name, Design design) {
 		this.incomingReferences = new ReferenceList();
 		this.name = name;
 		this.flags = 0;
+		this.design = design;
 	}
 	
-	public static Reference getReference(Node from, Node to, int tag) {
-		if (from == null || to == null) return null;
-		
-		Reference ref = Reference.get(from, to, tag);
-		to.incomingReferences.add(ref);
-		return ref;
+	public Reference getReference(Node from, Node to, int tag) {
+		Reference r = design.getReference(from, to, tag);
+		if (r != null && r.getTarget() != null)
+			r.getTarget().incomingReferences.add(r);
+		return r;
 	}
 	
-	public static Reference getReference(Node from, String to, int tag) {
-		if (from == null) return null;
-		return Reference.get(from, to, tag);
+	public Reference getReference(Node from, String to, int tag) {
+		Reference r = design.getReference(from, to, tag);
+		if (r != null && r.getTarget() != null)
+			r.getTarget().incomingReferences.add(r);
+		return r;
 	}
 	
 	public void removeReference(Reference ref) {

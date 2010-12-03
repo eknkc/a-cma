@@ -45,8 +45,8 @@ public class Design implements Serializable {
 	
 	public <T extends Node> T create(String name, Class<T> cls) {
 		try {
-			Constructor<T> ctor = cls.getConstructor(String.class);
-			T item = ctor.newInstance(name);
+			Constructor<T> ctor = cls.getConstructor(String.class, Design.class);
+			T item = ctor.newInstance(name, this);
 			
 			if (item instanceof Type)
 				types.add((Type)item);
@@ -54,6 +54,41 @@ public class Design implements Serializable {
 			return item;
 		} catch (Exception e) { e.printStackTrace(); }
 		return null;
+	}
+	
+	Reference getReference(Node from, Node to, int tag) {
+		return getReference(from, to, 1, tag);
+	}
+	
+	Reference getReference(Node from, Node to, int dimension, int tag) {
+		if (from == null || to == null) return null;
+		
+		Reference ref = Reference.get(from, to, tag);
+		ref.setDimension(dimension);
+		return ref;
+	}
+	
+	public Reference getReference(Node from, String to, int tag) {
+		if (from == null) return null;
+		
+		int dimension = 0;
+		int arrindex = to.indexOf("[]");
+		String realName = to.substring(0, arrindex < 0 ? to.length() : arrindex);
+		while (arrindex >= 0)
+		{
+			dimension++;
+			arrindex = to.indexOf("[]", arrindex + 2);
+		}
+		
+		Type reft = getType(realName);
+		if (reft != null)
+			return getReference(from, reft, dimension, tag);
+		else
+		{
+			Reference ref = Reference.get(from, realName, tag);
+			ref.setDimension(dimension);
+			return ref;
+		}
 	}
 	
 	public Design() {

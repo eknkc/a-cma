@@ -1,5 +1,6 @@
 package edu.atilim.acma.design;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -14,6 +15,21 @@ public class Method extends Node {
 	private List<Reference> paramTypes;
 	private List<Reference> calledMethods;
 	private List<Reference> accessedFields;
+	
+	public String getSignature() {
+		StringBuilder sb = new StringBuilder();
+		sb.append(getName())
+		.append('(');
+		for (int i = 0; i < paramTypes.size(); i++) {
+			sb.append(paramTypes.get(i).toString());
+			
+			if (i != paramTypes.size() - 1)
+				sb.append(',');
+		}
+		sb.append(')');
+		
+		return sb.toString();
+	}
 	
 	public void setOwnerType(Type ownerType) {
 		if (this.ownerType != null)
@@ -53,24 +69,24 @@ public class Method extends Node {
 	}
 	
 	public void addParameter(Type t) {
-		addParameter(t, false);
+		addParameter(t, 1);
 	}
 	
-	public void addParameter(Type t, boolean array) {
+	public void addParameter(Type t, int dimension) {
 		Reference ref = getReference(this, t, Tags.REF_PARAMETER);
-		ref.setArray(array);
+		ref.setDimension(dimension);
 		paramTypes.add(ref);
 	}
 	
-	public void addParameter(String t, boolean array) {
+	public void addParameter(String t, int dimension) {
 		Reference ref = getReference(this, t, Tags.REF_PARAMETER);
-		ref.setArray(array);
+		ref.setDimension(dimension);
 		paramTypes.add(ref);
 	}
 	
 	public void removeParameter(Parameter p) {
 		for (Reference r : paramTypes) {
-			if (p.getType() == r.getTarget() && p.isArray == r.isArray()) {
+			if (p.getType() == r.getTarget() && p.getDimension() == r.getDimension()) {
 				r.release();
 				paramTypes.remove(r);
 				return;
@@ -113,7 +129,7 @@ public class Method extends Node {
 	
 	public void addAccessedField(Field f) {
 		if (f == null) return;
-		for (Reference ref : calledMethods)
+		for (Reference ref : accessedFields)
 			if (f == ref.getTarget()) return;
 		accessedFields.add(getReference(this, f, Tags.REF_DEPEND));
 	}
@@ -132,8 +148,17 @@ public class Method extends Node {
 		return getReferers(Tags.REF_DEPEND, Method.class);
 	}
 	
-	public Method(String name) {
-		super(name);
+	public Method(String name, Design design) {
+		super(name, design);
+		
+		this.paramTypes = new ArrayList<Reference>();
+		this.calledMethods = new ArrayList<Reference>();
+		this.accessedFields = new ArrayList<Reference>();
+	}
+	
+	@Override
+	public String toString() {
+		return getSignature();
 	}
 	
 	private class ParameterMapper implements Func1P<Parameter, Reference> {
@@ -141,26 +166,26 @@ public class Method extends Node {
 		public Parameter run(Reference in) {
 			Type t = in.getTarget(Type.class);
 			if (t != null)
-				return new Parameter(in.getTarget(Type.class), in.isArray());
+				return new Parameter(in.getTarget(Type.class), in.getDimension());
 			return null;
 		}
 	}
 	
 	public class Parameter {
 		private Type type;
-		private boolean isArray;
+		private int dimension;
 		
 		public Type getType() {
 			return type;
 		}
 		
-		public boolean isArray() {
-			return isArray;
+		public int getDimension() {
+			return dimension;
 		}
-		
-		Parameter(Type type, boolean isArray) {
+
+		Parameter(Type type, int dimension) {
 			this.type = type;
-			this.isArray = isArray;
+			this.dimension = dimension;
 		}
 	}
 }
