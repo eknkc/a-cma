@@ -2,8 +2,11 @@ package edu.atilim.acma;
 
 import java.util.Random;
 
-import edu.atilim.acma.search.BeamSearch;
-import edu.atilim.acma.search.HillClimbing;
+import edu.atilim.acma.design.Design;
+import edu.atilim.acma.design.Field;
+import edu.atilim.acma.design.Node;
+import edu.atilim.acma.design.Type;
+import edu.atilim.acma.design.io.DesignReader;
 import edu.atilim.acma.search.ModSimAnn;
 import edu.atilim.acma.test.RastriginSolution;
 import edu.atilim.acma.util.Log;
@@ -11,6 +14,22 @@ import edu.atilim.acma.util.Log;
 public class Core {
 	public static void main(String[] args) {
 		Random rand = new Random();
+		
+
+		DesignReader dr = new DesignReader("C:\\Users\\Antimon\\workspace\\intlib\\bin");
+		
+		Design d = dr.read();
+		
+		for (Type t : d.getTypes()) {
+			System.out.println(t.getName());
+			for (Field f : t.getFields()) {
+				System.out.println("   " + f);
+			}
+		}
+		
+		System.out.println("hebe");
+		
+		//for (Type a : t2.)
 		
 		/*
 		 * Rastrigin's function has a global optimum at (0, 0) with score 0.
