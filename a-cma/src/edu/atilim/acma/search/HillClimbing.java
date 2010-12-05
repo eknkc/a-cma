@@ -8,7 +8,7 @@ public class HillClimbing implements Algorithm {
 	private long maxIterations;
 	private long iterations;
 	
-	Solution curBest;
+	private Solution curBest;
 	
 	public long getMaxIterations() {
 		return maxIterations;

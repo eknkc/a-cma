@@ -4,6 +4,10 @@ public class Pair<T, V> {
 	private T first;
 	private V second;
 	
+	public static <T, V> Pair<T, V> create(T first, V second) {
+		return new Pair<T, V>(first, second);
+	}
+	
 	public T getFirst() {
 		return first;
 	}

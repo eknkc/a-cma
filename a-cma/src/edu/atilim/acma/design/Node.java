@@ -114,4 +114,34 @@ public abstract class Node implements Serializable {
 			setFlag(Tags.PACKAGE);
 		}
 	}
+	
+	public abstract String getPackage();
+	public abstract Type getOwnerType();
+	
+	public boolean canAccess(Node other) {
+		return canAccess(other, other.getAccess());
+	}
+	
+	public boolean canAccess(Node other, Accessibility otheroverride) {
+		if (otheroverride == Accessibility.PUBLIC)
+			return true;
+		
+		if (otheroverride == Accessibility.PACKAGE)
+			return getPackage().equals(other.getPackage());
+		
+		if (otheroverride == Accessibility.PROTECTED) {
+			Type myType = getOwnerType();
+			Type otType = other.getOwnerType();
+			
+			if (myType == null || otType == null) return false;
+			
+			return otType.isAncestorOf(myType);
+		}
+		
+		if (otheroverride == Accessibility.PRIVATE) {
+			return getOwnerType() == other.getOwnerType();
+		}
+		
+		return false;
+	}
 }

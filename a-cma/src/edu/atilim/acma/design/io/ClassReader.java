@@ -24,7 +24,7 @@ public class ClassReader implements ClassVisitor {
 	private static final int STAGE_AFTERBASE = 1;
 	private static final int STAGE_FIELDS = 2;
 	private static final int STAGE_METHODS = 3;
-	public static final int STAGE_COUNT = 4;
+	static final int STAGE_COUNT = 4;
 	
 	private File file;
 	private Design design;

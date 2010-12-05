@@ -8,6 +8,10 @@ public class Field extends Node {
 	private Reference ownerType;
 	private Reference type;
 	
+	public boolean isConstant() {
+		return isStatic() && isFinal();
+	}
+	
 	public void setOwnerType(Type ownerType) {
 		if (this.ownerType != null)
 			this.ownerType.release();
@@ -39,7 +43,14 @@ public class Field extends Node {
 	}
 	
 	@Override
+	public String getPackage() {
+		Type owner = getOwnerType();
+		if (owner == null) return "";
+		return owner.getPackage();
+	}
+	
+	@Override
 	public String toString() {
-		return getName() + (getType() == null ? ":Unknown" : ":" + getType().getName());
+		return String.format("%s.%s:%s", getOwnerType(), getName(), getType());
 	}
 }

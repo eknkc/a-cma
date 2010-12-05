@@ -1,5 +1,6 @@
 package edu.atilim.acma;
 
+import java.io.IOException;
 import java.util.List;
 
 import edu.atilim.acma.design.Design;
@@ -17,16 +18,13 @@ public class Core {
 		}
 	}
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		// Kendini oku...
 		DesignReader dr = new DesignReader("./bin");
-		
 		Design d = dr.read();
 		
 		// Yaz
 		for (Type t : d.getTypes()) {
-			if (!t.getPackage().equals("edu.atilim.acma.search")) continue;
-			
 			System.out.println(t);
 			
 			printList("implements", t.getInterfaces());

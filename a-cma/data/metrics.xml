@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metrics>
+	<category name="size" class="SizeMetrics">
+		<metric name="numFields" weight="1.0"></metric>
+		<metric name="numOps" weight="1.0"></metric>
+		<metric name="numPubOps" weight="1.0"></metric>
+		<metric name="setters" weight="1.0"></metric>
+		<metric name="getters" weight="1.0"></metric>
+	</category>
+	<category name="miscellaneous" class="MiscMetrics">
+		<metric name="nesting" weight="1.0"></metric>
+	</category>
+</metrics>

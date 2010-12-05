@@ -3,6 +3,7 @@ package edu.atilim.acma.design;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 import edu.atilim.acma.util.CollectionHelper;
 
@@ -100,6 +101,10 @@ public class Type extends Node {
 		return getReferers(Tags.REF_PARENT, Field.class);
 	}
 	
+	public List<Type> getNestedTypes() {
+		return getReferers(Tags.REF_PARENT, Type.class);
+	}
+	
 	public List<Type> getExtenders() {
 		return getReferers(Tags.REF_SUPERCLASS, Type.class);
 	}
@@ -138,11 +143,36 @@ public class Type extends Node {
 		return f;
 	}
 	
+	@Override
 	public String getPackage() {
 		String name = getName();
 		int lastDot = name.lastIndexOf(".");
 		if (lastDot < 0) return "";
 		return name.substring(0, lastDot);
+	}
+	
+	@Override
+	public Type getOwnerType() {
+		return this;
+	}
+	
+	public boolean isAncestorOf(Type other) {
+		if (other == null) return false;
+		Stack<Type> supTypes = new Stack<Type>();
+		
+		supTypes.push(other);
+		
+		while (supTypes.size() > 0) {
+			Type sup = supTypes.pop();
+			if (this == sup) return true;
+			
+			if (sup.getSuperType() != null)
+				supTypes.add(sup.getSuperType());
+			
+			supTypes.addAll(sup.getInterfaces());
+		}
+		
+		return false;
 	}
 
 	public Type(String name, Design design) {

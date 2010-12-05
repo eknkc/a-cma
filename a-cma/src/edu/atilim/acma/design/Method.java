@@ -31,6 +31,14 @@ public class Method extends Node {
 		return sb.toString();
 	}
 	
+	public boolean isGetter() {
+		return getName().startsWith("get");
+	}
+	
+	public boolean isSetter() {
+		return getName().startsWith("set");
+	}
+	
 	public void setOwnerType(Type ownerType) {
 		if (this.ownerType != null)
 			this.ownerType.release();
@@ -159,6 +167,13 @@ public class Method extends Node {
 	@Override
 	public String toString() {
 		return getSignature();
+	}
+	
+	@Override
+	public String getPackage() {
+		Type owner = getOwnerType();
+		if (owner == null) return "";
+		return owner.getPackage();
 	}
 	
 	private class ParameterMapper implements Func1P<Parameter, Reference> {

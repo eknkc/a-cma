@@ -10,6 +10,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import edu.atilim.acma.transition.TransitionManager;
+import edu.atilim.acma.transition.actions.Action;
 
 public class Design implements Serializable {
 	private static final long serialVersionUID = 1L;
@@ -93,6 +97,10 @@ public class Design implements Serializable {
 	
 	public Design() {
 		types = new ArrayList<Type>();
+	}
+	
+	public Set<Action> getPossibleActions() {
+		return TransitionManager.getPossibleActions(this);
 	}
 	
 	public Design copy() {
