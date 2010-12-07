@@ -19,11 +19,9 @@ public class DecreaseFieldSecurity {
 			for (Type t : types) {
 				field:
 				for (Field f : t.getFields()) {
-					// Daha nereye?
+					// Turns out, Java compiler binds accesses to constants (static final) in compile time
+					// So, a constant does not reflect the access characteristics of a field in bytecode.
 					if (f.isConstant() ||  f.getAccess() == Accessibility.PRIVATE) continue;
-					
-					if (f.getName().equals("REF_SUPERCLASS"))
-						System.out.println();
 					
 					Accessibility newaccess = Accessibility.PRIVATE;
 					
@@ -39,7 +37,7 @@ public class DecreaseFieldSecurity {
 							break field;
 					}
 					
-					set.add(new Performer(f, newaccess));
+					set.add(new Performer(t.getName(), f.getName(), newaccess));
 				}
 			}
 		}
@@ -47,22 +45,25 @@ public class DecreaseFieldSecurity {
 	}
 	
 	public static class Performer implements Action {
-		private Field field;
+		private String typeName;
+		private String fieldName;
 		private Accessibility newAccess;
 
-		public Performer(Field field, Accessibility newAccess) {
-			this.field = field;
+		public Performer(String typeName, String fieldName,
+				Accessibility newAccess) {
+			this.typeName = typeName;
+			this.fieldName = fieldName;
 			this.newAccess = newAccess;
 		}
 
 		@Override
 		public void perform(Design d) {
-			field.setAccess(newAccess);
+			d.getType(typeName).getField(fieldName).setAccess(newAccess);
 		}
 		
 		@Override
 		public String toString() {
-			return String.format("Change accessibility of field %s to %s", field, newAccess);
+			return String.format("Change accessibility of field '%s' of '%s' to '%s'", fieldName, typeName, newAccess);
 		}
 	}
 }

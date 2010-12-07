@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -94,6 +95,9 @@ public class MetricTable {
 		List<String> cols = new ArrayList<String>(colNames.keySet());
 		List<String> rows = new ArrayList<String>(rowNames.keySet());
 		
+		Collections.sort(cols);
+		Collections.sort(rows);
+		
 		StringBuilder sb = new StringBuilder(";");
 		
 		for (String c : cols)
@@ -129,7 +133,7 @@ public class MetricTable {
 		
 		sb.append("WEIGHTED SUM;").append(nf.format(getWeightedSum()));
 		
-		FileWriter fw = new FileWriter("output/metrics.csv");
+		FileWriter fw = new FileWriter(fileName);
 		fw.write(sb.toString());
 		fw.flush();
 		fw.close();

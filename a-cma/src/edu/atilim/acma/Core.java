@@ -1,36 +1,48 @@
 package edu.atilim.acma;
 
 import java.io.IOException;
-import java.util.List;
 
 import edu.atilim.acma.design.Design;
-import edu.atilim.acma.design.Type;
 import edu.atilim.acma.design.io.DesignReader;
+import edu.atilim.acma.mess.TestClass;
+import edu.atilim.acma.metrics.MetricTable;
+import edu.atilim.acma.search.Algorithm;
+import edu.atilim.acma.search.HillClimbing;
+import edu.atilim.acma.transition.DesignWrapper;
 
 public class Core {
-	@SuppressWarnings("rawtypes")
-	private static void printList(String name, List list) {
-		if (list.size() == 0) return;
-		
-		System.out.println("\t" + name);
-		for (Object n : list) {
-			System.out.println("\t\t" + n);
-		}
-	}
+	public int fixMePlease = 0;
+	public int fixMeTooPlease = 0;
 	
 	public static void main(String[] args) throws IOException {
 		// Kendini oku...
 		DesignReader dr = new DesignReader("./bin");
 		Design d = dr.read();
 		
-		// Yaz
-		for (Type t : d.getTypes()) {
-			System.out.println(t);
-			
-			printList("implements", t.getInterfaces());
-			printList("implementedby", t.getImplementers());
-			printList("fields", t.getFields());
-			printList("methods", t.getMethods());
+		// An illusion of dependency on edu.atilim.acma.mess.TestClass.canYouFixMe field
+		// It will not attempt to decrease it's security to private because we are accessing it from here, another package.
+		TestClass tc = new TestClass();
+		tc.canYouFixMe = 6;
+		
+		MetricTable initMetrics = d.getMetrics();
+		initMetrics.writeCSV("output/metrics_init.csv");
+		System.out.printf("Initial Score of Design: %f\n", initMetrics.getWeightedSum());
+		
+		Algorithm alg = new HillClimbing(0, 0);
+		
+		DesignWrapper fin = (DesignWrapper)alg.run(DesignWrapper.wrap(d));
+		
+		MetricTable finalMetrics = fin.getDesign().getMetrics();
+		finalMetrics.writeCSV("output/metrics_final.csv");
+		System.out.printf("Initial Score of Design: %f\n", finalMetrics.getWeightedSum());
+		
+		System.out.println("Metric tables have been written to output folder within the project directory.");
+		
+		System.out.println("\nRequired actions to perform:");
+		
+		for (String mod : fin.getDesign().getModifications()) {
+			System.out.println(mod);
 		}
+		
 	}
 }

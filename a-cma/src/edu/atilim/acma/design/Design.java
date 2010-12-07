@@ -12,6 +12,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import edu.atilim.acma.metrics.MetricCalculator;
+import edu.atilim.acma.metrics.MetricTable;
 import edu.atilim.acma.transition.TransitionManager;
 import edu.atilim.acma.transition.actions.Action;
 
@@ -19,9 +21,22 @@ public class Design implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	private ArrayList<Type> types;
+	private ArrayList<String> modificationLog;
 	
 	public List<Type> getTypes() {
 		return Collections.unmodifiableList(types);
+	}
+	
+	public void logModification(String log) {
+		modificationLog.add(log);
+	}
+	
+	public MetricTable getMetrics() {
+		return MetricCalculator.calculate(this);
+	}
+	
+	public List<String> getModifications() {
+		return Collections.unmodifiableList(modificationLog);
 	}
 	
 	public Type getType(String name) {
@@ -97,6 +112,7 @@ public class Design implements Serializable {
 	
 	public Design() {
 		types = new ArrayList<Type>();
+		modificationLog = new ArrayList<String>();
 	}
 	
 	public Set<Action> getPossibleActions() {

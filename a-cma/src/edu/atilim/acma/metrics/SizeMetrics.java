@@ -3,6 +3,7 @@ package edu.atilim.acma.metrics;
 import java.util.List;
 
 import edu.atilim.acma.design.Accessibility;
+import edu.atilim.acma.design.Field;
 import edu.atilim.acma.design.Method;
 import edu.atilim.acma.design.Type;
 import edu.atilim.acma.metrics.MetricTable.MetricRow;
@@ -11,6 +12,16 @@ public final class SizeMetrics {
 	@TypeMetric
 	public static void calculateFieldMetrics(Type type, MetricRow row) {
 		row.set("numFields", type.getFields().size());
+		
+		row.set("numPubFields", 0);
+		row.set("numConstants", 0);
+		
+		for (Field f : type.getFields()) {
+			if (f.isConstant())
+				row.increase("numConstants");
+			else if (f.getAccess() == Accessibility.PUBLIC)
+				row.increase("numPubFields");
+		}
  	}
 	
 	@TypeMetric

@@ -1,7 +1,7 @@
 package edu.atilim.acma.transition;
 
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 
 import edu.atilim.acma.design.Design;
 import edu.atilim.acma.search.NeighborSet;
@@ -10,21 +10,19 @@ import edu.atilim.acma.transition.actions.Action;
 import edu.atilim.acma.util.CollectionHelper;
 
 public class TransitionSet implements NeighborSet {
-	private HashSet<Action> actions;
+	private Set<Action> actions;
 	private Design design;
 	
-	public void add(Action action) {
-		actions.add(action);
-	}
 	
 	public TransitionSet(Design design) {
-		this.actions = new HashSet<Action>();
 		this.design = design;
+		this.actions = design.getPossibleActions();
 	}
 	
 	private Design getModifiedDesign(Action action) {
 		Design newDesign = design.copy();
 		action.perform(newDesign);
+		newDesign.logModification(action.toString());
 		return newDesign;
 	}
 

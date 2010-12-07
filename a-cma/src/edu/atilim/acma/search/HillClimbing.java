@@ -44,7 +44,7 @@ public class HillClimbing implements Algorithm {
 			Solution next = cur;
 			
 			for (Solution n : cur.neighbors()) {
-				if (n.score() > next.score())
+				if (n.score() > cur.score())
 					next = n;
 			}
 			
