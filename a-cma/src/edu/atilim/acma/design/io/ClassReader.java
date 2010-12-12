@@ -1,7 +1,6 @@
 package edu.atilim.acma.design.io;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import org.objectweb.asm.AnnotationVisitor;
@@ -26,7 +25,6 @@ public class ClassReader implements ClassVisitor {
 	private static final int STAGE_METHODS = 3;
 	static final int STAGE_COUNT = 4;
 	
-	private File file;
 	private Design design;
 	private Type type;
 	private int stage;
@@ -35,20 +33,19 @@ public class ClassReader implements ClassVisitor {
 	private String[] interfaces;
 	private String superclass;
 	
-	public ClassReader(File f, Design d) {
-		file = f;
+	public ClassReader(Design d) {
 		design = d;
 		stage = -1;
 	}
 	
-	public void readStage(int s) {
+	public void readStage(int s, InputStream stream) {
 		stage = s;
 		
 		if (stage == STAGE_AFTERBASE) {
 			afterBase();
 		} else {
 			try {
-				new org.objectweb.asm.ClassReader(new FileInputStream(file)).accept(this, 0);
+				new org.objectweb.asm.ClassReader(stream).accept(this, 0);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -318,8 +315,14 @@ public class ClassReader implements ClassVisitor {
 		}
 
 		@Override
-		public void visitTypeInsn(int arg0, String arg1) {
-			
+		public void visitTypeInsn(int opcode, String type) {
+			if (opcode == Opcodes.NEW) {
+				Type ot = design.getType(org.objectweb.asm.Type.getObjectType(type).getClassName());
+				
+				if (ot != null) {
+					method.addInstantiatedType(ot);
+				}
+			}
 		}
 
 		@Override

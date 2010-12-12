@@ -1,10 +1,11 @@
 package edu.atilim.acma.design;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-class ReferenceList extends LinkedList<Reference> {
+class ReferenceList extends ArrayList<Reference> {
 	private static final long serialVersionUID = 1L;
 	
 	public List<Reference> getByTag(int tag) {

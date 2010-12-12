@@ -1,7 +1,7 @@
 package edu.atilim.acma.design;
 
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
@@ -12,7 +12,7 @@ public class Type extends Node {
 	
 	private Reference parentType;
 	private Reference superType;
-	private LinkedList<Reference> interfaces;
+	private List<Reference> interfaces;
 	
 	public boolean isInterface() {
 		return getFlag(Tags.TYP_INTERFACE);
@@ -125,6 +125,10 @@ public class Type extends Node {
 		return getReferers(Tags.REF_RETURN, Method.class);
 	}
 	
+	public List<Method> getDependentMethodsAsInstantiator() {
+		return getReferers(Tags.REF_INSTANTIATE, Method.class);
+	}
+	
 	public Method createMethod(String name) {
 		Method m = new Method(name, getDesign());
 		m.setOwnerType(this);
@@ -177,7 +181,7 @@ public class Type extends Node {
 
 	public Type(String name, Design design) {
 		super(name, design);
-		this.interfaces = new LinkedList<Reference>();
+		this.interfaces = new ArrayList<Reference>();
 	}
 	
 	@Override

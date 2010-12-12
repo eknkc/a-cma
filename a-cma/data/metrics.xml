@@ -12,4 +12,7 @@
 	<category name="miscellaneous" class="MiscMetrics">
 		<metric name="nesting" weight="1.0"></metric>
 	</category>
+	<category name="package" class="PackageMetrics">
+		<metric name="abstractness" weight="1.0"></metric>
+	</category>
 </metrics>

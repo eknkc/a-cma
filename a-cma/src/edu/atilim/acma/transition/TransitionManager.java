@@ -15,6 +15,7 @@ import org.w3c.dom.NodeList;
 import edu.atilim.acma.design.Design;
 import edu.atilim.acma.transition.actions.ActionChecker;
 import edu.atilim.acma.transition.actions.Action;
+import edu.atilim.acma.util.Log;
 
 public class TransitionManager {
 	static {
@@ -36,6 +37,8 @@ public class TransitionManager {
 		checkers = new ArrayList<ActionChecker>();
 		
 		try {
+			Log.config("Loading actions.xml for action configuration.");
+			
 			DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
 	        DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
 	        Document doc = docBuilder.parse(new File("./data/actions.xml"));
@@ -54,6 +57,8 @@ public class TransitionManager {
 	        		}
 	        	}
 	        }
+	        
+	        Log.config("Found %d action configurers. Action manager is ready.", checkers.size());
 		} catch (Exception e) {
 			System.out.println("Could not initialize transition manager. Details:");
 			e.printStackTrace();

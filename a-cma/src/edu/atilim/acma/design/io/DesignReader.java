@@ -1,11 +1,14 @@
 package edu.atilim.acma.design.io;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
 import edu.atilim.acma.design.Design;
+import edu.atilim.acma.util.Pair;
 
 public class DesignReader {
 	private File classPath;
@@ -15,21 +18,25 @@ public class DesignReader {
 	}
 	
 	public Design read() {
-		if (!classPath.exists())
+		if (!classPath.exists() || !classPath.isDirectory())
 			throw new RuntimeException("Class path for reading design does not exist.");
 		
 		Design design = new Design();
 		List<File> files = findAllClassFiles();
-		List<ClassReader> readers = new ArrayList<ClassReader>();
+		List<Pair<ClassReader, File>> readers = new ArrayList<Pair<ClassReader, File>>();
 		
 		for (File f : files) {
-			ClassReader reader = new ClassReader(f, design);
-			readers.add(reader);
+			ClassReader reader = new ClassReader(design);
+			readers.add(Pair.create(reader, f));
 		}
 		
 		for (int i = 0; i < ClassReader.STAGE_COUNT; i++) {
-			for (ClassReader r : readers) {
-				r.readStage(i);
+			for (Pair<ClassReader, File> r : readers) {
+				try {
+					r.getFirst().readStage(i, new FileInputStream(r.getSecond()));
+				} catch (FileNotFoundException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 		
@@ -41,6 +48,7 @@ public class DesignReader {
 		if (lastDollar > 0) {
 			try { Integer.parseInt(String.valueOf(name.charAt(lastDollar + 1))); return true; }
 			catch (NumberFormatException nfe) { }
+			catch (StringIndexOutOfBoundsException sioobe) { }
 		}
 		return false;
 	}

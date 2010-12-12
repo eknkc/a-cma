@@ -50,14 +50,14 @@ public class Design implements Serializable {
 		return null;
 	}
 	
-	public List<String> getPackages() {
-		HashSet<String> set = new HashSet<String>();
+	public List<Package> getPackages() {
+		HashSet<Package> set = new HashSet<Package>();
 		
 		for (Type t : types) {
-			set.add(t.getPackage());
+			set.add(new Package(t.getPackage(), this));
 		}
 		
-		ArrayList<String> list = new ArrayList<String>(set);
+		ArrayList<Package> list = new ArrayList<Package>(set);
 		Collections.sort(list);
 		return list;
 	}

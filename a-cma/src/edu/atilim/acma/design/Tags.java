@@ -7,6 +7,7 @@ public final class Tags {
 	public static final int REF_RETURN = 4;
 	public static final int REF_PARAMETER = 5;
 	public static final int REF_DEPEND = 6;
+	public static final int REF_INSTANTIATE = 7;
 	
 	// Accessibility
 	public static final int PUBLIC = 0x00000001;

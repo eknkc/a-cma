@@ -28,14 +28,15 @@ public class MetricTable {
 		
 		for (int i = 0; i < rowNames.size(); i++) {
 			int index = (i * colNames.size()) + j;
-			
-			if (values[index] == Double.NaN)
+				
+			if (Double.isNaN(values[index]))
 				continue;
 			
 			cnt++;
 			sum += values[index];
 		}
 		
+		if (cnt == 0) return 0;		
 		return sum / cnt;
 	}
 	

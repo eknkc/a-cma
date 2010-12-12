@@ -15,6 +15,7 @@ public class Method extends Node {
 	private List<Reference> paramTypes;
 	private List<Reference> calledMethods;
 	private List<Reference> accessedFields;
+	private List<Reference> instantiatedTypes;
 	
 	public String getSignature() {
 		StringBuilder sb = new StringBuilder();
@@ -152,6 +153,28 @@ public class Method extends Node {
 		}
 	}
 	
+	public List<Type> getInstantiatedTypes() {
+		List<Type> methodList = CollectionHelper.map(instantiatedTypes, new Reference.TargetSelector<Type>(Type.class));
+		return Collections.unmodifiableList(methodList);
+	}
+	
+	public void addInstantiatedType(Type t) {
+		if (t == null) return;
+		for (Reference ref : instantiatedTypes)
+			if (t == ref.getTarget()) return;
+		instantiatedTypes.add(getReference(this, t, Tags.REF_INSTANTIATE));
+	}
+	
+	public void removeInstantiatedType(Type t) {
+		for (Reference r : instantiatedTypes) {
+			if (t == r.getTarget()) {
+				r.release();
+				instantiatedTypes.remove(r);
+				return;
+			}
+		}
+	}
+	
 	public List<Method> getCallerMethods() {
 		return getReferers(Tags.REF_DEPEND, Method.class);
 	}
@@ -162,6 +185,7 @@ public class Method extends Node {
 		this.paramTypes = new ArrayList<Reference>();
 		this.calledMethods = new ArrayList<Reference>();
 		this.accessedFields = new ArrayList<Reference>();
+		this.instantiatedTypes = new ArrayList<Reference>();
 	}
 	
 	@Override
