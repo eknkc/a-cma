@@ -43,6 +43,14 @@ public abstract class Node implements Serializable {
 			flags &= ~flag;
 	}
 	
+	int getFlags() {
+		return flags;
+	}
+	
+	void setFlags(int flags) {
+		this.flags = flags;
+	}
+	
 	public Reference getReference(Node from, Node to, int tag) {
 		Reference r = design.getReference(from, to, tag);
 		if (r != null && r.getTarget() != null)

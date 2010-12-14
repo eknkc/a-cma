@@ -57,6 +57,8 @@ public abstract class Reference implements Serializable {
 		
 	}
 	
+	public abstract String toRawString();
+	
 	public String toString(String inner) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(inner);
@@ -92,6 +94,11 @@ public abstract class Reference implements Serializable {
 		}
 		
 		@Override
+		public String toRawString() {
+			return target.getName();
+		}
+		
+		@Override
 		public String toString() {
 			return super.toString(target.toString());
 		}
@@ -115,6 +122,11 @@ public abstract class Reference implements Serializable {
 		@Override
 		public boolean isInternal() {
 			return false;
+		}
+		
+		@Override
+		public String toRawString() {
+			return typeName;
 		}
 		
 		@Override

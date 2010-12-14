@@ -83,6 +83,10 @@ public class Method extends Node {
 		return returnType == null ? null : returnType.getTarget(Type.class);
 	}
 	
+	List<Reference> getRawParameters() {
+		return Collections.unmodifiableList(paramTypes);
+	}
+	
 	public List<Parameter> getParameters() {
 		List<Parameter> typeList = CollectionHelper.map(paramTypes, new ParameterMapper());
 		return Collections.unmodifiableList(typeList);
