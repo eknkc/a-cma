@@ -1,5 +1,6 @@
 package edu.atilim.acma.design;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -9,7 +10,7 @@ public final class DesignCloner {
 	public static Design clone(Design d) {
 		Map<Node, Node> cloneMap = new HashMap<Node, Node>();
 		
-		Design nd = new Design();
+		Design nd = new Design(new ArrayList<String>(d.getModifications()));
 		
 		//Explore
 		for (Type t : d.getTypes()) {
@@ -54,7 +55,6 @@ public final class DesignCloner {
 				Field orgf = (Field)org;
 				Field clnf = (Field)cln;
 				
-				clnf.setOwnerType((Type)cloneMap.get(orgf.getOwnerType()));
 				clnf.setType((Type)cloneMap.get(orgf.getType()));
 			}
 			
@@ -62,7 +62,6 @@ public final class DesignCloner {
 				Method orgm = (Method)org;
 				Method clnm = (Method)cln;
 				
-				clnm.setOwnerType((Type)cloneMap.get(orgm.getOwnerType()));
 				clnm.setReturnType((Type)cloneMap.get(orgm.getReturnType()));
 				
 				for (Method m : orgm.getCalledMethods()) {

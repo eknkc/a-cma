@@ -1,9 +1,5 @@
 package edu.atilim.acma.design;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -115,8 +111,12 @@ public class Design implements Serializable {
 	}
 	
 	public Design() {
+		this(new ArrayList<String>());
+	}
+	
+	Design(ArrayList<String> modlog) {
 		types = new ArrayList<Type>();
-		modificationLog = new ArrayList<String>();
+		modificationLog = modlog;
 	}
 	
 	public Set<Action> getPossibleActions() {
@@ -124,15 +124,6 @@ public class Design implements Serializable {
 	}
 	
 	public Design copy() {
-		try {
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			ObjectOutputStream oout = new ObjectOutputStream(out);
-			oout.writeObject(this);
-			ObjectInputStream oin = new ObjectInputStream(new ByteArrayInputStream(out.toByteArray()));
-			return (Design)oin.readObject();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return null;
+		return DesignCloner.clone(this);
 	}
 }
