@@ -14,6 +14,22 @@ public class Type extends Node {
 	private Reference superType;
 	private List<Reference> interfaces;
 	
+	public Type(String name, Design design) {
+		super(name, design);
+		this.interfaces = new ArrayList<Reference>();
+	}
+	
+	@Override
+	public boolean remove() {
+		if (!super.remove()) return false;
+		parentType.release();
+		superType.release();
+		for (Reference ref : interfaces)
+			ref.release();
+		getDesign().removeType(this);
+		return true;
+	}
+	
 	public boolean isInterface() {
 		return getFlag(Tags.TYP_INTERFACE);
 	}
@@ -177,11 +193,6 @@ public class Type extends Node {
 		}
 		
 		return false;
-	}
-
-	public Type(String name, Design design) {
-		super(name, design);
-		this.interfaces = new ArrayList<Reference>();
 	}
 	
 	@Override

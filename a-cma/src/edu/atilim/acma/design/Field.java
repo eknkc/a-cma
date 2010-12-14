@@ -8,6 +8,18 @@ public class Field extends Node {
 	private Reference ownerType;
 	private Reference type;
 	
+	public Field(String name, Design design) {
+		super(name, design);
+	}
+	
+	@Override
+	public boolean remove() {
+		if (!super.remove()) return false;
+		ownerType.release();
+		type.release();
+		return true;
+	}
+	
 	public boolean isConstant() {
 		return isStatic() && isFinal();
 	}
@@ -36,10 +48,6 @@ public class Field extends Node {
 	
 	public List<Method> getAccessors() {
 		return getReferers(Tags.REF_DEPEND, Method.class);
-	}
-
-	public Field(String name, Design design) {
-		super(name, design);
 	}
 	
 	@Override

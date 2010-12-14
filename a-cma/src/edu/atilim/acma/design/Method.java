@@ -17,6 +17,27 @@ public class Method extends Node {
 	private List<Reference> accessedFields;
 	private List<Reference> instantiatedTypes;
 	
+	public Method(String name, Design design) {
+		super(name, design);
+		
+		this.paramTypes = new ArrayList<Reference>();
+		this.calledMethods = new ArrayList<Reference>();
+		this.accessedFields = new ArrayList<Reference>();
+		this.instantiatedTypes = new ArrayList<Reference>();
+	}
+	
+	@Override
+	public boolean remove() {
+		if (!super.remove()) return false;
+		ownerType.release();
+		returnType.release();
+		for (Reference ref : paramTypes) ref.release();
+		for (Reference ref : calledMethods) ref.release();
+		for (Reference ref : accessedFields) ref.release();
+		for (Reference ref : instantiatedTypes) ref.release();
+		return true;
+	}
+	
 	public String getSignature() {
 		StringBuilder sb = new StringBuilder();
 		sb.append(getName())
@@ -177,15 +198,6 @@ public class Method extends Node {
 	
 	public List<Method> getCallerMethods() {
 		return getReferers(Tags.REF_DEPEND, Method.class);
-	}
-	
-	public Method(String name, Design design) {
-		super(name, design);
-		
-		this.paramTypes = new ArrayList<Reference>();
-		this.calledMethods = new ArrayList<Reference>();
-		this.accessedFields = new ArrayList<Reference>();
-		this.instantiatedTypes = new ArrayList<Reference>();
 	}
 	
 	@Override

@@ -88,6 +88,7 @@ public abstract class Reference implements Serializable {
 		@Override
 		public void release() {
 			getTarget().removeReference(this);
+			target = null;
 		}
 		
 		@Override

@@ -3,6 +3,8 @@ package edu.atilim.acma.design;
 import java.io.Serializable;
 import java.util.List;
 
+import edu.atilim.acma.util.Log;
+
 public abstract class Node implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
@@ -10,6 +12,13 @@ public abstract class Node implements Serializable {
 	private String name;
 	private int flags;
 	private Design design;
+	
+	Node(String name, Design design) {
+		this.incomingReferences = new ReferenceList();
+		this.name = name;
+		this.flags = 0;
+		this.design = design;
+	}
 	
 	public String getName() {
 		return name;
@@ -32,13 +41,6 @@ public abstract class Node implements Serializable {
 			flags |= flag;
 		else
 			flags &= ~flag;
-	}
-
-	Node(String name, Design design) {
-		this.incomingReferences = new ReferenceList();
-		this.name = name;
-		this.flags = 0;
-		this.design = design;
 	}
 	
 	public Reference getReference(Node from, Node to, int tag) {
@@ -113,6 +115,14 @@ public abstract class Node implements Serializable {
 		default:
 			setFlag(Tags.PACKAGE);
 		}
+	}
+	
+	public boolean remove() {
+		if (incomingReferences.size() > 0) {
+			Log.warning("Trying to remove node [%s] from design with incoming references present.", getName());
+			return false;
+		}
+		return true;
 	}
 	
 	public abstract String getPackage();

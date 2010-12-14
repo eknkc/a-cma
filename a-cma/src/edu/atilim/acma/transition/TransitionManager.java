@@ -13,8 +13,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import edu.atilim.acma.design.Design;
-import edu.atilim.acma.transition.actions.ActionChecker;
 import edu.atilim.acma.transition.actions.Action;
+import edu.atilim.acma.transition.actions.ActionChecker;
 import edu.atilim.acma.util.Log;
 
 public class TransitionManager {
@@ -24,12 +24,12 @@ public class TransitionManager {
 	
 	private static ArrayList<ActionChecker> checkers;
 	
-	public static Set<Action> getPossibleActions(Design d) {
-		HashSet<Action> actions = new HashSet<Action>();
+	public static Set<Action> getPossibleActions(final Design d) {
+		final Set<Action> actions = new HashSet<Action>();
 		
 		for (ActionChecker checker : checkers)
 			checker.findPossibleActions(d, actions);
-		
+			
 		return actions;
 	}
 	

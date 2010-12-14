@@ -50,6 +50,10 @@ public class Design implements Serializable {
 		return null;
 	}
 	
+	void removeType(Type t) {
+		types.remove(t);
+	}
+	
 	public List<Package> getPackages() {
 		HashSet<Package> set = new HashSet<Package>();
 		
