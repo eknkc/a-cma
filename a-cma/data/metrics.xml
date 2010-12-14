@@ -18,4 +18,8 @@
 	<category name="inheritance" class="InheritanceMetrics">
 		<metric name="iFImpl" weight="1.0"></metric>
 	</category>
+	<category name="coupling" class="CouplingMetrics">
+		<metric name="iC_Attr" weight="1.0"></metric>
+		<metric name="eC_Attr" weight="1.0"></metric>
+	</category>
 </metrics>
