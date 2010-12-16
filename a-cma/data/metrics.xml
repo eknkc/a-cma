@@ -17,6 +17,9 @@
 	</category>
 	<category name="inheritance" class="InheritanceMetrics">
 		<metric name="iFImpl" weight="1.0"></metric>
+		<metric name="NOC" weight="1.0"></metric>
+		<metric name="NumDesc" weight="1.0"></metric>
+		<metric name="NumAnc" weight="1.0"></metric>
 	</category>
 	<category name="coupling" class="CouplingMetrics">
 		<metric name="iC_Attr" weight="1.0"></metric>
