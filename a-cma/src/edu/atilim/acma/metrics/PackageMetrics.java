@@ -23,6 +23,7 @@ public final class PackageMetrics {
 		}
 	}
 	
+	@PackageMetric
 	public static void calculateCounts(Package pack, MetricRow row) {
 		List<Type> types = pack.getTypes();
 		

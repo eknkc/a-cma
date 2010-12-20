@@ -14,7 +14,7 @@ public final class Log {
 	
 	static {
 		logger.setUseParentHandlers(false);
-		logger.setLevel(Level.FINE);
+		logger.setLevel(Level.FINEST);
 	}
 	
 	public static void config(String info)
@@ -59,7 +59,7 @@ public final class Log {
 	
 	public static void addOutput(OutputStream stream) {
 		StreamHandler sh = new StreamHandler(stream, new Format());
-		sh.setLevel(Level.CONFIG);
+		sh.setLevel(Level.FINEST);
 		logger.addHandler(sh);
 	}
 	
@@ -67,7 +67,7 @@ public final class Log {
 		try {
 			FileHandler fh = new FileHandler(filename);
 			fh.setFormatter(new Format());
-			fh.setLevel(Level.CONFIG);
+			fh.setLevel(Level.FINEST);
 			logger.addHandler(fh);
 		} catch (IOException e) {
 			e.printStackTrace();

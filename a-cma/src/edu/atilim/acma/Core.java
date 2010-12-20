@@ -20,6 +20,8 @@ public class Core {
 	public static void main(String[] args) throws IOException {
 		System.out.printf("A-CMA Software Refactoring Tool - version %s\n\n", version);
 		
+		//Log.addOutput("./output/acma.log");
+		
 		Design design = chooseDesign();
 		design.getMetrics().writeCSV("./output/metrics_initial.csv");
 		
@@ -27,13 +29,10 @@ public class Core {
 		System.out.printf("Initial design has been read. Statistics:\n");
 		printBasicInfo(design);
 		System.out.println();
-		
-		long stime = System.currentTimeMillis();
-		Design finalDesign = runAlgorithm(design);
-		long ftime = System.currentTimeMillis();
-		
 		System.out.println();
-		System.out.printf("Algorithm completed in %.2f seconds.\n", (ftime - stime) / 1000.0);
+		
+		Design finalDesign = runAlgorithm(design);
+
 		System.out.printf("Final design has been obtained. Statistics:\n");
 		printBasicInfo(finalDesign);
 		finalDesign.getMetrics().writeCSV("./output/metrics_final.csv");
@@ -78,7 +77,12 @@ public class Core {
 		}
 		
 		DesignWrapper iwrapper = DesignWrapper.wrap(design);
+		
+		long stime = System.currentTimeMillis();
 		DesignWrapper fwrapper = (DesignWrapper)alg.run(iwrapper);
+		long ftime = System.currentTimeMillis();
+		
+		System.out.printf("Algorithm completed in %.2f seconds.\n", (ftime - stime) / 1000.0);
 		
 		return fwrapper.getDesign();
 	}

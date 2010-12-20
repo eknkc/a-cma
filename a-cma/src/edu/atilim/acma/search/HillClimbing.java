@@ -38,6 +38,8 @@ public class HillClimbing implements Algorithm {
 		
 		while(true)
 		{
+			Log.info("[Hill Climbing] Iteration %d starting.", iterations);
+			
 			if (iterations++ >= maxIterations)
 				return curBest;
 			
@@ -47,6 +49,8 @@ public class HillClimbing implements Algorithm {
 				if (n.score() > cur.score())
 					next = n;
 			}
+			
+			Log.info("[Hill Climbing] Iteration %d finished. Found design with metric score: %f", iterations, next.score());
 			
 			if (next.score() > curBest.score())
 				curBest = cur;
