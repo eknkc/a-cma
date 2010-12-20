@@ -28,5 +28,7 @@
 		<metric name="eC_Attr" weight="1.0"></metric>
 		<metric name="iC_Par" weight="1.0"></metric>
 		<metric name="eC_Par" weight="1.0"></metric>
+		<metric name="Dep_In" weight="1.0"></metric>
+		<metric name="Dep_Out" weight="1.0"></metric>
 	</category>
 </metrics>
