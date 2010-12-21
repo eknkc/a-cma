@@ -65,28 +65,28 @@ public final class CouplingMetrics {
 		
 	}
 	
-	@PackageMetric
-	public static void calculateAssocElementsMetrics(Package pack, MetricRow row) {
+	@TypeMetric
+	public static void calculateAssocElementsMetrics(Type type, MetricRow row) {
 	
-		List<Type> packTypes= pack.getTypes();
+		List<Type> packTypes= type.getPackage().getTypes();
 		row.set("NumAssEl_ssc", 0);
 		row.set("NumAssEl_nsb", 0);
 		
 		
-		for (Type type : pack.getTypes()) {
-			for(Field field:type.getFields())
+		for (Type t : packTypes) {
+			for(Field field : t.getFields())
 			{
-				if(field.getType()!=type && packTypes.contains(field.getType()))
+				if(field.getType()!=t && packTypes.contains(field.getType()))
 					row.increase("NumAssEl_ssc");
-				else if(field.getType()!=type && !packTypes.contains(field.getType()))
+				else if(field.getType()!=t && !packTypes.contains(field.getType()))
 					row.increase("NumAssEl_nsb");
 			}
 			
-			for (Method method : type.getMethods()) {
+			for (Method method : t.getMethods()) {
 				for (Parameter parameter : method.getParameters()) {
-					if (type != parameter.getType() && packTypes.contains(parameter.getType()))
+					if (t!= parameter.getType() && packTypes.contains(parameter.getType()))
 						row.increase("NumAssEl_ssc");
-					else if (type != parameter.getType() && !packTypes.contains(parameter.getType()))
+					else if (t != parameter.getType() && !packTypes.contains(parameter.getType()))
 						row.increase("NumAssEl_nsb");
 				   }
 			   }
