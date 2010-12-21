@@ -3,7 +3,6 @@ package edu.atilim.acma.metrics;
 import java.util.List;
 import edu.atilim.acma.design.Field;
 import edu.atilim.acma.design.Method;
-import edu.atilim.acma.design.Package;
 import edu.atilim.acma.design.Method.Parameter;
 import edu.atilim.acma.design.Type;
 import edu.atilim.acma.metrics.MetricTable.MetricRow;
