@@ -82,38 +82,24 @@ public final class CouplingMetrics {
 			{
 				if(field.getType()!=type && packTypes.contains(field.getType()))
 					numOfDepAttr_ssc++;
+				else if(field.getType()!=type && !packTypes.contains(field.getType()))
+					numOfDepAttr_nsb++;
 			}
 			
 			for (Method method : type.getMethods()) {
 				for (Parameter parameter : method.getParameters()) {
 					if (type != parameter.getType() && packTypes.contains(parameter.getType()))
 						numOfDepMetAsParameter_ssc++;
-				}
-			}
-			
-		}
-		
-		res_ssc=numOfDepAttr_ssc+ numOfDepMetAsParameter_ssc;
-		row.set("NumAssEl_ssc", res_ssc);
-		
-		
-		for (Type type : pack.getTypes()) {
-			for(Field field:type.getFields())
-			{
-				if(field.getType()!=type && !packTypes.contains(field.getType()))
-					numOfDepAttr_nsb++;
-			}
-			
-			for (Method method : type.getMethods()) {
-				for (Parameter parameter : method.getParameters()) {
-					if (type != parameter.getType() && !packTypes.contains(parameter.getType()))
+					else if (type != parameter.getType() && !packTypes.contains(parameter.getType()))
 						numOfDepMetAsParameter_nsb++;
 				}
 			}
 			
 		}
 		
+		res_ssc=numOfDepAttr_ssc+ numOfDepMetAsParameter_ssc;
 		res_nsb=numOfDepAttr_nsb+ numOfDepMetAsParameter_nsb;
+		row.set("NumAssEl_ssc", res_ssc);
 		row.set("NumAssEl_nsb", res_nsb);
 		
 	}
