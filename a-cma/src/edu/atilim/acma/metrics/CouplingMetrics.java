@@ -65,42 +65,33 @@ public final class CouplingMetrics {
 		
 	}
 	
-	@TypeMetric
+	@PackageMetric
 	public static void calculateAssocElementsMetrics(Package pack, MetricRow row) {
-		
+	
 		List<Type> packTypes= pack.getTypes();
-		int res_ssc=0;
-		int numOfDepAttr_ssc=0;
-		int numOfDepMetAsParameter_ssc=0;
-		int res_nsb=0;
-		int numOfDepAttr_nsb=0;
-		int numOfDepMetAsParameter_nsb=0;
+		row.set("NumAssEl_ssc", 0);
+		row.set("NumAssEl_nsb", 0);
 		
 		
 		for (Type type : pack.getTypes()) {
 			for(Field field:type.getFields())
 			{
 				if(field.getType()!=type && packTypes.contains(field.getType()))
-					numOfDepAttr_ssc++;
+					row.increase("NumAssEl_ssc");
 				else if(field.getType()!=type && !packTypes.contains(field.getType()))
-					numOfDepAttr_nsb++;
+					row.increase("NumAssEl_nsb");
 			}
 			
 			for (Method method : type.getMethods()) {
 				for (Parameter parameter : method.getParameters()) {
 					if (type != parameter.getType() && packTypes.contains(parameter.getType()))
-						numOfDepMetAsParameter_ssc++;
+						row.increase("NumAssEl_ssc");
 					else if (type != parameter.getType() && !packTypes.contains(parameter.getType()))
-						numOfDepMetAsParameter_nsb++;
-				}
-			}
+						row.increase("NumAssEl_nsb");
+				   }
+			   }
 			
-		}
-		
-		res_ssc=numOfDepAttr_ssc+ numOfDepMetAsParameter_ssc;
-		res_nsb=numOfDepAttr_nsb+ numOfDepMetAsParameter_nsb;
-		row.set("NumAssEl_ssc", res_ssc);
-		row.set("NumAssEl_nsb", res_nsb);
+		  }  	
 		
 	}
 }
