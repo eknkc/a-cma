@@ -30,5 +30,8 @@
 		<metric name="eC_Par" weight="1.0"></metric>
 		<metric name="Dep_In" weight="1.0"></metric>
 		<metric name="Dep_Out" weight="1.0"></metric>
+		<metric name="NumAssEl_ssc" weight="1.0"></metric>
+		<metric name="NumAssEl_nsb" weight="1.0"></metric>
+		
 	</category>
 </metrics>
