@@ -11,6 +11,10 @@ public class Package implements Comparable<Package> {
 		this.packageName = packageName;
 		this.design = design;
 	}
+	
+	static Package emptyPackage(Design d) {
+		return new Package("", d);
+	}
 
 	public Design getDesign() {
 		return design;
@@ -23,7 +27,7 @@ public class Package implements Comparable<Package> {
 	public List<Type> getTypes() {
 		ArrayList<Type> ptypes = new ArrayList<Type>();
 		for (Type t : design.getTypes()) {
-			if (packageName.equals(t.getPackage()))
+			if (this.equals(t.getPackage()))
 				ptypes.add(t);
 		}
 		return ptypes;

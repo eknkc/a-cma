@@ -54,7 +54,7 @@ public class Design implements Serializable {
 		HashSet<Package> set = new HashSet<Package>();
 		
 		for (Type t : types) {
-			set.add(new Package(t.getPackage(), this));
+			set.add(t.getPackage());
 		}
 		
 		ArrayList<Package> list = new ArrayList<Package>(set);

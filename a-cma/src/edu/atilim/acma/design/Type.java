@@ -164,11 +164,11 @@ public class Type extends Node {
 	}
 	
 	@Override
-	public String getPackage() {
+	public Package getPackage() {
 		String name = getName();
 		int lastDot = name.lastIndexOf(".");
-		if (lastDot < 0) return "";
-		return name.substring(0, lastDot);
+		if (lastDot < 0) return Package.emptyPackage(getDesign());
+		return new Package(name.substring(0, lastDot), getDesign());
 	}
 	
 	@Override

@@ -51,9 +51,9 @@ public class Field extends Node {
 	}
 	
 	@Override
-	public String getPackage() {
+	public Package getPackage() {
 		Type owner = getOwnerType();
-		if (owner == null) return "";
+		if (owner == null) return Package.emptyPackage(getDesign());
 		return owner.getPackage();
 	}
 	

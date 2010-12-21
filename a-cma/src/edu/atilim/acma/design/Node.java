@@ -133,7 +133,7 @@ public abstract class Node implements Serializable {
 		return true;
 	}
 	
-	public abstract String getPackage();
+	public abstract Package getPackage();
 	public abstract Type getOwnerType();
 	
 	public boolean canAccess(Node other) {
