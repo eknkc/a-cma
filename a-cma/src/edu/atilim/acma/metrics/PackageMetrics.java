@@ -39,4 +39,11 @@ public final class PackageMetrics {
 			}
 		}
 	}
+	
+	@PackageMetric
+	public static void calculateNesting(Package pack, MetricRow row) {
+		String packagename = pack.getName();
+		int nc = packagename.split("\\.").length - 1;
+		row.set("packagenesting", nc);
+	}
 }
