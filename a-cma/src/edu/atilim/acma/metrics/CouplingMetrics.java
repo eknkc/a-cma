@@ -1,6 +1,7 @@
 package edu.atilim.acma.metrics;
 
 import java.util.List;
+
 import edu.atilim.acma.design.Field;
 import edu.atilim.acma.design.Method;
 import edu.atilim.acma.design.Method.Parameter;
@@ -45,7 +46,6 @@ public final class CouplingMetrics {
 		res= numOfDepAttr + numOfDepMetAsParameter+numOfDepMetAsInstantiator ;
 		
 		row.set("Dep_In", res);
-		
 		row.set("Dep_Out", 0);
 		
 		for (Field field : type.getFields()) {
@@ -60,37 +60,40 @@ public final class CouplingMetrics {
 					row.increase("Dep_Out");
 			}
 		}
-		
-		
+			
 	}
 	
 	@TypeMetric
 	public static void calculateAssocElementsMetrics(Type type, MetricRow row) {
 	
-		List<Type> packTypes= type.getPackage().getTypes();
 		row.set("NumAssEl_ssc", 0);
 		row.set("NumAssEl_nsb", 0);
-		
-		
-		for (Type t : packTypes) {
+			
+		for (Type t : type.getPackage().getTypes()) {
 			for(Field field : t.getFields())
 			{
-				if(field.getType()!=t && packTypes.contains(field.getType()))
+				if(field.getType()!=t && (field.getType()!=null && field.getType().getPackage().equals(type.getPackage()) ))
 					row.increase("NumAssEl_ssc");
-				else if(field.getType()!=t && !packTypes.contains(field.getType()))
+				else if(field.getType()!=t && field.getType()!=null )
 					row.increase("NumAssEl_nsb");
+				
 			}
 			
 			for (Method method : t.getMethods()) {
 				for (Parameter parameter : method.getParameters()) {
-					if (t!= parameter.getType() && packTypes.contains(parameter.getType()))
+					if (t!= parameter.getType() && (parameter.getType()!=null && parameter.getType().getPackage().equals(type.getPackage())) )
 						row.increase("NumAssEl_ssc");
-					else if (t != parameter.getType() && !packTypes.contains(parameter.getType()))
+					else if (t != parameter.getType() && parameter.getType()!=null)
 						row.increase("NumAssEl_nsb");
 				   }
+				if(t!=method.getReturnType() && (method.getReturnType()!=null && method.getReturnType().getPackage().equals(type.getPackage()) ) )
+					row.increase("NumAssEl_ssc");
+				else if (t != method.getReturnType() && method.getReturnType()!=null)
+					row.increase("NumAssEl_nsb");
 			   }
 			
-		  }  	
+		  } // end of package types loop
 		
-	}
+	} // end of calculateAssocElementsMetrics method
+	
 }
