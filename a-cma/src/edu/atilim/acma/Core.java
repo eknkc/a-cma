@@ -1,28 +1,33 @@
 package edu.atilim.acma;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
+
+import javax.swing.UIManager;
 
 import edu.atilim.acma.design.Design;
-import edu.atilim.acma.design.io.ZIPDesignReader;
 import edu.atilim.acma.search.Algorithm;
 import edu.atilim.acma.search.BeamSearch;
 import edu.atilim.acma.search.HillClimbing;
 import edu.atilim.acma.search.ModSimAnn;
 import edu.atilim.acma.transition.DesignWrapper;
+import edu.atilim.acma.ui.DesignSelectionDialog;
 
 public class Core {
-	public static final String version = "0.0.0.1a";
+	public static final String version = "0.0.0.2a";
 	
 	public static void main(String[] args) throws IOException {
 		System.out.printf("A-CMA Software Refactoring Tool - version %s\n\n", version);
 		
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (Exception e) {}
+		
 		//Log.addOutput("./output/acma.log");
 		
-		Design design = chooseDesign();
+		Design design = DesignSelectionDialog.loadDesign();
+		
 		design.getMetrics().writeCSV("./output/metrics_initial.csv");
 		
 		System.out.println();
@@ -40,6 +45,7 @@ public class Core {
 		System.out.println("Would you like to view required actions to reach final design? [Y]es, [N]o: ");
 		String resp = readLine();
 		if (resp.startsWith("y") || resp.startsWith("Y")) {
+			System.out.printf("%d modifications has been made\n", finalDesign.getModifications().size());
 			for (String mod : finalDesign.getModifications())
 				System.out.println(mod);
 		}
@@ -47,6 +53,8 @@ public class Core {
 		System.out.println();
 		System.out.println("Press enter to exit");
 		readLine();
+		
+		System.exit(0);
 	}
 	
 	private static Design runAlgorithm(Design design) {
@@ -92,38 +100,6 @@ public class Core {
 		System.out.printf("Number of types: %d.\n", design.getTypes().size());
 		System.out.printf("Metric score: %f.\n", design.getMetrics().getWeightedSum());
 		System.out.printf("Possible actions: %d.\n", design.getPossibleActions().size());
-	}
-	
-	private static Design chooseDesign() {
-		System.out.println("Found benchmark software:");
-		
-		ArrayList<File> files = new ArrayList<File>();
-		File bmdir = new File("./data/benchmarks");
-		
-		for (File f : bmdir.listFiles()) {
-			if (!f.isDirectory() && f.getName().endsWith(".zip"))
-				files.add(f);
-		}
-		
-		for (int i = 0; i < files.size(); i++)
-			System.out.printf("[%d] %s\n", i, files.get(i).getName());
-		
-		System.out.print("Please choose the initial design to run refactorings on: ");
-		
-		String line = readLine();
-		int id = -1;
-		
-		do {
-			try { id = Integer.parseInt(line); } catch (NumberFormatException e) {
-				System.out.println("Please enter the number of benchmark software.");
-			}
-			if (id >= files.size()) {
-				id = -1;
-				System.out.println("Please enter the number of benchmark software.");
-			}
-		} while (id < 0);
-		
-		return new ZIPDesignReader(files.get(id).getAbsolutePath()).read();
 	}
 	
 	private static String readLine() {
