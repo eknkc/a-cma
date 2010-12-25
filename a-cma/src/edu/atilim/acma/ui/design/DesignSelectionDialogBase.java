@@ -55,7 +55,7 @@ public class DesignSelectionDialogBase extends JDialog {
 		panelPredefined.setLayout(null);
 		
 		comboBoxDesigns = new JComboBox();
-		comboBoxDesigns.setBounds(10, 86, 409, 20);
+		comboBoxDesigns.setBounds(10, 85, 409, 22);
 		panelPredefined.add(comboBoxDesigns);
 		
 		txtrPredefinedDesc = new JTextArea();
@@ -81,7 +81,7 @@ public class DesignSelectionDialogBase extends JDialog {
 		txtrCustomDesc.setForeground(SystemColor.textInactiveText);
 		txtrCustomDesc.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		txtrCustomDesc.setEditable(false);
-		txtrCustomDesc.setBackground(SystemColor.menu);
+		txtrCustomDesc.setBackground(SystemColor.control);
 		panel.add(txtrCustomDesc);
 		
 		textFieldPath = new JTextField();

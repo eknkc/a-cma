@@ -23,7 +23,7 @@ public class PleaseWaitDialog extends JDialog {
 		setAlwaysOnTop(true);
 		setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 		setResizable(false);
-		setBounds(100, 100, 143, 75);
+		setBounds(100, 100, 163, 75);
 		getContentPane().setLayout(new BorderLayout(0, 0));
 		
 		panel = new JPanel();
@@ -34,7 +34,7 @@ public class PleaseWaitDialog extends JDialog {
 		lblPleaseWait = new JLabel("Please wait...");
 		lblPleaseWait.setIcon(new ImageIcon(PleaseWaitDialog.class.getResource("/resources/icons/button-yellow.png")));
 		lblPleaseWait.setHorizontalAlignment(SwingConstants.CENTER);
-		lblPleaseWait.setBounds(10, 11, 123, 53);
+		lblPleaseWait.setBounds(10, 11, 143, 53);
 		panel.add(lblPleaseWait);
 
 	}
