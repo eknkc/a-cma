@@ -29,6 +29,7 @@ public final class PackageMetrics {
 		
 		row.set("numCls", 0);
 		row.set("numInterf", 0);
+		row.set("numOpsCls", 0);
 		
 		for (Type type : types)
 		{
@@ -37,6 +38,8 @@ public final class PackageMetrics {
 			} else {
 				row.increase("numCls");
 			}
+			
+			row.add("numOpsCls", type.getMethods().size());
 		}
 	}
 	
