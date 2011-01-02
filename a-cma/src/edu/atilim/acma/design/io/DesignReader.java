@@ -10,7 +10,7 @@ import java.util.Stack;
 import edu.atilim.acma.design.Design;
 import edu.atilim.acma.util.Pair;
 
-public class DesignReader {
+public class DesignReader implements DesignLoader {
 	private File classPath;
 	
 	public DesignReader(String classPath) {

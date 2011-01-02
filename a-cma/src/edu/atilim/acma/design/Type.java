@@ -30,6 +30,15 @@ public class Type extends Node {
 		return true;
 	}
 	
+	public String getSimpleName() {
+		String name = getName();
+		int lastDot = name.lastIndexOf(".");
+		if (lastDot >= 0) name = name.substring(lastDot + 1);
+		int lastDollar = name.lastIndexOf("$");
+		if (lastDollar >= 0) name = name.substring(lastDollar + 1);
+		return name;
+	}
+	
 	public boolean isInterface() {
 		return getFlag(Tags.TYP_INTERFACE);
 	}

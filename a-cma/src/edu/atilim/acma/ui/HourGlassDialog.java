@@ -1,4 +1,4 @@
-package edu.atilim.acma.ui.design;
+package edu.atilim.acma.ui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -10,15 +10,14 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
 
-public class PleaseWaitDialog extends JDialog {
+public class HourGlassDialog extends JDialog {
 	private static final long serialVersionUID = 1L;
 	protected JPanel panel;
 	protected JLabel lblPleaseWait;
 
-	/**
-	 * Create the dialog.
-	 */
-	public PleaseWaitDialog() {
+	public HourGlassDialog() {
+		super(MainWindow.getInstance(), true);
+		
 		setUndecorated(true);
 		setTitle("Working");
 		setAlwaysOnTop(true);
@@ -33,10 +32,11 @@ public class PleaseWaitDialog extends JDialog {
 		panel.setLayout(new BorderLayout(0, 0));
 		
 		lblPleaseWait = new JLabel("Please wait...");
-		lblPleaseWait.setIcon(new ImageIcon(PleaseWaitDialog.class.getResource("/resources/icons/button-yellow.png")));
+		lblPleaseWait.setIcon(new ImageIcon(HourGlassDialog.class.getResource("/resources/icons/button-yellow.png")));
 		lblPleaseWait.setHorizontalAlignment(SwingConstants.CENTER);
 		panel.add(lblPleaseWait);
 
+		setLocationRelativeTo(MainWindow.getInstance());
 	}
 
 }

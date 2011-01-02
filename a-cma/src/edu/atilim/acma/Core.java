@@ -1,21 +1,26 @@
 package edu.atilim.acma;
 
+import java.awt.EventQueue;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 
+import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 
 import edu.atilim.acma.design.Design;
+import edu.atilim.acma.design.io.ZIPDesignReader;
 import edu.atilim.acma.search.Algorithm;
 import edu.atilim.acma.search.BeamSearch;
 import edu.atilim.acma.search.HillClimbing;
 import edu.atilim.acma.search.ModSimAnn;
 import edu.atilim.acma.transition.DesignWrapper;
-import edu.atilim.acma.ui.DesignSelectionDialog;
+import edu.atilim.acma.ui.MainWindow;
 
 public class Core {
-	public static final String version = "0.0.0.2a";
+	public static final String version = "0.0.0.5a";
 	
 	public static void main(String[] args) throws IOException {
 		System.out.printf("A-CMA Software Refactoring Tool - version %s\n\n", version);
@@ -24,9 +29,25 @@ public class Core {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {}
 		
-		//Log.addOutput("./output/acma.log");
-		
-		Design design = DesignSelectionDialog.loadDesign();
+		EventQueue.invokeLater(new Runnable() {
+			@Override
+			public void run() {
+				int resp = JOptionPane.showConfirmDialog(null, "Test GUI mode?", "GUI mi acaba?", JOptionPane.YES_NO_OPTION);
+				if (resp == JOptionPane.YES_OPTION) {
+					MainWindow.getInstance().setVisible(true);
+				} else {
+					try {
+						consoleRun();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		});
+	}
+	
+	private static void consoleRun() throws Exception {
+		Design design = chooseDesign();
 		
 		design.getMetrics().writeCSV("./output/metrics_initial.csv");
 		
@@ -56,6 +77,38 @@ public class Core {
 		
 		System.exit(0);
 	}
+	
+    private static Design chooseDesign() {
+        System.out.println("Found benchmark software:");
+        
+        ArrayList<File> files = new ArrayList<File>();
+        File bmdir = new File("./data/benchmarks");
+        
+        for (File f : bmdir.listFiles()) {
+                if (!f.isDirectory() && f.getName().endsWith(".zip"))
+                        files.add(f);
+        }
+        
+        for (int i = 0; i < files.size(); i++)
+                System.out.printf("[%d] %s\n", i, files.get(i).getName());
+        
+        System.out.print("Please choose the initial design to run refactorings on: ");
+        
+        String line = readLine();
+        int id = -1;
+        
+        do {
+                try { id = Integer.parseInt(line); } catch (NumberFormatException e) {
+                        System.out.println("Please enter the number of benchmark software.");
+                }
+                if (id >= files.size()) {
+                        id = -1;
+                        System.out.println("Please enter the number of benchmark software.");
+                }
+        } while (id < 0);
+        
+        return new ZIPDesignReader(files.get(id).getAbsolutePath()).read();
+}
 	
 	private static Design runAlgorithm(Design design) {
 		Algorithm alg = null;

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import edu.atilim.acma.metrics.MetricCalculator;
 import edu.atilim.acma.metrics.MetricTable;
@@ -16,6 +17,7 @@ import edu.atilim.acma.transition.actions.Action;
 public class Design implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
+	private String name;
 	private ArrayList<Type> types;
 	private ArrayList<String> modificationLog;
 	
@@ -117,6 +119,7 @@ public class Design implements Serializable {
 	Design(ArrayList<String> modlog) {
 		types = new ArrayList<Type>();
 		modificationLog = modlog;
+		name = String.format("Design #%s", UUID.randomUUID().toString());
 	}
 	
 	public Set<Action> getPossibleActions() {
@@ -125,5 +128,10 @@ public class Design implements Serializable {
 	
 	public Design copy() {
 		return DesignCloner.clone(this);
+	}
+	
+	@Override
+	public String toString() {
+		return name;
 	}
 }

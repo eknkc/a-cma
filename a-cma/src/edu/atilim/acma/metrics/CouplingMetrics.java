@@ -60,9 +60,9 @@ public final class CouplingMetrics {
 		}
 	}
 
-	@TypeMetric
+	//TODO: This is dead slow O(n^3). Either move into package metrics, or omit entirely.
+	//@TypeMetric
 	public static void calculateAssocElementsMetrics(Type type, MetricRow row) {
-
 		row.set("NumAssEl_ssc", 0);
 		row.set("NumAssEl_nsb", 0);
 

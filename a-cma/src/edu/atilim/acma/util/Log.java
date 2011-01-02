@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
+import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
@@ -55,6 +56,12 @@ public final class Log {
 	public static void warning(String format, Object... args)
 	{
 		warning(String.format(format, args));
+	}
+	
+	public static void addOutput(Handler handler) {
+		handler.setFormatter(new Format());
+		handler.setLevel(Level.FINEST);
+		logger.addHandler(handler);
 	}
 	
 	public static void addOutput(OutputStream stream) {

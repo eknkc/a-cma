@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MetricTable {
 	private double[] values;
@@ -18,6 +19,14 @@ public class MetricTable {
 		int j = colNames.get(col);
 		
 		return (i * colNames.size()) + j;
+	}
+	
+	public Map<String, Integer> getCols() {
+		return Collections.unmodifiableMap(colNames);
+	}
+	
+	public Map<String, Integer> getRows() {
+		return Collections.unmodifiableMap(rowNames);
 	}
 	
 	public double getAverage(String metric) {
@@ -53,6 +62,10 @@ public class MetricTable {
 	
 	public double get(String element, String metric) {
 		return values[index(element, metric)];
+	}
+	
+	public double get(int row, int col) {
+		return values[row * colNames.size() + col];
 	}
 	
 	public void set(String element, String metric, double value) {

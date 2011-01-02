@@ -10,7 +10,7 @@ import java.util.zip.ZipFile;
 import edu.atilim.acma.design.Design;
 import edu.atilim.acma.util.Pair;
 
-public class ZIPDesignReader {
+public class ZIPDesignReader implements DesignLoader {
 	private ZipFile zip;
 	
 	public ZIPDesignReader(String zip) {
