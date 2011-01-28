@@ -20,6 +20,10 @@ public final class Tags {
 	public static final int STATIC = 0x00000020;
 	public static final int ABSTRACT = 0x00000040;
 	
+	// Special
+	public static final int ACCESSES_THIS = 0x00010000;
+	public static final int ROOT_TYPE = 0x00020000;
+	
 	// Type flags
 	public static final int TYP_INTERFACE = 0x00000100;
 }

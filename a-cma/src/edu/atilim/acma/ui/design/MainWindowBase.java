@@ -7,13 +7,13 @@ import java.awt.Toolkit;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.JTabbedPane;
-import javax.swing.JToolBar;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
@@ -24,8 +24,6 @@ import edu.atilim.acma.ui.Console;
 import edu.atilim.acma.ui.LoadedDesigns;
 import edu.atilim.acma.ui.MainWindow;
 import edu.atilim.acma.ui.TasksPanel;
-import java.awt.Component;
-import javax.swing.Box;
 
 public class MainWindowBase extends JFrame {
 
@@ -37,24 +35,28 @@ public class MainWindowBase extends JFrame {
 	protected TasksPanel tasksPanel;
 	protected JPanel topPanel;
 	protected JMenuBar menuBar;
-	protected JMenu menu;
-	protected JMenu menu_1;
-	protected JToolBar toolBar;
-	protected JButton btnLoad;
+	protected JMenu mnFile;
 	protected JPanel mainPanel;
 	protected JPanel rightPanel;
 	protected JTabbedPane mainTabs;
 	protected Console console;
-	protected JButton btnConfigureMetrics;
-	protected JButton btnConfigureActions;
-	protected Component horizontalGlue;
-	protected JButton btnAbout;
+	protected JMenuItem mnitmLoadDesign;
+	protected JMenuItem mnitmUnloadDesign;
+	protected JSeparator sp1;
+	protected JMenuItem mnitmExit;
+	protected JMenu mnSettings;
+	protected JMenuItem mnitmConfigureMetrics;
+	protected JMenuItem mnitmConfigureActions;
+	protected JSeparator sp2;
+	protected JMenuItem mnitmClearConsole;
+	protected JMenu mnHelp;
+	protected JMenuItem mnitmAbout;
 
 	public MainWindowBase() {
 		setTitle("A-CMA");
 		setIconImage(Toolkit.getDefaultToolkit().getImage(MainWindowBase.class.getResource("/resources/acmaicon.png")));
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(100, 100, 1000, 700);
+		setBounds(100, 100, 1200, 740);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));
 		contentPane.setLayout(new BorderLayout(0, 0));
@@ -110,41 +112,64 @@ public class MainWindowBase extends JFrame {
 		
 		topPanel = new JPanel();
 		contentPane.add(topPanel, BorderLayout.NORTH);
-		topPanel.setBorder(new MatteBorder(0, 0, 1, 0, (Color) new Color(0, 0, 0)));
 		topPanel.setLayout(new BorderLayout(0, 0));
 		
 		menuBar = new JMenuBar();
 		topPanel.add(menuBar, BorderLayout.NORTH);
 		
-		menu = new JMenu("New menu");
-		menuBar.add(menu);
+		mnFile = new JMenu("File");
+		menuBar.add(mnFile);
 		
-		menu_1 = new JMenu("New menu");
-		menuBar.add(menu_1);
+		mnitmLoadDesign = new JMenuItem("Load Design");
+		mnitmLoadDesign.setIcon(new ImageIcon(MainWindowBase.class.getResource("/resources/icons/java/design.gif")));
+		mnitmLoadDesign.setActionCommand(Actions.DESIGN_LOAD);
+		mnitmLoadDesign.addActionListener(MainWindow.getListener());
+		mnFile.add(mnitmLoadDesign);
 		
-		toolBar = new JToolBar();
-		toolBar.setFloatable(false);
-		topPanel.add(toolBar, BorderLayout.SOUTH);
+		mnitmUnloadDesign = new JMenuItem("Unload Design");
+		mnitmUnloadDesign.setActionCommand(Actions.DESIGN_UNLOAD);
+		mnitmUnloadDesign.addActionListener(MainWindow.getListener());
+		mnFile.add(mnitmUnloadDesign);
 		
-		btnLoad = new JButton("Load Design");
-		btnLoad.setActionCommand(Actions.DESIGN_LOAD);
-		btnLoad.addActionListener(MainWindow.getListener());
-		btnLoad.setIcon(new ImageIcon(MainWindowBase.class.getResource("/resources/icons/java/design.gif")));
-		toolBar.add(btnLoad);
+		sp1 = new JSeparator();
+		mnFile.add(sp1);
 		
-		btnConfigureMetrics = new JButton("Configure Metrics");
-		btnConfigureMetrics.setIcon(new ImageIcon(MainWindowBase.class.getResource("/resources/icons/statistics2_16.png")));
-		toolBar.add(btnConfigureMetrics);
+		mnitmExit = new JMenuItem("Exit");
+		mnitmExit.setActionCommand(Actions.EXIT);
+		mnitmExit.addActionListener(MainWindow.getListener());
+		mnFile.add(mnitmExit);
 		
-		btnConfigureActions = new JButton("Configure Actions");
-		btnConfigureActions.setIcon(new ImageIcon(MainWindowBase.class.getResource("/resources/icons/engine_16.png")));
-		toolBar.add(btnConfigureActions);
+		mnSettings = new JMenu("Settings");
+		menuBar.add(mnSettings);
 		
-		horizontalGlue = Box.createHorizontalGlue();
-		toolBar.add(horizontalGlue);
+		mnitmConfigureMetrics = new JMenuItem("Configure Metrics");
+		mnitmConfigureMetrics.setIcon(new ImageIcon(MainWindowBase.class.getResource("/resources/icons/statistics2_16.png")));
+		mnitmConfigureMetrics.setActionCommand(Actions.CONFIG_METRICS);
+		mnitmConfigureMetrics.addActionListener(MainWindow.getListener());
+		mnSettings.add(mnitmConfigureMetrics);
 		
-		btnAbout = new JButton("About");
-		btnAbout.setIcon(new ImageIcon(MainWindowBase.class.getResource("/resources/icons/info_16.png")));
-		toolBar.add(btnAbout);
+		mnitmConfigureActions = new JMenuItem("Configure Actions");
+		mnitmConfigureActions.setIcon(new ImageIcon(MainWindowBase.class.getResource("/resources/icons/engine_16.png")));
+		mnitmConfigureActions.setActionCommand(Actions.CONFIG_ACTIONS);
+		mnitmConfigureActions.addActionListener(MainWindow.getListener());
+		mnSettings.add(mnitmConfigureActions);
+		
+		sp2 = new JSeparator();
+		mnSettings.add(sp2);
+		
+		mnitmClearConsole = new JMenuItem("Clear Console");
+		mnitmClearConsole.setIcon(new ImageIcon(MainWindowBase.class.getResource("/resources/icons/file_16.png")));
+		mnitmClearConsole.setActionCommand(Actions.CLEAR_CONSOLE);
+		mnitmClearConsole.addActionListener(MainWindow.getListener());
+		mnSettings.add(mnitmClearConsole);
+		
+		mnHelp = new JMenu("Help");
+		menuBar.add(mnHelp);
+		
+		mnitmAbout = new JMenuItem("About");
+		mnitmAbout.setIcon(new ImageIcon(MainWindowBase.class.getResource("/resources/icons/info_16.png")));
+		mnitmAbout.setActionCommand(Actions.ABOUT);
+		mnitmAbout.addActionListener(MainWindow.getListener());
+		mnHelp.add(mnitmAbout);
 	}
 }

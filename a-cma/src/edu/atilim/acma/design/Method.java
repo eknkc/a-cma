@@ -61,6 +61,18 @@ public class Method extends Node {
 		return getName().startsWith("set");
 	}
 	
+	public boolean isConstructor() {
+		return getName().startsWith("<init>");
+	}
+	
+	public boolean isAccessingThisPointer() {
+		return getFlag(Tags.ACCESSES_THIS);
+	}
+	
+	public void setAccessingThisPointer(boolean value) {
+		setFlag(Tags.ACCESSES_THIS, value);
+	}
+	
 	public void setOwnerType(Type ownerType) {
 		if (this.ownerType != null)
 			this.ownerType.release();

@@ -34,8 +34,14 @@ public class MainWindow extends MainWindowBase {
 	private static class Listener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			if (e.getActionCommand().equals(Actions.DESIGN_LOAD)) {
+			String ac = e.getActionCommand();
+			
+			if (ac.equals(Actions.DESIGN_LOAD)) {
 				new LoadDesignDialog().setVisible(true);
+			} else if (ac.equals(Actions.EXIT)) {
+				System.exit(0);
+			} else if (ac.equals(Actions.CLEAR_CONSOLE)) {
+				MainWindow.getInstance().console.clear();
 			}
 		}
 	}

@@ -1,1 +1,1 @@
-@java -classpath ./bin;./lib/asm-3.3.jar -server -Xmn100M -Xms500m -Xmx1024M -Xss10M edu.atilim.acma.Core
+@java -classpath ./bin;./lib/asm-3.3.jar;./lib/jcommon-1.0.16.jar;./lib/jfreechart-1.0.13.jar -server -Xmn100M -Xms500m -Xmx1024M -Xss10M edu.atilim.acma.Core

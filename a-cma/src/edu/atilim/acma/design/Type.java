@@ -47,6 +47,14 @@ public class Type extends Node {
 		setFlag(Tags.TYP_INTERFACE, value);
 	}
 	
+	public boolean isRootType() {
+		return getFlag(Tags.ROOT_TYPE);
+	}
+	
+	public void setRootType(boolean value) {
+		setFlag(Tags.ROOT_TYPE, value);
+	}
+	
 	public Type getParentType() {
 		return parentType == null ? null : parentType.getTarget(Type.class);
 	}

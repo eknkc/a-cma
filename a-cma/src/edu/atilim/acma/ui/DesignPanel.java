@@ -1,11 +1,17 @@
 package edu.atilim.acma.ui;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
+import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JTable;
@@ -18,25 +24,78 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
+import org.jfree.data.general.DefaultPieDataset;
 
 import edu.atilim.acma.design.Design;
 import edu.atilim.acma.design.Type;
 import edu.atilim.acma.metrics.MetricTable;
+import edu.atilim.acma.transition.actions.Action;
 import edu.atilim.acma.ui.design.DesignPanelBase;
+import edu.atilim.acma.util.ACMAUtil;
 
 public class DesignPanel extends DesignPanelBase {
 	private static final long serialVersionUID = 1L;
 
 	private Design design;
 	private MetricTable metrics;
+	private Set<Action> posActions;
 	
 	DesignPanel(Design design) {
 		this.design = design;
 		this.metrics = this.design.getMetrics();
+		this.posActions = this.design.getPossibleActions();
 		
+		initPossibleActions();
 		initMetrics();
+	}
+	
+	private void initPossibleActions() {
+		final DefaultListModel model = new DefaultListModel();
+		for (Action act : posActions) {
+			model.addElement(act.toString());
+		}
+		posActionsList.setModel(model);
+		
+		btnPosActionsRefresh.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				posActionsList.setModel(model);
+			}
+		});
+		
+		btnPosActionsChart.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				HashMap<String, Integer> actionMap = new HashMap<String, Integer>();
+				for (Action act : posActions) {
+					String type = act.getClass().getEnclosingClass().getSimpleName();
+					
+					if (actionMap.containsKey(type))
+						actionMap.put(type, actionMap.get(type) + 1);
+					else
+						actionMap.put(type, 1);
+				}
+				
+				DefaultPieDataset dataset = new DefaultPieDataset();
+				for (Entry<String, Integer> e : actionMap.entrySet()) {
+					dataset.setValue(ACMAUtil.splitCamelCase(e.getKey()), e.getValue());
+				}
+				
+				JFreeChart chart = ChartFactory.createPieChart3D("Action Distribution", dataset, true, false, false);
+				chart.setBackgroundPaint(new Color(255, 255, 255, 0));
+				
+				PiePlot plot = (PiePlot)chart.getPlot();
+				plot.setBackgroundPaint(new Color(255, 255, 255, 0));
+				plot.setOutlineVisible(false);
+				plot.setForegroundAlpha(0.75f);
+				ChartPanel panel = new ChartPanel(chart);
+				panel.setOpaque(false);
+				PanelDialog.display(panel, 700, 470);
+			}
+		});
 	}
 	
 	private void initMetrics() {

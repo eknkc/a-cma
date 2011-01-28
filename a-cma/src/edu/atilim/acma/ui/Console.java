@@ -14,6 +14,11 @@ public class Console extends ConsolePanelBase {
 		Log.config("Console logging enabled.");
 	}
 	
+	public void clear() {
+		out.setText("");
+		validate();
+	}
+	
 	private class LogHandler extends Handler {
 		@Override
 		public void close() throws SecurityException {

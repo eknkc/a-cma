@@ -53,6 +53,9 @@ public class ClassReader implements ClassVisitor {
 	}
 	
 	private void afterBase() {
+		if (superclass.equals("java/lang/Object"))
+			type.setRootType(true);
+		
 		type.setSuperType(design.getType(org.objectweb.asm.Type.getObjectType(superclass).getClassName()));
 		for (String i : interfaces) {
 			type.addInterface(design.getType(org.objectweb.asm.Type.getObjectType(i).getClassName()));
@@ -326,8 +329,9 @@ public class ClassReader implements ClassVisitor {
 		}
 
 		@Override
-		public void visitVarInsn(int arg0, int arg1) {
-			
+		public void visitVarInsn(int opcode, int var) {
+			if (!method.isStatic() && (opcode == Opcodes.ALOAD || opcode == Opcodes.ASTORE) && var == 0)
+				method.setAccessingThisPointer(true);
 		}
 		
 	}

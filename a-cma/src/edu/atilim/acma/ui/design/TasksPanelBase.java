@@ -25,7 +25,7 @@ public class TasksPanelBase extends JPanel {
 		taskList = new JList();
 		taskList.setModel(new AbstractListModel() {
 			private static final long serialVersionUID = 1L;
-			String[] values = new String[] {"Asd", "BCD"};
+			String[] values = new String[] {""};
 			public int getSize() {
 				return values.length;
 			}

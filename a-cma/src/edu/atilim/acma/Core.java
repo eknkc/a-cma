@@ -24,7 +24,6 @@ public class Core {
 	
 	public static void main(String[] args) throws IOException {
 		System.out.printf("A-CMA Software Refactoring Tool - version %s\n\n", version);
-		
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch (Exception e) {}
