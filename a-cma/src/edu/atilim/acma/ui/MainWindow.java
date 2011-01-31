@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import javax.swing.JTabbedPane;
 
 import edu.atilim.acma.ui.design.MainWindowBase;
+import edu.atilim.acma.util.WeakHashSet;
 
 public class MainWindow extends MainWindowBase {
 	private static final long serialVersionUID = 1L;
@@ -16,6 +17,22 @@ public class MainWindow extends MainWindowBase {
 	public static MainWindow getInstance() {
 		if (instance == null) instance = new MainWindow();
 		return instance;
+	}
+	
+	private WeakHashSet<WindowEventListener> eventListeners;
+	
+	void addEventListener(WindowEventListener listener) {
+		eventListeners.add(listener);
+	}
+	
+	void fireEvent(Object e) {
+		if (e == null) return;
+		for (WindowEventListener listener : eventListeners)
+			listener.onWindowEvent(e);
+	}
+	
+	public MainWindow() {
+		eventListeners = new WeakHashSet<MainWindow.WindowEventListener>();
 	}
 	
 	LoadedDesigns getLoadedDesigns() {
@@ -42,7 +59,13 @@ public class MainWindow extends MainWindowBase {
 				System.exit(0);
 			} else if (ac.equals(Actions.CLEAR_CONSOLE)) {
 				MainWindow.getInstance().console.clear();
+			} else if (ac.equals(Actions.CONFIG_RUN)) {
+				new RunConfigDialog().setVisible(true);
 			}
 		}
+	}
+	
+	public static interface WindowEventListener {
+		public void onWindowEvent(Object e);
 	}
 }

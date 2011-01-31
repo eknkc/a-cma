@@ -3,16 +3,22 @@ package edu.atilim.acma.ui.design;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -31,7 +37,7 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
 import edu.atilim.acma.ui.Actions;
-import edu.atilim.acma.ui.MainWindow;
+import edu.atilim.acma.ui.RunConfigDialog;
 
 public class DesignPanelBase extends JPanel {
 
@@ -47,14 +53,8 @@ public class DesignPanelBase extends JPanel {
 	protected JLabel lblValNumMetrics;
 	protected JLabel lblItems;
 	protected JLabel lblValNumItems;
-	protected JLabel dummyLabel1;
-	protected JLabel dummyLabel2;
-	protected JLabel lblweightedSum;
+	protected JLabel lblScore;
 	protected JLabel lblValWeightedSum;
-	protected JLabel dummyLabel3;
-	protected JLabel dummyLabel4;
-	protected JLabel dummyLabel5;
-	protected JButton btnConfiguration;
 	protected JPanel posActionsPanel;
 	protected JPanel posActionsListPanel;
 	protected JScrollPane postActionsListScroller;
@@ -85,6 +85,12 @@ public class DesignPanelBase extends JPanel {
 	protected JSpinner bsBeamLength;
 	protected Component hg3;
 	protected JButton bsBtnStart;
+	protected JButton btnSave;
+	protected JButton btnPreset;
+	protected JPanel panel;
+	protected JComboBox runConfigBox;
+	protected JButton btnConfigure;
+	protected Component horizontalStrut;
 
 	public DesignPanelBase() {
 		setOpaque(false);
@@ -132,49 +138,82 @@ public class DesignPanelBase extends JPanel {
 						.addComponent(infoPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 						.addComponent(chartPanel, GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)))
 		);
-		infoPanel.setLayout(new GridLayout(0, 2, 0, 0));
+		GridBagLayout gbl_infoPanel = new GridBagLayout();
+		gbl_infoPanel.columnWidths = new int[]{88, 88, 0};
+		gbl_infoPanel.rowHeights = new int[]{25, 25, 25, 25, 25, 25, 25, 0};
+		gbl_infoPanel.columnWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
+		gbl_infoPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+		infoPanel.setLayout(gbl_infoPanel);
 		
 		lblNumberOfMetrics = new JLabel("# Metrics:");
-		infoPanel.add(lblNumberOfMetrics);
+		GridBagConstraints gbc_lblNumberOfMetrics = new GridBagConstraints();
+		gbc_lblNumberOfMetrics.fill = GridBagConstraints.BOTH;
+		gbc_lblNumberOfMetrics.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNumberOfMetrics.gridx = 0;
+		gbc_lblNumberOfMetrics.gridy = 0;
+		infoPanel.add(lblNumberOfMetrics, gbc_lblNumberOfMetrics);
 		
 		lblValNumMetrics = new JLabel("");
 		lblValNumMetrics.setHorizontalAlignment(SwingConstants.RIGHT);
-		infoPanel.add(lblValNumMetrics);
+		GridBagConstraints gbc_lblValNumMetrics = new GridBagConstraints();
+		gbc_lblValNumMetrics.fill = GridBagConstraints.BOTH;
+		gbc_lblValNumMetrics.insets = new Insets(0, 0, 5, 0);
+		gbc_lblValNumMetrics.gridx = 1;
+		gbc_lblValNumMetrics.gridy = 0;
+		infoPanel.add(lblValNumMetrics, gbc_lblValNumMetrics);
 		
 		lblItems = new JLabel("# Items:");
-		infoPanel.add(lblItems);
+		GridBagConstraints gbc_lblItems = new GridBagConstraints();
+		gbc_lblItems.fill = GridBagConstraints.BOTH;
+		gbc_lblItems.insets = new Insets(0, 0, 5, 5);
+		gbc_lblItems.gridx = 0;
+		gbc_lblItems.gridy = 1;
+		infoPanel.add(lblItems, gbc_lblItems);
 		
 		lblValNumItems = new JLabel("");
 		lblValNumItems.setHorizontalAlignment(SwingConstants.RIGHT);
-		infoPanel.add(lblValNumItems);
+		GridBagConstraints gbc_lblValNumItems = new GridBagConstraints();
+		gbc_lblValNumItems.fill = GridBagConstraints.BOTH;
+		gbc_lblValNumItems.insets = new Insets(0, 0, 5, 0);
+		gbc_lblValNumItems.gridx = 1;
+		gbc_lblValNumItems.gridy = 1;
+		infoPanel.add(lblValNumItems, gbc_lblValNumItems);
 		
-		dummyLabel1 = new JLabel("");
-		infoPanel.add(dummyLabel1);
-		
-		dummyLabel2 = new JLabel("");
-		infoPanel.add(dummyLabel2);
-		
-		lblweightedSum = new JLabel("<html><b>Weighted Sum:</b></html>");
-		infoPanel.add(lblweightedSum);
+		lblScore = new JLabel("<html><b>Score:</b></html>");
+		GridBagConstraints gbc_lblScore = new GridBagConstraints();
+		gbc_lblScore.fill = GridBagConstraints.BOTH;
+		gbc_lblScore.insets = new Insets(0, 0, 5, 5);
+		gbc_lblScore.gridx = 0;
+		gbc_lblScore.gridy = 3;
+		infoPanel.add(lblScore, gbc_lblScore);
 		
 		lblValWeightedSum = new JLabel("");
 		lblValWeightedSum.setHorizontalAlignment(SwingConstants.RIGHT);
-		infoPanel.add(lblValWeightedSum);
+		GridBagConstraints gbc_lblValWeightedSum = new GridBagConstraints();
+		gbc_lblValWeightedSum.fill = GridBagConstraints.BOTH;
+		gbc_lblValWeightedSum.insets = new Insets(0, 0, 5, 0);
+		gbc_lblValWeightedSum.gridx = 1;
+		gbc_lblValWeightedSum.gridy = 3;
+		infoPanel.add(lblValWeightedSum, gbc_lblValWeightedSum);
 		
-		dummyLabel3 = new JLabel("");
-		infoPanel.add(dummyLabel3);
+		btnSave = new JButton("Save CSV");
+		btnSave.setActionCommand(Actions.SAVE_METRICS);
+		btnSave.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/save_16.png")));
+		GridBagConstraints gbc_btnSave = new GridBagConstraints();
+		gbc_btnSave.gridwidth = 2;
+		gbc_btnSave.fill = GridBagConstraints.BOTH;
+		gbc_btnSave.gridx = 0;
+		gbc_btnSave.gridy = 5;
+		infoPanel.add(btnSave, gbc_btnSave);
 		
-		dummyLabel4 = new JLabel("");
-		infoPanel.add(dummyLabel4);
-		
-		dummyLabel5 = new JLabel("");
-		infoPanel.add(dummyLabel5);
-		
-		btnConfiguration = new JButton("Config");
-		btnConfiguration.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/engine_16.png")));
-		btnConfiguration.setActionCommand(Actions.CONFIG_METRICS);
-		btnConfiguration.addActionListener(MainWindow.getListener());
-		infoPanel.add(btnConfiguration);
+		btnPreset = new JButton("Add to Normalization List");
+		btnPreset.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/add.png")));
+		GridBagConstraints gbc_btnPreset = new GridBagConstraints();
+		gbc_btnPreset.gridwidth = 2;
+		gbc_btnPreset.fill = GridBagConstraints.BOTH;
+		gbc_btnPreset.gridx = 0;
+		gbc_btnPreset.gridy = 6;
+		infoPanel.add(btnPreset, gbc_btnPreset);
 		chartPanel.setLayout(new BorderLayout(0, 0));
 		metricsPanel.setLayout(gl_metricsPanel);
 		
@@ -193,15 +232,15 @@ public class DesignPanelBase extends JPanel {
 		GroupLayout gl_actionsPanel = new GroupLayout(actionsPanel);
 		gl_actionsPanel.setHorizontalGroup(
 			gl_actionsPanel.createParallelGroup(Alignment.LEADING)
-				.addComponent(algorithmsPanel, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
 				.addComponent(posActionsPanel, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
+				.addComponent(algorithmsPanel, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
 		);
 		gl_actionsPanel.setVerticalGroup(
 			gl_actionsPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_actionsPanel.createSequentialGroup()
-					.addComponent(algorithmsPanel, GroupLayout.PREFERRED_SIZE, 99, GroupLayout.PREFERRED_SIZE)
+					.addComponent(algorithmsPanel, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(posActionsPanel, GroupLayout.DEFAULT_SIZE, 455, Short.MAX_VALUE))
+					.addComponent(posActionsPanel, GroupLayout.DEFAULT_SIZE, 443, Short.MAX_VALUE))
 		);
 		
 		algorithmsTabPane = new JTabbedPane(JTabbedPane.TOP);
@@ -212,9 +251,7 @@ public class DesignPanelBase extends JPanel {
 		);
 		gl_algorithmsPanel.setVerticalGroup(
 			gl_algorithmsPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_algorithmsPanel.createSequentialGroup()
-					.addComponent(algorithmsTabPane, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-					.addContainerGap(58, Short.MAX_VALUE))
+				.addComponent(algorithmsTabPane, GroupLayout.DEFAULT_SIZE, 74, Short.MAX_VALUE)
 		);
 		
 		hillClimbingPanel = new JPanel();
@@ -340,6 +377,30 @@ public class DesignPanelBase extends JPanel {
 		postActionsListScroller.setViewportView(posActionsList);
 		posActionsPanel.setLayout(gl_posActionsPanel);
 		actionsPanel.setLayout(gl_actionsPanel);
+		
+		panel = new JPanel();
+		panel.setOpaque(false);
+		panel.setBorder(new CompoundBorder(new EmptyBorder(5, 5, 0, 5), new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Metric & Action Configuration", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0))));
+		add(panel, BorderLayout.NORTH);
+		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		
+		runConfigBox = new JComboBox();
+		runConfigBox.setModel(new DefaultComboBoxModel(new String[] {"Default"}));
+		panel.add(runConfigBox);
+		
+		horizontalStrut = Box.createHorizontalStrut(5);
+		panel.add(horizontalStrut);
+		
+		btnConfigure = new JButton("Configure");
+		btnConfigure.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/engine_16.png")));
+		panel.add(btnConfigure);
+		
+		btnConfigure.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				new RunConfigDialog().setVisible(true);
+			}
+		});
 	}
 	
 	private static class PossibleActionsRenderer extends DefaultListCellRenderer {

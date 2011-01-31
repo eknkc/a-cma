@@ -3,7 +3,6 @@
 	<action class = "DecreaseFieldSecurity" />
 	<action class = "IncreaseFieldSecurity" />
 	<action class = "MakeClassAbstract" />
-	<action class = "FreezeMethod" />
 	<action class = "RemoveMethod" />
 	<action class = "RemoveField" />
 	<action class = "RemoveClass" />

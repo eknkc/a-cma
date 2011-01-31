@@ -24,7 +24,7 @@ public class ClassReader implements ClassVisitor {
 	private static final int STAGE_FIELDS = 2;
 	private static final int STAGE_METHODS = 3;
 	static final int STAGE_COUNT = 4;
-	
+	//TODO: 1 more stage to methods. It requires all aother methods to be loaded.
 	private Design design;
 	private Type type;
 	private int stage;
@@ -229,8 +229,6 @@ public class ClassReader implements ClassVisitor {
 
 		@Override
 		public void visitInsn(int arg0) {
-			// TODO Auto-generated method stub
-			
 		}
 
 		@Override
@@ -274,6 +272,10 @@ public class ClassReader implements ClassVisitor {
 
 		@Override
 		public void visitMethodInsn(int opcode, String owner, String name, String desc) {
+			if (owner.contains("/Core")) {
+				System.out.println();
+			}
+			
 			Type ot = design.getType(org.objectweb.asm.Type.getObjectType(owner).getClassName());
 			if (ot == null) return;
 			

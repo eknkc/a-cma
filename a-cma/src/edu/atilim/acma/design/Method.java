@@ -146,6 +146,10 @@ public class Method extends Node {
 		paramTypes.remove(ref);
 	}
 	
+	/**
+	 * Get all methods that are called from this method
+	 * @return Unmodifiable list of methods
+	 */
 	public List<Method> getCalledMethods() {
 		List<Method> methodList = CollectionHelper.map(calledMethods, new Reference.TargetSelector<Method>(Method.class));
 		return Collections.unmodifiableList(methodList);
@@ -168,6 +172,10 @@ public class Method extends Node {
 		}
 	}
 	
+	/**
+	 * Get All fields accessed from this method
+	 * @return Unmodifiable list of fields
+	 */
 	public List<Field> getAccessedFields() {
 		List<Field> methodList = CollectionHelper.map(accessedFields, new Reference.TargetSelector<Field>(Field.class));
 		return Collections.unmodifiableList(methodList);
@@ -190,6 +198,13 @@ public class Method extends Node {
 		}
 	}
 	
+	/**
+	 * Get all types that are instantiated by this method.
+	 * For example; if such a statement exists in the body of the method:
+	 * b = new B();
+	 * B is returned as an instantiated type.
+	 * @return Unmodifiable list of types
+	 */
 	public List<Type> getInstantiatedTypes() {
 		List<Type> methodList = CollectionHelper.map(instantiatedTypes, new Reference.TargetSelector<Type>(Type.class));
 		return Collections.unmodifiableList(methodList);
@@ -212,6 +227,10 @@ public class Method extends Node {
 		}
 	}
 	
+	/**
+	 * Get all methods that this method potentially calls.
+	 * @return Unmodifiable list of methods
+	 */
 	public List<Method> getCallerMethods() {
 		return getReferers(Tags.REF_DEPEND, Method.class);
 	}

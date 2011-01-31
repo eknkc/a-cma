@@ -5,6 +5,8 @@ import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,9 +16,12 @@ import java.util.Set;
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.filechooser.FileFilter;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 
@@ -29,14 +34,18 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 
+import edu.atilim.acma.RunConfig;
 import edu.atilim.acma.design.Design;
 import edu.atilim.acma.design.Type;
+import edu.atilim.acma.metrics.MetricSummary;
 import edu.atilim.acma.metrics.MetricTable;
 import edu.atilim.acma.transition.actions.Action;
+import edu.atilim.acma.ui.MainWindow.WindowEventListener;
 import edu.atilim.acma.ui.design.DesignPanelBase;
 import edu.atilim.acma.util.ACMAUtil;
+import edu.atilim.acma.util.Log;
 
-public class DesignPanel extends DesignPanelBase {
+public class DesignPanel extends DesignPanelBase implements WindowEventListener {
 	private static final long serialVersionUID = 1L;
 
 	private Design design;
@@ -48,8 +57,11 @@ public class DesignPanel extends DesignPanelBase {
 		this.metrics = this.design.getMetrics();
 		this.posActions = this.design.getPossibleActions();
 		
+		MainWindow.getInstance().addEventListener(this);
+		
 		initPossibleActions();
 		initMetrics();
+		updateConfigSelector();
 	}
 	
 	private void initPossibleActions() {
@@ -119,6 +131,64 @@ public class DesignPanel extends DesignPanelBase {
 		lblValNumItems.setText(String.valueOf(metrics.getRows().size()));
 		lblValWeightedSum.setText(String.format("%.2f", metrics.getWeightedSum()));
 		
+		btnSave.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fc = new JFileChooser();
+				fc.setFileFilter(new FileFilter() {
+					@Override
+					public String getDescription() {
+						return "CSV File";
+					}
+					
+					@Override
+					public boolean accept(File f) {
+						if (f.isDirectory()) return true;
+						return f.getName().endsWith(".csv");
+					}
+				});
+				fc.showSaveDialog(DesignPanel.this);
+
+				File out = fc.getSelectedFile();
+				
+				if (out == null) return;
+				
+				if (out.exists()) {
+					int res = JOptionPane.showConfirmDialog(DesignPanel.this, "This file already exists.\nRewrite?", "File exists", JOptionPane.OK_CANCEL_OPTION);
+					if (res == JOptionPane.CANCEL_OPTION) return;
+				}
+				
+				Log.info("Saving metrics to %s", out.getAbsolutePath());
+				
+				try {
+					metrics.writeCSV(out.getAbsolutePath());
+				} catch (IOException e1) {
+					Log.severe("Error saving metrics");
+				}
+			}
+		});
+		
+		btnPreset.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				String name = null;
+				do {
+					name = JOptionPane.showInputDialog(DesignPanel.this, "Please input a name for preset", design.toString());
+					
+					if (name == null) return;
+					
+					if (ConfigManager.getNormalMetric(name) != null) {
+						JOptionPane.showMessageDialog(DesignPanel.this, "Preset with this name already exists.");
+						name = null;
+					}
+				} while (name == null);
+				
+				MetricSummary ms = new MetricSummary(name, metrics);
+				ConfigManager.add(ms);
+				ConfigManager.saveChanges();
+			}
+		});
+		
 		updateMetricsChart();
 	}
 	
@@ -145,6 +215,31 @@ public class DesignPanel extends DesignPanelBase {
 		chartPanel.removeAll();
 		chartPanel.add(panel);
 		chartPanel.validate();
+	}
+	
+	private void updateConfigSelector() {
+		boolean prevfound = false;
+		Object prc = runConfigBox.getSelectedItem();
+		runConfigBox.removeAllItems();
+		
+		for (RunConfig rc : ConfigManager.runConfigs()) {
+			runConfigBox.addItem(rc);
+			
+			if (rc == prc) prevfound = true;
+		}
+		
+		if (prevfound) {
+			runConfigBox.setSelectedItem(prc);
+		} else {
+			runConfigBox.setSelectedIndex(0);
+		}
+	}
+	
+	@Override
+	public void onWindowEvent(Object e) {
+		if (ConfigManager.CONFIG_CHANGED.equals(e)) {
+			updateConfigSelector();
+		}
 	}
 	
 	private class MetricTableModel extends AbstractTableModel {

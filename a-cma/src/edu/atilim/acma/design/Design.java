@@ -1,6 +1,9 @@
 package edu.atilim.acma.design;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,9 +17,7 @@ import edu.atilim.acma.metrics.MetricTable;
 import edu.atilim.acma.transition.TransitionManager;
 import edu.atilim.acma.transition.actions.Action;
 
-public class Design implements Serializable {
-	private static final long serialVersionUID = 1L;
-	
+public class Design implements Externalizable {
 	private String name;
 	private ArrayList<Type> types;
 	private ArrayList<String> modificationLog;
@@ -133,5 +134,200 @@ public class Design implements Serializable {
 	@Override
 	public String toString() {
 		return name;
+	}
+
+	//TODO: These are not tested. I mean really, I just wrote them and it compiles. Don't know if they work.
+	@Override
+	public void readExternal(ObjectInput in) throws IOException,
+			ClassNotFoundException {
+		ArrayList<Method> methods = new ArrayList<Method>();
+		ArrayList<Field> fields = new ArrayList<Field>();
+		
+		in.readInt(); //version
+		
+		name = in.readUTF();
+		
+		int modlogcnt = in.readInt();
+		for (int i = 0; i < modlogcnt; i++) {
+			modificationLog.add(in.readUTF());
+		}
+		
+		int typecnt = in.readInt();
+		for (int i = 0; i < typecnt; i++) {
+			Type t = new Type(in.readUTF(), this);
+			types.add(t);
+			t.setFlags(in.readInt());
+			
+			int fldcnt = in.readInt();
+			for (int j = 0; j < fldcnt; j++) {
+				Field f = t.createField(in.readUTF());
+				f.setFlags(in.readInt());
+				
+				fields.add(f);
+			}
+			
+			int mthcnt = in.readInt();
+			for (int j = 0; j < mthcnt; j++) {
+				Method m = t.createMethod(in.readUTF());
+				m.setFlags(in.readInt());
+				
+				methods.add(m);
+			}
+		}
+		
+		for (int i = 0; i < typecnt; i++) {
+			Type t = types.get(i);
+			
+			int superindex = in.readInt();
+			int parentindex = in.readInt();
+			
+			if (superindex >= 0) t.setSuperType(types.get(superindex));
+			if (parentindex >= 0) t.setParentType(types.get(parentindex));
+			
+			int interfacecnt = in.readInt();
+			for (int j = 0; j < interfacecnt; j++) {
+				int interfaceindex = in.readInt();
+				
+				if (interfaceindex >= 0)
+					t.addInterface(types.get(in.readInt()));
+			}
+		}
+		
+		int fieldcnt = in.readInt();
+		for (int i = 0; i < fieldcnt; i++) {
+			int ftypeindex = in.readInt();
+			if (ftypeindex >= 0)
+				fields.get(i).setType(types.get(ftypeindex));
+		}
+		
+		int methodcnt = in.readInt();
+		for (int i = 0; i < methodcnt; i++) {
+			Method m = methods.get(i);
+			
+			int calledcnt = in.readInt();
+			for (int j = 0; j < calledcnt; j++) {
+				int calledindex = in.readInt();
+				if (calledindex >= 0)
+					m.addCalledMethod(methods.get(calledindex));
+			}
+			
+			int accessedcnt = in.readInt();
+			for (int j = 0; j < accessedcnt; j++) {
+				int accessedindex = in.readInt();
+				if (accessedindex >= 0)
+					m.addAccessedField(fields.get(accessedindex));
+			}
+			
+			int instantiatedcnt = in.readInt();
+			for (int j = 0; j < instantiatedcnt; j++) {
+				int instantiatedindex = in.readInt();
+				if (instantiatedindex >= 0)
+					m.addInstantiatedType(types.get(instantiatedindex));
+			}
+			
+			int paramscnt = in.readInt();
+			for (int j = 0; j < paramscnt; j++) {
+				int dim = in.readInt();
+				boolean internal = in.readBoolean();
+				
+				if (internal)
+					m.addParameter(types.get(in.readInt()), dim);
+				else
+					m.addParameter(in.readUTF(), dim);
+			}
+		}
+	}
+
+	@Override
+	public void writeExternal(ObjectOutput out) throws IOException {
+		ArrayList<Method> methods = new ArrayList<Method>();
+		ArrayList<Field> fields = new ArrayList<Field>();
+		
+		out.writeInt(0); //version
+		out.writeUTF(name);
+		
+		out.writeInt(modificationLog.size());
+		for (String mod : modificationLog) {
+			out.writeUTF(mod);
+		}
+		
+		out.writeInt(types.size());
+		for (int i = 0; i < types.size(); i++) {
+			Type t = types.get(i);
+		
+			out.writeUTF(t.getName());
+			out.writeInt(t.getFlags());
+			
+			List<Method> tm = t.getMethods();
+			List<Field> tf = t.getFields();
+			
+			out.writeInt(tf.size());
+			for (int j = 0; j < tf.size(); j++) {
+				out.writeUTF(tf.get(j).getName());
+				out.writeInt(tf.get(j).getFlags());
+				
+				fields.add(tf.get(j));
+			}
+			
+			out.writeInt(tm.size());
+			for (int j = 0; j < tm.size(); j++) {
+				out.writeUTF(tm.get(j).getName());
+				out.writeInt(tm.get(j).getFlags());
+				
+				methods.add(tm.get(j));
+			}
+		}
+		
+		for (int i = 0; i < types.size(); i++) {
+			Type t = types.get(i);
+			
+			out.writeInt(types.indexOf(t.getSuperType()));
+			out.writeInt(types.indexOf(t.getParentType()));
+			
+			List<Type> interfaces = t.getInterfaces();
+			out.writeInt(interfaces.size());
+			for (int j = 0; j < interfaces.size(); j++)
+				out.writeInt(types.indexOf(interfaces.get(j)));
+		}
+		
+		out.writeInt(fields.size());
+		for (int i = 0; i < fields.size(); i++) {
+			out.writeInt(types.indexOf(fields.get(i).getType()));
+		}
+		
+		out.writeInt(methods.size());
+		for (int i = 0; i < methods.size(); i++) {
+			Method m = methods.get(i);
+			
+			List<Method> called = m.getCalledMethods();
+			List<Field> accessed = m.getAccessedFields();
+			List<Type> instantiated = m.getInstantiatedTypes();
+			List<Reference> params = m.getRawParameters();
+			
+			out.writeInt(called.size());
+			for (Method cm : called)
+				out.writeInt(methods.indexOf(cm));
+			
+			out.writeInt(accessed.size());
+			for (Field af : accessed)
+				out.writeInt(fields.indexOf(af));
+			
+			out.writeInt(instantiated.size());
+			for (Type it : instantiated)
+				out.writeInt(types.indexOf(it));
+			
+			out.writeInt(params.size());
+			for (Reference ref : params) {
+				Type target = (Type)ref.getTarget();
+				
+				out.writeInt(ref.getDimension());
+				out.writeBoolean(target != null);
+				if (target != null) {
+					out.writeInt(types.indexOf(target));
+				} else {
+					out.writeUTF(ref.toRawString());
+				}
+			}
+		}
 	}
 }

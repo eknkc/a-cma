@@ -45,8 +45,7 @@ public class MainWindowBase extends JFrame {
 	protected JSeparator sp1;
 	protected JMenuItem mnitmExit;
 	protected JMenu mnSettings;
-	protected JMenuItem mnitmConfigureMetrics;
-	protected JMenuItem mnitmConfigureActions;
+	protected JMenuItem mnitmRunConfig;
 	protected JSeparator sp2;
 	protected JMenuItem mnitmClearConsole;
 	protected JMenu mnHelp;
@@ -142,17 +141,11 @@ public class MainWindowBase extends JFrame {
 		mnSettings = new JMenu("Settings");
 		menuBar.add(mnSettings);
 		
-		mnitmConfigureMetrics = new JMenuItem("Configure Metrics");
-		mnitmConfigureMetrics.setIcon(new ImageIcon(MainWindowBase.class.getResource("/resources/icons/statistics2_16.png")));
-		mnitmConfigureMetrics.setActionCommand(Actions.CONFIG_METRICS);
-		mnitmConfigureMetrics.addActionListener(MainWindow.getListener());
-		mnSettings.add(mnitmConfigureMetrics);
-		
-		mnitmConfigureActions = new JMenuItem("Configure Actions");
-		mnitmConfigureActions.setIcon(new ImageIcon(MainWindowBase.class.getResource("/resources/icons/engine_16.png")));
-		mnitmConfigureActions.setActionCommand(Actions.CONFIG_ACTIONS);
-		mnitmConfigureActions.addActionListener(MainWindow.getListener());
-		mnSettings.add(mnitmConfigureActions);
+		mnitmRunConfig = new JMenuItem("Run Configuration");
+		mnitmRunConfig.setIcon(new ImageIcon(MainWindowBase.class.getResource("/resources/icons/engine_16.png")));
+		mnitmRunConfig.setActionCommand(Actions.CONFIG_RUN);
+		mnitmRunConfig.addActionListener(MainWindow.getListener());
+		mnSettings.add(mnitmRunConfig);
 		
 		sp2 = new JSeparator();
 		mnSettings.add(sp2);
