@@ -43,16 +43,6 @@ public class DesignReader implements DesignLoader {
 		return design;
 	}
 	
-	static boolean isCompilerGenerated(String name) {
-		int lastDollar = name.lastIndexOf('$');
-		if (lastDollar > 0) {
-			try { Integer.parseInt(String.valueOf(name.charAt(lastDollar + 1))); return true; }
-			catch (NumberFormatException nfe) { }
-			catch (StringIndexOutOfBoundsException sioobe) { }
-		}
-		return false;
-	}
-	
 	private List<File> findAllClassFiles() {
 		Stack<File> dirs  = new Stack<File>();
 		ArrayList<File> files = new ArrayList<File>();
@@ -67,9 +57,6 @@ public class DesignReader implements DesignLoader {
 				if (f.isDirectory())
 					dirs.push(f);
 				else if (f.getName().endsWith(".class")) {
-					if (isCompilerGenerated(f.getName()))
-						continue;
-					
 					files.add(f);
 				}
 			}

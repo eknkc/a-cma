@@ -127,7 +127,7 @@ public class LoadedDesigns extends LoadedDesignsPanelBase {
 		DefaultMutableTreeNode pNode = new DefaultMutableTreeNode(pack);
 		
 		for (Type t : pack.getTypes()) {
-			if (t.getParentType() == null)
+			if (t.getParentType() == null && t.isUserVisible())
 				pNode.add(populateTypeTree(t));
 		}
 		
@@ -137,7 +137,8 @@ public class LoadedDesigns extends LoadedDesignsPanelBase {
 	private DefaultMutableTreeNode populateTypeTree(Type type) {
 		DefaultMutableTreeNode tNode = new DefaultMutableTreeNode(type);
 		for (Type cType : type.getNestedTypes()) {
-			tNode.add(populateTypeTree(cType));
+			if (cType.isUserVisible())
+				tNode.add(populateTypeTree(cType));
 		}
 		return tNode;
 	}

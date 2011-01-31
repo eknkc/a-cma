@@ -16,15 +16,15 @@ public class IncreaseFieldSecurity {
 			
 			for (Type t : types) {
 				for (Field f : t.getFields()) {
-					if (f.isConstant() ||  f.getAccess() == Accessibility.PUBLIC) continue;
+					if (f.isCompilerGenerated() || f.isConstant() ||  f.getAccess() == Accessibility.PUBLIC) continue;
 					
 					Accessibility newaccess = Accessibility.PUBLIC;
 					
 					if (f.getAccess() == Accessibility.PRIVATE)
-						newaccess = Accessibility.PROTECTED;
-					if (f.getAccess() == Accessibility.PROTECTED)
 						newaccess = Accessibility.PACKAGE;
 					if (f.getAccess() == Accessibility.PACKAGE)
+						newaccess = Accessibility.PROTECTED;
+					if (f.getAccess() == Accessibility.PROTECTED)
 						newaccess = Accessibility.PUBLIC;
 					
 					set.add(new Performer(t.getName(), f.getName(), newaccess));

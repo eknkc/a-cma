@@ -86,6 +86,7 @@ public class LoadedDesignsPanelBase extends JPanel {
 		private static final Icon packageIcon = new ImageIcon(LoadedDesignsPanelBase.class.getResource("/resources/icons/java/package.gif"));
 		private static final Icon classIcon = new ImageIcon(LoadedDesignsPanelBase.class.getResource("/resources/icons/java/class.gif"));
 		private static final Icon interfaceIcon = new ImageIcon(LoadedDesignsPanelBase.class.getResource("/resources/icons/java/interface.gif"));
+		private static final Icon annotIcon = new ImageIcon(LoadedDesignsPanelBase.class.getResource("/resources/icons/java/annotation.gif"));
 		
 		@Override
 		public Component getTreeCellRendererComponent(JTree tree, Object value,
@@ -103,7 +104,10 @@ public class LoadedDesignsPanelBase extends JPanel {
 				setIcon(packageIcon);
 			} else if (o instanceof Type) {
 				Type t = (Type)o;
-				if (t.isInterface())
+				
+				if (t.isAnnotation())
+					setIcon(annotIcon);
+				else if (t.isInterface())
 					setIcon(interfaceIcon);
 				else
 					setIcon(classIcon);

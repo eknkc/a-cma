@@ -20,8 +20,41 @@ public abstract class Node implements Serializable {
 		this.design = design;
 	}
 	
-	public String getName() {
-		return name;
+	public boolean canAccess(Node other) {
+		return canAccess(other, other.getAccess());
+	}
+	
+	public boolean canAccess(Node other, Accessibility otheroverride) {
+		if (otheroverride == Accessibility.PUBLIC)
+			return true;
+		
+		if (otheroverride == Accessibility.PACKAGE)
+			return getPackage().equals(other.getPackage());
+		
+		if (otheroverride == Accessibility.PROTECTED) {
+			if (getPackage().equals(other.getPackage()))
+				return true;
+			
+			Type myType = getOwnerType();
+			Type otType = other.getOwnerType();
+			
+			if (myType == null || otType == null) return false;
+			
+			return otType.isAncestorOf(myType);
+		}
+		
+		if (otheroverride == Accessibility.PRIVATE) {
+			return getOwnerType() == other.getOwnerType();
+		}
+		
+		return false;
+	}
+	
+	public Accessibility getAccess() {
+		if (getFlag(Tags.PRIVATE)) return Accessibility.PRIVATE;
+		if (getFlag(Tags.PROTECTED)) return Accessibility.PROTECTED;
+		if (getFlag(Tags.PUBLIC)) return Accessibility.PUBLIC;
+		return Accessibility.PACKAGE;
 	}
 	
 	public Design getDesign() {
@@ -32,24 +65,17 @@ public abstract class Node implements Serializable {
 		return (flags & flag) > 0;
 	}
 	
-	protected void setFlag(int flag) {
-		setFlag(flag, true);
-	}
-	
-	protected void setFlag(int flag, boolean value) {
-		if (value)
-			flags |= flag;
-		else
-			flags &= ~flag;
-	}
-	
 	int getFlags() {
 		return flags;
 	}
 	
-	void setFlags(int flags) {
-		this.flags = flags;
+	public String getName() {
+		return name;
 	}
+	
+	public abstract Type getOwnerType();
+	
+	public abstract Package getPackage();
 	
 	public Reference getReference(Node from, Node to, int tag) {
 		Reference r = design.getReference(from, to, tag);
@@ -65,10 +91,6 @@ public abstract class Node implements Serializable {
 		return r;
 	}
 	
-	public void removeReference(Reference ref) {
-		incomingReferences.remove(ref);
-	}
-	
 	public <T extends Node> List<T> getReferers(Class<T> cls) {
 		return getReferers(-1, cls);
 	}
@@ -77,35 +99,46 @@ public abstract class Node implements Serializable {
 		return incomingReferences.getSourcesByTag(tag, cls);
 	}
 	
-	public boolean isFinal() {
-		return getFlag(Tags.FINAL);
+	public boolean isAbstract() {
+		return getFlag(Tags.ABSTRACT);
 	}
 	
-	public void setFinal(boolean value) {
-		setFlag(Tags.FINAL, value);
+	public boolean isCompilerGenerated() {
+		int lastDollar = name.lastIndexOf('$');
+		if (lastDollar > 0) {
+			try { Integer.parseInt(String.valueOf(name.charAt(lastDollar + 1))); return true; }
+			catch (NumberFormatException nfe) { }
+			catch (StringIndexOutOfBoundsException sioobe) { }
+		}
+		return false;
+	}
+	
+	public boolean isFinal() {
+		return getFlag(Tags.FINAL);
 	}
 	
 	public boolean isStatic() {
 		return getFlag(Tags.STATIC);
 	}
 	
-	public void setStatic(boolean value) {
-		setFlag(Tags.STATIC, value);
+	public boolean isUserVisible() {
+		return !isCompilerGenerated();
 	}
 	
-	public boolean isAbstract() {
-		return getFlag(Tags.ABSTRACT);
+	public boolean remove() {
+		if (incomingReferences.size() > 0) {
+			Log.warning("Trying to remove node [%s] from design with incoming references present.", getName());
+			return false;
+		}
+		return true;
+	}
+	
+	public void removeReference(Reference ref) {
+		incomingReferences.remove(ref);
 	}
 	
 	public void setAbstract(boolean value) {
 		setFlag(Tags.ABSTRACT, value);
-	}
-	
-	public Accessibility getAccess() {
-		if (getFlag(Tags.PRIVATE)) return Accessibility.PRIVATE;
-		if (getFlag(Tags.PROTECTED)) return Accessibility.PROTECTED;
-		if (getFlag(Tags.PUBLIC)) return Accessibility.PUBLIC;
-		return Accessibility.PACKAGE;
 	}
 	
 	public void setAccess(Accessibility access) {
@@ -125,41 +158,25 @@ public abstract class Node implements Serializable {
 		}
 	}
 	
-	public boolean remove() {
-		if (incomingReferences.size() > 0) {
-			Log.warning("Trying to remove node [%s] from design with incoming references present.", getName());
-			return false;
-		}
-		return true;
+	public void setFinal(boolean value) {
+		setFlag(Tags.FINAL, value);
 	}
 	
-	public abstract Package getPackage();
-	public abstract Type getOwnerType();
-	
-	public boolean canAccess(Node other) {
-		return canAccess(other, other.getAccess());
+	protected void setFlag(int flag) {
+		setFlag(flag, true);
+	}
+	protected void setFlag(int flag, boolean value) {
+		if (value)
+			flags |= flag;
+		else
+			flags &= ~flag;
 	}
 	
-	public boolean canAccess(Node other, Accessibility otheroverride) {
-		if (otheroverride == Accessibility.PUBLIC)
-			return true;
-		
-		if (otheroverride == Accessibility.PACKAGE)
-			return getPackage().equals(other.getPackage());
-		
-		if (otheroverride == Accessibility.PROTECTED) {
-			Type myType = getOwnerType();
-			Type otType = other.getOwnerType();
-			
-			if (myType == null || otType == null) return false;
-			
-			return otType.isAncestorOf(myType);
-		}
-		
-		if (otheroverride == Accessibility.PRIVATE) {
-			return getOwnerType() == other.getOwnerType();
-		}
-		
-		return false;
+	void setFlags(int flags) {
+		this.flags = flags;
+	}
+	
+	public void setStatic(boolean value) {
+		setFlag(Tags.STATIC, value);
 	}
 }

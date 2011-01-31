@@ -93,6 +93,9 @@ public class ClassReader implements ClassVisitor {
 		if (n instanceof Type) {
 			if (checkFlag(access, Opcodes.ACC_INTERFACE))
 				((Type)n).setInterface(true);
+			
+			if (checkFlag(access, Opcodes.ACC_ANNOTATION))
+				((Type)n).setAnnotation(true);
 		}
 		if (checkFlag(access, Opcodes.ACC_ABSTRACT))
 			n.setAbstract(true);
@@ -121,7 +124,7 @@ public class ClassReader implements ClassVisitor {
 	}
 
 	@Override
-	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
+	public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {		
 		if (stage == STAGE_BASE) {
 			type = design.create(org.objectweb.asm.Type.getObjectType(name).getClassName(), Type.class);
 
@@ -147,10 +150,7 @@ public class ClassReader implements ClassVisitor {
 
 	@Override
 	public FieldVisitor visitField(int access, String name, String desc, String signature, Object value) {
-		if (stage == STAGE_FIELDS) {
-			if (DesignReader.isCompilerGenerated(name))
-				return null;
-			
+		if (stage == STAGE_FIELDS) {	
 			org.objectweb.asm.Type ft = org.objectweb.asm.Type.getType(desc);
 			
 			Field f = type.createField(name);
@@ -172,9 +172,7 @@ public class ClassReader implements ClassVisitor {
 
 	@Override
 	public MethodVisitor visitMethod(int access, String name, String desc, String signature, String[] exceptions) {
-		if (stage == STAGE_METHODS) {
-			if (DesignReader.isCompilerGenerated(name)) return null;
-					
+		if (stage == STAGE_METHODS) {				
 			Method m = type.createMethod(name);
 			setAccess(m, access);
 			
@@ -297,11 +295,7 @@ public class ClassReader implements ClassVisitor {
 		}
 
 		@Override
-		public void visitMethodInsn(int opcode, String owner, String name, String desc) {
-			if (owner.endsWith("Core")) {
-				System.out.println();
-			}
-			
+		public void visitMethodInsn(int opcode, String owner, String name, String desc) {	
 			Type ot = design.getType(org.objectweb.asm.Type.getObjectType(owner).getClassName());
 			if (ot == null) return;
 			

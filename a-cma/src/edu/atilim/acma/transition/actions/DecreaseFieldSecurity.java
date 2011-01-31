@@ -21,15 +21,15 @@ public class DecreaseFieldSecurity {
 				for (Field f : t.getFields()) {
 					// Turns out, Java compiler binds accesses to constants (static final) in compile time
 					// So, a constant does not reflect the access characteristics of a field in bytecode.
-					if (f.isConstant() ||  f.getAccess() == Accessibility.PRIVATE) continue;
+					if (f.isCompilerGenerated() || f.isConstant() ||  f.getAccess() == Accessibility.PRIVATE) continue;
 					
 					Accessibility newaccess = Accessibility.PRIVATE;
 					
 					if (f.getAccess() == Accessibility.PUBLIC)
-						newaccess = Accessibility.PACKAGE;
-					if (f.getAccess() == Accessibility.PACKAGE)
 						newaccess = Accessibility.PROTECTED;
 					if (f.getAccess() == Accessibility.PROTECTED)
+						newaccess = Accessibility.PACKAGE;
+					if (f.getAccess() == Accessibility.PACKAGE)
 						newaccess = Accessibility.PRIVATE;
 					
 					for (Method m : f.getAccessors()) {

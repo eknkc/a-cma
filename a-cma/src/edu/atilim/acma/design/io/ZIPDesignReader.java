@@ -31,9 +31,6 @@ public class ZIPDesignReader implements DesignLoader {
 			if (ze.isDirectory() || !ze.getName().endsWith(".class"))
 				continue;
 			
-			if (DesignReader.isCompilerGenerated(ze.getName()))
-				continue;
-			
 			readers.add(Pair.create(new ClassReader(design), ze));
 		}
 		

@@ -13,7 +13,6 @@ public class RemoveMethod {
 	public static class Checker implements ActionChecker {
 		@Override
 		public void findPossibleActions(Design design, Set<Action> set) {
-			
 			for (Type t : design.getTypes())
 			{
 				method:

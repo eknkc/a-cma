@@ -300,6 +300,7 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 		private static final Icon packageIcon = new ImageIcon(MetricTableRenderer.class.getResource("/resources/icons/java/package.gif"));
 		private static final Icon classIcon = new ImageIcon(MetricTableRenderer.class.getResource("/resources/icons/java/class.gif"));
 		private static final Icon interfaceIcon = new ImageIcon(MetricTableRenderer.class.getResource("/resources/icons/java/interface.gif"));
+		private static final Icon annotIcon = new ImageIcon(MetricTableRenderer.class.getResource("/resources/icons/java/annotation.gif"));
 		
 		@Override
 		public Component getTableCellRendererComponent(JTable table,
@@ -318,7 +319,9 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 				}
 			} else if (value instanceof Type) {
 				Type tval = (Type)value;
-				if (tval.isInterface())
+				if (tval.isAnnotation())
+					setIcon(annotIcon);
+				else if (tval.isInterface())
 					setIcon(interfaceIcon);
 				else
 					setIcon(classIcon);

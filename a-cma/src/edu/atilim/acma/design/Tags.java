@@ -26,4 +26,5 @@ public final class Tags {
 	
 	// Type flags
 	public static final int TYP_INTERFACE = 0x00000100;
+	public static final int TYP_ANNOTATION = 0x00000200;
 }

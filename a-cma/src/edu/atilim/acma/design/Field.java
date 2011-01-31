@@ -12,6 +12,29 @@ public class Field extends Node {
 		super(name, design);
 	}
 	
+	public List<Method> getAccessors() {
+		return getReferers(Tags.REF_DEPEND, Method.class);
+	}
+	
+	public Type getOwnerType() {
+		return ownerType == null ? null : ownerType.getTarget(Type.class);
+	}
+	
+	@Override
+	public Package getPackage() {
+		Type owner = getOwnerType();
+		if (owner == null) return Package.emptyPackage(getDesign());
+		return owner.getPackage();
+	}
+
+	public Type getType() {
+		return type == null ? null : type.getTarget(Type.class);
+	}
+	
+	public boolean isConstant() {
+		return isStatic() && isFinal();
+	}
+
 	@Override
 	public boolean remove() {
 		if (!super.remove()) return false;
@@ -22,19 +45,11 @@ public class Field extends Node {
 		return true;
 	}
 	
-	public boolean isConstant() {
-		return isStatic() && isFinal();
-	}
-	
 	public void setOwnerType(Type ownerType) {
 		if (this.ownerType != null)
 			this.ownerType.release();
 		
 		this.ownerType = getReference(this, ownerType, Tags.REF_PARENT);
-	}
-
-	public Type getOwnerType() {
-		return ownerType == null ? null : ownerType.getTarget(Type.class);
 	}
 	
 	public void setType(Type type) {
@@ -42,21 +57,6 @@ public class Field extends Node {
 			this.type.release();
 		
 		this.type = getReference(this, type, Tags.REF_RETURN);
-	}
-
-	public Type getType() {
-		return type == null ? null : type.getTarget(Type.class);
-	}
-	
-	public List<Method> getAccessors() {
-		return getReferers(Tags.REF_DEPEND, Method.class);
-	}
-	
-	@Override
-	public Package getPackage() {
-		Type owner = getOwnerType();
-		if (owner == null) return Package.emptyPackage(getDesign());
-		return owner.getPackage();
 	}
 	
 	@Override

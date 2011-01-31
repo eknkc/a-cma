@@ -16,7 +16,6 @@ public class RemoveClass {
 			{	
 				if(t.getExtenders().isEmpty() && t.getDependentFields().isEmpty() && t.getMethods().isEmpty() && t.getDependentMethodsAsInstantiator().isEmpty() )
 					set.add(new Performer(t.getName()));
-				
 			}
 		}
 	}

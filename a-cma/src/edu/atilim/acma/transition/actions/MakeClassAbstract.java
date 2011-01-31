@@ -11,7 +11,7 @@ public final class MakeClassAbstract {
 		@Override
 		public void findPossibleActions(Design design, Set<Action> set) {
 			for (Type t : design.getTypes()) {
-				if (t.isInterface() || t.isAbstract()) continue;
+				if (t.isCompilerGenerated() || t.isAnnotation() || t.isInterface() || t.isAbstract()) continue;
 				
 				if (t.getDependentMethodsAsInstantiator().size() != 0)
 					continue;
