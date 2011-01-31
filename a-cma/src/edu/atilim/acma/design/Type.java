@@ -22,8 +22,10 @@ public class Type extends Node {
 	@Override
 	public boolean remove() {
 		if (!super.remove()) return false;
-		parentType.release();
-		superType.release();
+		if (parentType != null)
+			parentType.release();
+		if (superType != null)
+			superType.release();
 		for (Reference ref : interfaces)
 			ref.release();
 		getDesign().removeType(this);

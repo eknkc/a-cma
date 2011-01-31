@@ -15,8 +15,10 @@ public class Field extends Node {
 	@Override
 	public boolean remove() {
 		if (!super.remove()) return false;
-		ownerType.release();
-		type.release();
+		if (ownerType != null)
+			ownerType.release();
+		if (type != null)
+			type.release();
 		return true;
 	}
 	

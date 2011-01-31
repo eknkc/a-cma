@@ -29,8 +29,10 @@ public class Method extends Node {
 	@Override
 	public boolean remove() {
 		if (!super.remove()) return false;
-		ownerType.release();
-		returnType.release();
+		if (ownerType != null)
+			ownerType.release();
+		if (returnType != null)
+			returnType.release();
 		for (Reference ref : paramTypes) ref.release();
 		for (Reference ref : calledMethods) ref.release();
 		for (Reference ref : accessedFields) ref.release();

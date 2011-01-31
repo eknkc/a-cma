@@ -23,8 +23,9 @@ public class ClassReader implements ClassVisitor {
 	private static final int STAGE_AFTERBASE = 1;
 	private static final int STAGE_FIELDS = 2;
 	private static final int STAGE_METHODS = 3;
-	static final int STAGE_COUNT = 4;
-	//TODO: 1 more stage to methods. It requires all aother methods to be loaded.
+	private static final int STAGE_AFTERMETHODS = 4;
+	static final int STAGE_COUNT = 5;
+	
 	private Design design;
 	private Type type;
 	private int stage;
@@ -32,6 +33,7 @@ public class ClassReader implements ClassVisitor {
 	private ArrayList<String> inner;
 	private String[] interfaces;
 	private String superclass;
+	private ArrayList<MethodAccess> methodAccesses;
 	
 	public ClassReader(Design d) {
 		design = d;
@@ -43,6 +45,8 @@ public class ClassReader implements ClassVisitor {
 		
 		if (stage == STAGE_AFTERBASE) {
 			afterBase();
+		} else if (stage == STAGE_AFTERMETHODS) {
+			afterMethods();
 		} else {
 			try {
 				new org.objectweb.asm.ClassReader(stream).accept(this, 0);
@@ -71,6 +75,16 @@ public class ClassReader implements ClassVisitor {
 		superclass = null; interfaces = null; inner = null;
 	}
 	
+	private void afterMethods() {
+		if (methodAccesses == null) return;
+		
+		for (MethodAccess ma : methodAccesses) {
+			Method dest = ma.destType.getMethod(ma.destMethod);
+			if (dest != null)
+				ma.method.addCalledMethod(dest);
+		}
+	}
+	
 	private boolean checkFlag(int flags, int flag) {
 		return ((flags & flag) > 0);
 	}
@@ -92,6 +106,18 @@ public class ClassReader implements ClassVisitor {
 			n.setAccess(Accessibility.PROTECTED);
 		if (checkFlag(access, Opcodes.ACC_PRIVATE))
 			n.setAccess(Accessibility.PRIVATE);
+	}
+	
+	private class MethodAccess {
+		private Method method;
+		private Type destType;
+		private String destMethod;
+		
+		private MethodAccess(Method method, Type destType, String destMethod) {
+			this.method = method;
+			this.destType = destType;
+			this.destMethod = destMethod;
+		}
 	}
 
 	@Override
@@ -272,7 +298,7 @@ public class ClassReader implements ClassVisitor {
 
 		@Override
 		public void visitMethodInsn(int opcode, String owner, String name, String desc) {
-			if (owner.contains("/Core")) {
+			if (owner.endsWith("Core")) {
 				System.out.println();
 			}
 			
@@ -290,10 +316,9 @@ public class ClassReader implements ClassVisitor {
 				sign.setLength(sign.length() - 1);
 			sign.append(')');
 			
-			Method m = ot.getMethod(sign.toString());
-			if (m == null) return;
+			if (methodAccesses == null) methodAccesses = new ArrayList<ClassReader.MethodAccess>();
 			
-			method.addCalledMethod(m);
+			methodAccesses.add(new MethodAccess(method, ot, sign.toString()));
 		}
 
 		@Override
