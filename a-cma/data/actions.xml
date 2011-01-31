@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <actions>
-	<action class="DecreaseFieldSecurity" />
-	<action class="IncreaseFieldSecurity" />
-	<action class="MakeClassAbstract" />
+	<action class = "DecreaseFieldSecurity" />
+	<action class = "IncreaseFieldSecurity" />
+	<action class = "MakeClassAbstract" />
+	<action class = "FreezeMethod" />
+	<action class = "RemoveMethod" />
+	<action class = "RemoveField" />
+	<action class = "RemoveClass" />
+	<action class = "RemoveInterface" />
 </actions>
