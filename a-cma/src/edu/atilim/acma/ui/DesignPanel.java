@@ -5,11 +5,15 @@ import java.awt.Component;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
+import java.util.UUID;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -37,8 +41,10 @@ import org.jfree.data.general.DefaultPieDataset;
 import edu.atilim.acma.RunConfig;
 import edu.atilim.acma.design.Design;
 import edu.atilim.acma.design.Type;
+import edu.atilim.acma.metrics.MetricCalculator;
 import edu.atilim.acma.metrics.MetricSummary;
 import edu.atilim.acma.metrics.MetricTable;
+import edu.atilim.acma.transition.TransitionManager;
 import edu.atilim.acma.transition.actions.Action;
 import edu.atilim.acma.ui.MainWindow.WindowEventListener;
 import edu.atilim.acma.ui.design.DesignPanelBase;
@@ -49,32 +55,26 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 	private static final long serialVersionUID = 1L;
 
 	private Design design;
-	private MetricTable metrics;
-	private Set<Action> posActions;
+	private DesignData designData;
 	
 	DesignPanel(Design design) {
 		this.design = design;
-		this.metrics = this.design.getMetrics();
-		this.posActions = this.design.getPossibleActions();
+		this.designData = new DesignData();
 		
 		MainWindow.getInstance().addEventListener(this);
 		
 		initPossibleActions();
 		initMetrics();
-		updateConfigSelector();
+		initConfigSelector();
+		
+		validateDesignData();
 	}
 	
 	private void initPossibleActions() {
-		final DefaultListModel model = new DefaultListModel();
-		for (Action act : posActions) {
-			model.addElement(act.toString());
-		}
-		posActionsList.setModel(model);
-		
 		btnPosActionsRefresh.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				posActionsList.setModel(model);
+				posActionsList.validate();
 			}
 		});
 		
@@ -82,7 +82,7 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
 				HashMap<String, Integer> actionMap = new HashMap<String, Integer>();
-				for (Action act : posActions) {
+				for (Action act : designData.getActions()) {
 					String type = act.getClass().getEnclosingClass().getSimpleName();
 					
 					if (actionMap.containsKey(type))
@@ -112,8 +112,6 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 	
 	private void initMetrics() {
 		metricTable.setDefaultRenderer(Object.class, new MetricTableRenderer());
-		metricTable.setModel(new MetricTableModel());
-		metricTable.getColumnModel().getColumn(0).setPreferredWidth(250);
 		
 		metricTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override
@@ -121,15 +119,11 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 				EventQueue.invokeLater(new Runnable() {
 					@Override
 					public void run() {
-						updateMetricsChart();
+						drawMetricsChart();
 					}
 				});
 			}
 		});
-		
-		lblValNumMetrics.setText(String.valueOf(metrics.getCols().size()));
-		lblValNumItems.setText(String.valueOf(metrics.getRows().size()));
-		lblValWeightedSum.setText(String.format("%.2f", metrics.getWeightedSum()));
 		
 		btnSave.addActionListener(new ActionListener() {
 			@Override
@@ -161,7 +155,7 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 				Log.info("Saving metrics to %s", out.getAbsolutePath());
 				
 				try {
-					metrics.writeCSV(out.getAbsolutePath());
+					designData.getTable().writeCSV(out.getAbsolutePath());
 				} catch (IOException e1) {
 					Log.severe("Error saving metrics");
 				}
@@ -183,27 +177,26 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 					}
 				} while (name == null);
 				
-				MetricSummary ms = new MetricSummary(name, metrics);
+				MetricSummary ms = new MetricSummary(name, designData.getTable());
 				ConfigManager.add(ms);
 				ConfigManager.saveChanges();
 			}
 		});
-		
-		updateMetricsChart();
 	}
 	
-	private void updateMetricsChart() {
-		ArrayList<String> cols = new ArrayList<String>(metrics.getCols().keySet());
+	private void drawMetricsChart() {
+		List<String> cols = designData.getCols();
+		List<String> rows = designData.getRows();
 		
 		DefaultCategoryDataset ds = new DefaultCategoryDataset();
 		
 		for (int i = 0; i < cols.size(); i++) {
-			ds.addValue(Math.log(metrics.getAverage(cols.get(i)) + 1), "Averages", cols.get(i));
+			ds.addValue(Math.log(designData.getTable().getAverage(cols.get(i)) + 1), "Averages", cols.get(i));
 		}
-		
+
 		if (metricTable.getSelectedRow() >= 0) {
 			for (int i = 0; i < cols.size(); i++)
-				ds.addValue(Math.log(metrics.get(metricTable.getSelectedRow(), i) + 1), "Selected", cols.get(i));
+				ds.addValue(Math.log(designData.getTable().get(rows.get(metricTable.getSelectedRow()), cols.get(i)) + 1), "Selected", cols.get(i));
 		}
 		
 		JFreeChart chart = ChartFactory.createBarChart("", "", "log(value)", ds, PlotOrientation.VERTICAL, true, true, false);
@@ -217,15 +210,60 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 		chartPanel.validate();
 	}
 	
+	private void validateDesignData() {
+		designData = new DesignData();
+		
+		metricTable.setModel(new MetricTableModel());
+		metricTable.getColumnModel().getColumn(0).setPreferredWidth(300);
+		
+		lblValNumMetrics.setText(String.valueOf(designData.getCols().size()));
+		lblValNumItems.setText(String.valueOf(designData.getRows().size()));
+		lblValWeightedSum.setText(String.format("%.2f", designData.getScore()));
+		
+		final DefaultListModel model = new DefaultListModel();
+		for (Action act : designData.getActions()) {
+			model.addElement(act.toString());
+		}
+		posActionsList.setModel(model);
+		
+		drawMetricsChart();
+	}
+	
+	private RunConfig getRunConfig() {
+		Object rc = runConfigBox.getSelectedItem();
+		if (rc == null || !(rc instanceof RunConfig)) return RunConfig.getDefault();
+		return (RunConfig)rc;
+	}
+	
+	private void initConfigSelector() {
+		updateConfigSelector();
+		
+		runConfigBox.addItemListener(new ItemListener() {
+			@Override
+			public void itemStateChanged(ItemEvent e) {
+				if (e.getStateChange() == ItemEvent.SELECTED) {
+					validateDesignData();
+				}
+			}
+		});
+	}
+	
 	private void updateConfigSelector() {
 		boolean prevfound = false;
+		UUID previd = UUID.randomUUID();
 		Object prc = runConfigBox.getSelectedItem();
+		if (prc != null && prc instanceof RunConfig)
+			previd = ((RunConfig)prc).getId();
+		
 		runConfigBox.removeAllItems();
 		
 		for (RunConfig rc : ConfigManager.runConfigs()) {
 			runConfigBox.addItem(rc);
 			
-			if (rc == prc) prevfound = true;
+			if (rc.getId().equals(previd)) { 
+				prevfound = true;
+				prc = rc;
+			}
 		}
 		
 		if (prevfound) {
@@ -242,12 +280,54 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 		}
 	}
 	
+	private class DesignData {
+		private MetricTable table;
+		private List<String> cols;
+		private List<String> rows;
+		private List<Action> actions;
+		
+		public List<String> getRows() {
+			return rows;
+		}
+		
+		public List<String> getCols() {
+			return cols;
+		}
+		
+		public MetricTable getTable() {
+			return table;
+		}
+		
+		public List<Action> getActions() {
+			return actions;
+		}
+		
+		public double getScore() {
+			return MetricCalculator.normalize(table, getRunConfig());
+		}
+		
+		private DesignData() {
+			table = MetricCalculator.calculate(design, getRunConfig());
+			rows = table.getRows();
+			Collections.sort(rows);
+			
+			cols = new ArrayList<String>();
+			for (ConfigManager.Metric m : ConfigManager.getMetrics(getRunConfig())) {
+				if (m.isEnabled())
+					cols.add(m.getName());
+			}
+			Collections.sort(cols);
+		
+			actions = new ArrayList<Action>(TransitionManager.getPossibleActions(design, getRunConfig()));
+		}
+	}
+	
 	private class MetricTableModel extends AbstractTableModel {
 		private static final long serialVersionUID = 1L;
 		
 		@Override
 		public int getColumnCount() {
-			return metrics.getCols().size() + 1;
+			return designData.getCols().size() + 1;
 		}
 		
 		@Override
@@ -255,42 +335,27 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 			if (arg0 == 0)
 				return "Name";
 			
-			return getMetric(arg0 - 1);
+			return designData.getCols().get(arg0 - 1); 
 		}
 
 		@Override
 		public int getRowCount() {
-			return metrics.getRows().size();
+			return designData.getRows().size();
 		}
 
 		@Override
 		public Object getValueAt(int row, int col) {
 			if (col == 0)
-				return getRow(row);
+				return getRow(designData.getRows().get(row));
 			
-			return metrics.get(row, col - 1);
+			return designData.getTable().get(designData.getRows().get(row), designData.getCols().get(col - 1));
 		}
 		
-		private String getMetric(int index) {
-			Map<String, Integer> cols = metrics.getCols();
-			for (Entry<String, Integer> e : cols.entrySet()) {
-				if (e.getValue().equals(index))
-					return e.getKey();
-			}
-			return null;
-		}
-		
-		private Object getRow(int index) {
-			Map<String, Integer> cols = metrics.getRows();
-			for (Entry<String, Integer> e : cols.entrySet()) {
-				if (e.getValue().equals(index)) {
-					Type t = design.getType(e.getKey());
-					if (t != null)
-						return t;
-					return e.getKey();
-				}
-			}
-			return null;
+		private Object getRow(String name) {
+				Type t = design.getType(name);
+				if (t != null)
+					return t;
+				return name;
 		}
 	}
 	

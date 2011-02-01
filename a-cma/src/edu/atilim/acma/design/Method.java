@@ -209,13 +209,16 @@ public class Method extends Node {
 		if (isStatic()) return false;
 		
 		Type owner = getOwnerType();
-		boolean lastOwnerRoot = false;
-		
 		if (owner == null) return false;
+		
+		boolean lastOwnerRoot = owner.isRootType();
+		owner = owner.getSuperType();
 		
 		while (owner != null) {
 			if (owner.getMethod(getSignature()) != null) return true;
 			lastOwnerRoot = owner.isRootType();
+			
+			owner = owner.getSuperType();
 		}
 		
 		if (!lastOwnerRoot) return true;

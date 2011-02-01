@@ -36,13 +36,13 @@ public final class InheritanceMetrics {
 	@TypeMetric
 	public static void calculateNumberOfAnc(Type type, MetricRow row) {
 		
-		Type parType = type.getParentType();
+		Type parType = type.getSuperType();
 		row.set("NumAnc", 0);
 		
 		while(parType != null)
 		{
 			row.increase("NumAnc");
-			parType = parType.getParentType();
+			parType = parType.getSuperType();
 			
 		}
 	}

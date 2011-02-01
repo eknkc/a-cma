@@ -150,7 +150,7 @@ public class Core {
 	private static void printBasicInfo(Design design) {
 		System.out.printf("Number of packages: %d.\n", design.getPackages().size());
 		System.out.printf("Number of types: %d.\n", design.getTypes().size());
-		System.out.printf("Metric score: %f.\n", design.getMetrics().getWeightedSum());
+		//System.out.printf("Metric score: %f.\n", design.getMetrics().getWeightedSum());
 		System.out.printf("Possible actions: %d.\n", design.getPossibleActions().size());
 	}
 	

@@ -11,16 +11,16 @@ import edu.atilim.acma.util.CollectionHelper;
 
 public class TransitionSet implements NeighborSet {
 	private Set<Action> actions;
-	private Design design;
+	private DesignWrapper design;
 	
 	
-	public TransitionSet(Design design) {
+	public TransitionSet(DesignWrapper design) {
 		this.design = design;
-		this.actions = design.getPossibleActions();
+		this.actions = TransitionManager.getPossibleActions(design.getDesign(), design.getConfig());
 	}
 	
 	private Design getModifiedDesign(Action action) {
-		Design newDesign = design.copy();
+		Design newDesign = design.getDesign().copy();
 		action.perform(newDesign);
 		newDesign.logModification(action.toString());
 		return newDesign;
@@ -34,8 +34,8 @@ public class TransitionSet implements NeighborSet {
 	@Override
 	public Solution randomNeighbor() {
 		Action action = CollectionHelper.getRandom(actions);
-		if (action == null) return DesignWrapper.wrap(design);
-		return DesignWrapper.wrap(getModifiedDesign(action));
+		if (action == null) return DesignWrapper.wrap(design.getDesign(), design.getConfig());
+		return DesignWrapper.wrap(getModifiedDesign(action), design.getConfig());
 	}
 	
 	private class Iter implements Iterator<Solution> {
@@ -55,7 +55,7 @@ public class TransitionSet implements NeighborSet {
 			Action next = innerIterator.next();
 			if (next == null) return null;
 			
-			return DesignWrapper.wrap(getModifiedDesign(next));
+			return DesignWrapper.wrap(getModifiedDesign(next), design.getConfig());
 		}
 
 		@Override

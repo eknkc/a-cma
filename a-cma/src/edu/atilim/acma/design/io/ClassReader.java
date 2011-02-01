@@ -2,6 +2,8 @@ package edu.atilim.acma.design.io;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map.Entry;
 
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.Attribute;
@@ -30,7 +32,7 @@ public class ClassReader implements ClassVisitor {
 	private Type type;
 	private int stage;
 	
-	private ArrayList<String> inner;
+	private HashMap<String, String> inner;
 	private String[] interfaces;
 	private String superclass;
 	private ArrayList<MethodAccess> methodAccesses;
@@ -65,10 +67,15 @@ public class ClassReader implements ClassVisitor {
 			type.addInterface(design.getType(org.objectweb.asm.Type.getObjectType(i).getClassName()));
 		}
 		if (inner != null) {
-			for (String i : inner) {
-				Type itype = design.getType(org.objectweb.asm.Type.getObjectType(i).getClassName());
-				if(itype != null)
-					itype.setParentType(type);
+			for (Entry<String, String> i : inner.entrySet()) {
+				try {
+					Type itype = design.getType(org.objectweb.asm.Type.getObjectType(i.getKey()).getClassName());
+					Type otype = design.getType(org.objectweb.asm.Type.getObjectType(i.getValue()).getClassName());
+					
+					if (itype != null && otype != null)
+						itype.setParentType(otype);
+				} catch (NullPointerException e) {
+				}
 			}
 		}
 		
@@ -79,7 +86,7 @@ public class ClassReader implements ClassVisitor {
 		if (methodAccesses == null) return;
 		
 		for (MethodAccess ma : methodAccesses) {
-			Method dest = ma.destType.getMethod(ma.destMethod);
+			Method dest = ma.destType.getInheritedMethod(ma.destMethod);
 			if (dest != null)
 				ma.method.addCalledMethod(dest);
 		}
@@ -165,8 +172,8 @@ public class ClassReader implements ClassVisitor {
 	@Override
 	public void visitInnerClass(String name, String outerName, String innerName, int access) {
 		if (stage == STAGE_BASE) {
-			if (inner == null) inner = new ArrayList<String>();
-			inner.add(name);
+			if (inner == null) inner = new HashMap<String, String>();
+			inner.put(name, outerName);
 		}
 	}
 
@@ -295,7 +302,7 @@ public class ClassReader implements ClassVisitor {
 		}
 
 		@Override
-		public void visitMethodInsn(int opcode, String owner, String name, String desc) {	
+		public void visitMethodInsn(int opcode, String owner, String name, String desc) {		
 			Type ot = design.getType(org.objectweb.asm.Type.getObjectType(owner).getClassName());
 			if (ot == null) return;
 			

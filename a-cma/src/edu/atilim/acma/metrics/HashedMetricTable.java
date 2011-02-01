@@ -1,0 +1,90 @@
+package edu.atilim.acma.metrics;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+class HashedMetricTable implements MetricTable {
+	private HashMap<String, HashMap<String, Double>> metrics;
+	
+	public HashedMetricTable() {
+		metrics = new HashMap<String, HashMap<String,Double>>();
+	}
+
+	@Override
+	public MetricRow row(Object key) {
+		return new Row(key);
+	}
+
+	@Override
+	public void set(Object key, String metric, double value) {
+		HashMap<String, Double> inner = metrics.get(key.toString());
+		if (inner == null) {
+			inner = new HashMap<String, Double>();
+			metrics.put(key.toString(), inner);
+		}
+		inner.put(metric, value);
+	}
+
+	@Override
+	public double get(Object key, String metric) {
+		HashMap<String, Double> inner = metrics.get(key.toString());
+		if (inner == null || !inner.containsKey(metric)) return Double.NaN;
+		return inner.get(metric);
+	}
+	
+	@Override
+	public List<String> getRows() {
+		return new ArrayList<String>(metrics.keySet());
+	}
+	
+	@Override
+	public double getAverage(String metric) {
+		double sum = 0;
+		int cnt = 0;
+		
+		for (HashMap<String, Double> map : metrics.values()) {
+			Double val = map.get(metric);
+			if (val != null && !val.isNaN()) {
+				sum += val;
+				cnt++;
+			}
+		}
+		
+		return sum / cnt;
+	}
+
+	@Override
+	public void writeCSV(String fileName) throws IOException {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	private class Row implements MetricRow {
+		private Object key;
+		
+		private Row(Object key) {
+			this.key = key;
+		}
+		
+		@Override
+		public void set(String metric, double value) {
+			HashedMetricTable.this.set(key, metric, value);
+		}
+
+		@Override
+		public void increase(String metric) {
+			add(metric, 1.0);
+		}
+
+		@Override
+		public void add(String metric, double value) {
+			double current = HashedMetricTable.this.get(key, metric);
+			if (Double.isNaN(current)) {
+				current = 0;
+			}
+			set(metric, current + 1);
+		}
+	}
+}

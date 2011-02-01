@@ -88,6 +88,14 @@ public class Type extends Node {
 		return getReferers(Tags.REF_IMPLEMENT, Type.class);
 	}
 	
+	public Method getInheritedMethod(String name) {
+		Method m = getMethod(name);
+		if (m == null && getSuperType() != null) {
+			m = getSuperType().getInheritedMethod(name);
+		}
+		return m;
+	}
+	
 	public List<Type> getInterfaces() {
 		List<Type> typeList = CollectionHelper.map(interfaces, new Reference.TargetSelector<Type>(Type.class));
 		return Collections.unmodifiableList(typeList);

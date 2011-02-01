@@ -176,14 +176,21 @@ public class LoadDesignDialog extends JDialog {
 					@Override
 					protected Design doInBackground() throws Exception {
 						Log.info("Loading design.");
-						return floader.read();
+						try {
+							return floader.read();
+						} catch (Exception e) {
+							e.printStackTrace();
+							throw e;
+						}
 					}
 					
 					protected void done() {
 						Log.info("Completed loading design.");
 						try {
 							MainWindow.getInstance().getLoadedDesigns().addDesign(get());
-						} catch (Exception ignore) { }
+						} catch (Exception e) {
+							e.printStackTrace();
+						}
 						hg.setVisible(false);
 					}
 				}.execute();
