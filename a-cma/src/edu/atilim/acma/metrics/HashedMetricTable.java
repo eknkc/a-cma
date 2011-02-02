@@ -84,7 +84,7 @@ class HashedMetricTable implements MetricTable {
 			if (Double.isNaN(current)) {
 				current = 0;
 			}
-			set(metric, current + 1);
+			set(metric, current + value);
 		}
 	}
 }
