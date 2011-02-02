@@ -14,7 +14,7 @@ public class RemoveClass {
 			
 			for (Type t : design.getTypes())
 			{	
-				if(t.getExtenders().isEmpty() && t.getDependentFields().isEmpty() && t.getMethods().isEmpty() && t.getDependentMethodsAsInstantiator().isEmpty() )
+				if(!t.isAnnotation() && !t.isCompilerGenerated() && t.getExtenders().isEmpty() && t.getDependentFields().isEmpty() && t.getMethods().isEmpty() && t.getDependentMethodsAsInstantiator().isEmpty() && t.getDependentMethodsAsParameter().isEmpty() && t.getDependentMethodsAsReturnType().isEmpty() )
 					set.add(new Performer(t.getName()));
 			}
 		}
@@ -34,7 +34,6 @@ public class RemoveClass {
 		public void perform(Design d) {
 			
 			Type t = d.getType(typeName);
-			
 			if (t == null) {
 				Log.severe("[RemoveClass] Can not find type: %s.", typeName);
 				return;

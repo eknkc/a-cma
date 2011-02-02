@@ -15,11 +15,11 @@ public class RemoveInterface {
 			
 			for (Type t : design.getTypes())
 			{	
-				if(t.isInterface() && t.getAccess() == Accessibility.PUBLIC) continue;
+				if(t.getAccess() == Accessibility.PUBLIC || t.isAnnotation() || t.isCompilerGenerated()) continue;
 				
 				if(t.isInterface())
 				{
-					if(t.getImplementers().isEmpty() )
+					if(t.getImplementers().isEmpty() && t.getDependentMethodsAsParameter().isEmpty() && t.getDependentMethodsAsReturnType().isEmpty() )
 						set.add(new Performer(t.getName()));
 				}
 				
@@ -41,13 +41,11 @@ public class RemoveInterface {
 		public void perform(Design d) {
 			
 			Type t = d.getType(typeName);
-			
 			if (t == null) {
 				Log.severe("[RemoveInterface] Can not find interface: %s.", typeName);
 				return;
 			}
 			t.remove();
-			
 		}
 		
 		@Override

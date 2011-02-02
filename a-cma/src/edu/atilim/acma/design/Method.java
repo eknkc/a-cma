@@ -227,7 +227,7 @@ public class Method extends Node {
 			"clone", "equals", "finalize", "getClass", "hashCode", "notify", "notifyAll", "toString", "wait"	
 		};
 		
-		return !Arrays.asList(objMethods).contains(getName());
+		return Arrays.asList(objMethods).contains(getName());
 	}
 	
 	/**

@@ -13,30 +13,15 @@ public class RemoveMethod {
 	public static class Checker implements ActionChecker {
 		@Override
 		public void findPossibleActions(Design design, Set<Action> set) {
+			
 			for (Type t : design.getTypes())
-			{
-				method:
+			{	
 				for(Method m : t.getMethods())
 				{
-					if(m.getAccess() == Accessibility.PUBLIC || m.getAccess() == Accessibility.PROTECTED ) continue;
+					if(m.getAccess() == Accessibility.PUBLIC || m.getAccess() == Accessibility.PROTECTED || m.isClassConstructor() ||  m.isCompilerGenerated() || !m.getCallerMethods().isEmpty() || m.isOverride()) 
+						continue;
 					
-					if(!m.isStatic())
-					{
-						Type superType = t.getSuperType();
-						
-						while(superType != null)
-						{
-							for(Method mt : superType.getMethods() )
-							{
-								if(mt.getSignature().equals(m.getSignature()))
-								   break method;
-							}
-							superType = superType.getSuperType();
-						}
-					}
-					
-					if(m.getCallerMethods().isEmpty())
-						set.add(new Performer(t.getName(), m.getName()));
+					set.add(new Performer(t.getName(), m.getName()));
 				}
 			}
 		}
@@ -56,9 +41,8 @@ public class RemoveMethod {
 		@Override
 		public void perform(Design d) {
 			
-			Type t = d.getType(typeName);
 			Method m = d.getType(typeName).getMethod(methodName);
-			if (t == null || m == null) {
+			if (m == null) {
 				Log.severe("[RemoveMethod] Can not find method %s of type: %s.", methodName,typeName);
 				return;
 			}

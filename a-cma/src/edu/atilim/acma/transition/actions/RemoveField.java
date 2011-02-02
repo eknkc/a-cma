@@ -15,32 +15,32 @@ public class RemoveField {
 			
 			for (Type t : design.getTypes())
 			{
-			
 				for(Field f : t.getFields())
 				{
-					if(f.getAccess() == Accessibility.PUBLIC || f.getAccess() == Accessibility.PROTECTED || f.isConstant()) continue;
+					if(f.getAccess() == Accessibility.PUBLIC || f.getAccess() == Accessibility.PROTECTED || f.isConstant() || !f.getAccessors().isEmpty() || f.isCompilerGenerated()) continue;
 					
-					if(f.getAccessors().isEmpty())
-						set.add(new Performer(t.getName(), f.getName()));
+					set.add(new Performer(t.getName(), f.getName()));
 				}
 			}
 		}
 	}
 	
 	public static class Performer implements Action {
+		
 		private String typeName;
 		private String fieldName;
 		
 		public Performer(String typeName, String fieldName) {
+			
 			this.typeName = typeName;
 			this.fieldName = fieldName;
 		}
 
 		@Override
 		public void perform(Design d) {
-			Type t = d.getType(typeName);
+			
 			Field f = d.getType(typeName).getField(fieldName);
-			if (t == null || f == null) {
+			if (f == null) {
 				Log.severe("[RemoveField] Can not find field %s of type: %s.", fieldName,typeName);
 				return;
 			}
