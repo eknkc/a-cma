@@ -15,6 +15,8 @@ public interface MetricTable {
 	
 	public double getAverage(String metric);
 	
+	public MetricSummary getSummary();
+	
 	public interface MetricRow {
 		public void set(String metric, double value);
 		public void increase(String metric);

@@ -52,7 +52,7 @@ public class RunConfigPanel extends RunConfigPanelBase implements ActionListener
 		actionTable.getColumnModel().getColumn(0).setPreferredWidth(500);
 		actionTable.getColumnModel().getColumn(1).setPreferredWidth(20);
 		
-		normalMetricsTable.setModel(new NormalMetricsTableModel(ConfigManager.getNormalMetrics(curconf), !curconf.getName().equals("Default")));
+		normalMetricsTable.setModel(new NormalMetricsTableModel(curconf));
 		normalMetricsTable.getColumnModel().getColumn(0).setPreferredWidth(500);
 		normalMetricsTable.getColumnModel().getColumn(1).setPreferredWidth(20);
 		
@@ -61,6 +61,7 @@ public class RunConfigPanel extends RunConfigPanelBase implements ActionListener
 		availableMetricsTable.getColumnModel().getColumn(1).setPreferredWidth(100);
 		availableMetricsTable.getColumnModel().getColumn(2).setPreferredWidth(20);
 		availableMetricsTable.getColumnModel().getColumn(3).setPreferredWidth(20);
+		availableMetricsTable.getColumnModel().getColumn(4).setPreferredWidth(20);
 	}
 
 	@Override
@@ -177,7 +178,7 @@ public class RunConfigPanel extends RunConfigPanelBase implements ActionListener
 
 		@Override
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
-			if (aValue instanceof Boolean && columnIndex == 3) {
+			if (aValue instanceof Boolean && columnIndex == 4) {
 				metrics.get(rowIndex).setEnabled((Boolean)aValue);
 			} else if (aValue instanceof String && columnIndex == 1) {
 				try {
@@ -192,7 +193,7 @@ public class RunConfigPanel extends RunConfigPanelBase implements ActionListener
 
 		@Override
 		public int getColumnCount() {
-			return 4;
+			return 5;
 		}
 
 		@Override
@@ -202,23 +203,24 @@ public class RunConfigPanel extends RunConfigPanelBase implements ActionListener
 		
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return (columnIndex == 1 || columnIndex == 3) && editable;
+			return (columnIndex == 1 || columnIndex == 4) && editable;
 		}
 		
 		@Override
 		public Class<?> getColumnClass(int columnIndex) {
-			if (columnIndex == 3 || columnIndex == 2) return Boolean.class;
-			if (columnIndex == 2) return Double.class;
+			if (columnIndex == 4 || columnIndex == 3 || columnIndex == 2) return Boolean.class;
 			return super.getColumnClass(columnIndex);
 		}
 		
 		@Override
 		public String getColumnName(int column) {
 			switch(column) {
-			case 3:
+			case 4:
 				return "E";
-			case 2:
+			case 3:
 				return "P";
+			case 2:
+				return "M";
 			case 1:
 				return "Weight";
 			case 0:
@@ -231,10 +233,12 @@ public class RunConfigPanel extends RunConfigPanelBase implements ActionListener
 		public Object getValueAt(int row, int col) {
 			ConfigManager.Metric m = metrics.get(row);
 			switch(col) {
-			case 3:
+			case 4:
 				return m.isEnabled();
-			case 2:
+			case 3:
 				return m.isPackageMetric();
+			case 2:
+				return m.isMinimized();
 			case 1:
 				return m.getWeight();
 			case 0:
@@ -247,19 +251,35 @@ public class RunConfigPanel extends RunConfigPanelBase implements ActionListener
 	private static class NormalMetricsTableModel extends AbstractTableModel {
 		private static final long serialVersionUID = 1L;
 		
+		private RunConfig config;
 		private List<ConfigManager.NormalMetric> normalMetrics;
-		private boolean editable;
+		
+		private List<ConfigManager.NormalMetric> getMetrics() {
+			if (normalMetrics == null) {
+				normalMetrics = ConfigManager.getNormalMetrics(config);
+			}
+			return normalMetrics;
+		}
 
-		private NormalMetricsTableModel(List<NormalMetric> normalMetrics, boolean editable) {
-			this.normalMetrics = normalMetrics;
-			this.editable = editable;
+		private NormalMetricsTableModel(RunConfig config) {
+			this.config = config;
 		}
 
 		@Override
 		public void setValueAt(Object aValue, int rowIndex, int columnIndex) {
 			if (!(aValue instanceof Boolean) || columnIndex != 1) return;
-			normalMetrics.get(rowIndex).setEnabled((Boolean)aValue);
-			fireTableCellUpdated(rowIndex, columnIndex);
+			if (!(Boolean)aValue) {
+				int answer = JOptionPane.showConfirmDialog(MainWindow.getInstance(), 
+						"Are you sure that you want to delete this normalization metric?", 
+						"Delete", 
+						JOptionPane.YES_NO_OPTION);
+				
+				if (answer == JOptionPane.YES_OPTION) {
+					getMetrics().get(rowIndex).remove();
+					normalMetrics = null;
+					fireTableDataChanged();
+				}
+			}
 		}
 
 		@Override
@@ -269,12 +289,12 @@ public class RunConfigPanel extends RunConfigPanelBase implements ActionListener
 
 		@Override
 		public int getRowCount() {
-			return normalMetrics.size();
+			return getMetrics().size();
 		}
 		
 		@Override
 		public boolean isCellEditable(int rowIndex, int columnIndex) {
-			return columnIndex == 1 && editable;
+			return columnIndex == 1;
 		}
 		
 		@Override
@@ -296,10 +316,10 @@ public class RunConfigPanel extends RunConfigPanelBase implements ActionListener
 
 		@Override
 		public Object getValueAt(int row, int col) {
-			NormalMetric nm = normalMetrics.get(row);
+			NormalMetric nm = getMetrics().get(row);
 			switch(col) {
 			case 1:
-				return nm.isEnabled();
+				return true;
 			case 0:
 				return nm.getName();
 			}

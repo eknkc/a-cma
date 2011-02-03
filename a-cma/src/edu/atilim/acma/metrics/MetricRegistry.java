@@ -60,8 +60,9 @@ public final class MetricRegistry {
 		        	// C# has TryParse methods on these... In case you don't want to try and catch stuff all the time.
 		        	double dmweight = Double.parseDouble(mweight);
 		        	boolean pmetric = metric.getAttributes().getNamedItem("packagemetric") != null;
+		        	boolean minimize = metric.getAttributes().getNamedItem("minimize") != null;
 		        	
-		        	entries.put(mname, new Entry(mname, dmweight, pmetric));
+		        	entries.put(mname, new Entry(mname, dmweight, pmetric, minimize));
 	        	}
 	        }
 	        
@@ -76,6 +77,7 @@ public final class MetricRegistry {
 		private String name;
 		private double weight;
 		private boolean packageMetric;
+		private boolean minimized;
 
 		public double getWeight() {
 			return weight;
@@ -89,10 +91,15 @@ public final class MetricRegistry {
 			return packageMetric;
 		}
 
-		private Entry(String name, double weight, boolean packageMetric) {
+		public boolean isMinimized() {
+			return minimized;
+		}
+
+		private Entry(String name, double weight, boolean packageMetric, boolean minimized) {
 			this.name = name;
 			this.weight = weight;
 			this.packageMetric = packageMetric;
+			this.minimized = minimized;
 		}
 
 		@Override

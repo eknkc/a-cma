@@ -42,7 +42,10 @@ public class MetricSummary implements Externalizable {
 		this.name = name;
 		this.uuid = UUID.randomUUID();
 		this.metrics = new HashMap<String, Double>();
-		//TODO: metric table...
+		
+		for (MetricRegistry.Entry me : MetricRegistry.entries()) {
+			this.metrics.put(me.getName(), table.getAverage(me.getName()));
+		}
 	}
 	
 	public MetricSummary() {
@@ -61,6 +64,12 @@ public class MetricSummary implements Externalizable {
 
 	public UUID getUuid() {
 		return uuid;
+	}
+	
+	public double get(String metric) {
+		Double val = metrics.get(metric);
+		if (val == null) return 0;
+		return val;
 	}
 
 	public void save(OutputStream out) throws Exception {

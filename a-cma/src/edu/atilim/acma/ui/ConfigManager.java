@@ -26,14 +26,9 @@ final class ConfigManager {
 	public static final String CONFIG_CHANGED = "configChanged";
 	
 	private static ArrayList<RunConfig> runConfigs;
-	private static ArrayList<MetricSummary> normalizationMetrics;
 	
 	static List<RunConfig> runConfigs() {
 		return runConfigs;
-	}
-	
-	static List<MetricSummary> normalizationMetrics() {
-		return normalizationMetrics;
 	}
 	
 	static void saveChanges() {
@@ -51,7 +46,9 @@ final class ConfigManager {
 	}
 	
 	static void add(MetricSummary normal) {
-		normalizationMetrics.add(normal);
+		for (RunConfig rc : runConfigs) {
+			rc.getNormalMetrics().add(normal);
+		}
 	}
 	
 	static void remove(RunConfig config) {
@@ -62,14 +59,6 @@ final class ConfigManager {
 		for (RunConfig rc : runConfigs) {
 			if (rc.getName().equals(name))
 				return rc;
-		}
-		return null;
-	}
-	
-	static MetricSummary getNormalMetric(String name) {
-		for (MetricSummary ms : normalizationMetrics) {
-			if (ms.getName().equals(name))
-				return ms;
 		}
 		return null;
 	}
@@ -90,7 +79,7 @@ final class ConfigManager {
 		List<Metric> list = new ArrayList<Metric>();
 		
 		for (MetricRegistry.Entry e : metrics) {
-			list.add(new Metric(config, e.getName(), e.getWeight(), e.isPackageMetric()));
+			list.add(new Metric(config, e.getName(), e.getWeight(), e.isPackageMetric(), e.isMinimized()));
 		}
 		
 		return Collections.unmodifiableList(list);
@@ -99,7 +88,7 @@ final class ConfigManager {
 	static List<NormalMetric> getNormalMetrics(RunConfig config) {
 		List<NormalMetric> list = new ArrayList<NormalMetric>();
 		
-		for (MetricSummary ms : normalizationMetrics) {
+		for (MetricSummary ms : config.getNormalMetrics()) {
 			list.add(new NormalMetric(config, ms.getName(), ms.getUuid()));
 		}
 		
@@ -138,6 +127,7 @@ final class ConfigManager {
 		private String name;
 		private double weight;
 		private boolean packageMetric;
+		private boolean minimized;
 		
 		public String getName() {
 			return name;
@@ -162,12 +152,17 @@ final class ConfigManager {
 		public boolean isPackageMetric() {
 			return packageMetric;
 		}
-		
-		private Metric(RunConfig config, String name, double weight, boolean packageMetric) {
+
+		protected boolean isMinimized() {
+			return minimized;
+		}
+
+		private Metric(RunConfig config, String name, double weight, boolean packageMetric, boolean minimized) {
 			this.config = config;
 			this.name = name;
 			this.weight = weight;
 			this.packageMetric = packageMetric;
+			this.minimized = minimized;
 		}
 	}
 	
@@ -176,12 +171,14 @@ final class ConfigManager {
 		private UUID id;
 		private String name;
 		
-		public boolean isEnabled() {
-			return config.isNormalMetricEnabled(id);
-		}
-		
-		public void setEnabled(boolean enabled) {
-			config.setNormalMetricEnabled(id, enabled);
+		public void remove() {
+			List<MetricSummary> mslist = config.getNormalMetrics();
+			for (MetricSummary ms : mslist) {
+				if (ms.getUuid().equals(id)) {
+					mslist.remove(ms);
+					return;
+				}
+			}
 		}
 		
 		public UUID getID() {
@@ -201,7 +198,6 @@ final class ConfigManager {
 	
 	private static void load() {
 		runConfigs = new ArrayList<RunConfig>();
-		normalizationMetrics = new ArrayList<MetricSummary>();
 		
 		ObjectInputStream ois = null;
 		try {
@@ -211,22 +207,15 @@ final class ConfigManager {
 			for (int i = 0; i < rccnt; i++) {
 				runConfigs.add((RunConfig)ois.readObject());
 			}
-			
-			int nmcnt = ois.readInt();
-			for (int i = 0; i < nmcnt; i++) {
-				normalizationMetrics.add((MetricSummary)ois.readObject());
-			}
 		} catch (Exception e) {
 			Log.severe("Could not load user configuration. Falling back to default.");
 			runConfigs = new ArrayList<RunConfig>();
-			normalizationMetrics = new ArrayList<MetricSummary>();
+			runConfigs.add(RunConfig.getDefault());
 		} finally {
 			if (ois != null) {
 				try { ois.close(); } catch (IOException e) {}
 			}
 		}
-		
-		runConfigs.add(0, RunConfig.getDefault());
 	}
 	
 	private static void save() {
@@ -234,13 +223,9 @@ final class ConfigManager {
 		try {
 			oos = new ObjectOutputStream(new FileOutputStream("./data/user/user.config"));
 			
-			oos.writeInt(runConfigs.size() - 1);
-			for (int i = 1; i < runConfigs.size(); i++)
+			oos.writeInt(runConfigs.size());
+			for (int i = 0; i < runConfigs.size(); i++)
 				oos.writeObject(runConfigs.get(i));
-			
-			oos.writeInt(normalizationMetrics.size());
-			for (int i = 0; i < normalizationMetrics.size(); i++)
-				oos.writeObject(normalizationMetrics.get(i));
 		} catch (Exception e) {
 			Log.severe("Could not save user configuration!");
 		} finally {

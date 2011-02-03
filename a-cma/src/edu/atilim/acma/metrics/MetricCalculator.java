@@ -71,8 +71,7 @@ public class MetricCalculator {
 	}
 	
 	public static double normalize(MetricTable table, RunConfig config) {
-		//TODO: Actually normalize here, will ya?
-		return 0;
+		return MetricNormalizer.normalize(table.getSummary(), config);
 	}
 	
 	public static MetricTable calculate(Design d) {

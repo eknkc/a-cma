@@ -4,9 +4,13 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
+
+import edu.atilim.acma.metrics.MetricSummary;
 
 public class RunConfig implements Externalizable {
 	
@@ -20,7 +24,8 @@ public class RunConfig implements Externalizable {
 	private UUID uuid;
 	private HashMap<String, MetricOverride> metricOverrides;
 	private HashSet<String> actionOverrides;
-	private HashSet<UUID> normalMetricOverrides;
+	private ArrayList<MetricSummary> normalMetrics;
+	
 	private boolean usingWeightedSum;
 	
 	public UUID getId() {
@@ -46,7 +51,7 @@ public class RunConfig implements Externalizable {
 	public RunConfig() {
 		metricOverrides = new HashMap<String, RunConfig.MetricOverride>();
 		actionOverrides = new HashSet<String>();
-		normalMetricOverrides = new HashSet<UUID>();
+		normalMetrics = new ArrayList<MetricSummary>();
 		uuid = UUID.randomUUID();
 		usingWeightedSum = false;
 	}
@@ -93,13 +98,8 @@ public class RunConfig implements Externalizable {
 		mo.weight = value;
 	}
 	
-	public boolean isNormalMetricEnabled(UUID id) {
-		return !normalMetricOverrides.contains(id);
-	}
-	
-	public void setNormalMetricEnabled(UUID id, boolean enabled) {
-		if (enabled) normalMetricOverrides.remove(id);
-		else normalMetricOverrides.add(id);
+	public List<MetricSummary> getNormalMetrics() {
+		return normalMetrics;
 	}
 	
 	private class MetricOverride {
@@ -137,9 +137,9 @@ public class RunConfig implements Externalizable {
 			actionOverrides.add(in.readUTF());
 		}
 		
-		int msocnt = in.readInt();
-		for (int i = 0; i < msocnt; i++) {
-			normalMetricOverrides.add((UUID)in.readObject());
+		int nmcnt = in.readInt();
+		for (int i = 0; i < nmcnt; i++) {
+			normalMetrics.add((MetricSummary)in.readObject());
 		}
 	}
 
@@ -163,9 +163,9 @@ public class RunConfig implements Externalizable {
 			out.writeUTF(ao);
 		}
 		
-		out.writeInt(normalMetricOverrides.size());
-		for (UUID mso : normalMetricOverrides) {
-			out.writeObject(mso);
+		out.writeInt(normalMetrics.size());
+		for (MetricSummary ms : normalMetrics) {
+			out.writeObject(ms);
 		}
 	}
 }

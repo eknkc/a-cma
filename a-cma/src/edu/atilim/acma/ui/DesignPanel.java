@@ -13,9 +13,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.UUID;
 import java.util.Map.Entry;
-import java.util.Set;
+import java.util.UUID;
 
 import javax.swing.DefaultListModel;
 import javax.swing.Icon;
@@ -165,17 +164,9 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 		btnPreset.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				String name = null;
-				do {
-					name = JOptionPane.showInputDialog(DesignPanel.this, "Please input a name for preset", design.toString());
-					
-					if (name == null) return;
-					
-					if (ConfigManager.getNormalMetric(name) != null) {
-						JOptionPane.showMessageDialog(DesignPanel.this, "Preset with this name already exists.");
-						name = null;
-					}
-				} while (name == null);
+				String name = JOptionPane.showInputDialog(DesignPanel.this, "Please input a name for preset", design.toString());
+				
+				if (name == null) return;
 				
 				MetricSummary ms = new MetricSummary(name, designData.getTable());
 				ConfigManager.add(ms);

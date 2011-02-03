@@ -22,27 +22,22 @@ import edu.atilim.acma.transition.actions.RemoveMethod;
 public class RemoveActionsTests {
 	
 	private static Design design;
-	private static Type type;
 	private static HashSet<Action> actions;
 	
 	@BeforeClass
 	public static void createDesign() {
-		
 		design = new Design();
-		type = design.create("TestType", Type.class);
+		design.create("TestType", Type.class);
 		actions = new HashSet<Action>();
 	}
 	
 	@AfterClass
 	public static void destroyDesign() {
-		
-		type = null;
 		design = null;
 	}
 	
 	@Test
 	public void testRemoveMethod() {
-		
 		Design d = design.copy();
 		d.getType("TestType").setRootType(true);
 		Method m1 = d.getType("TestType").createMethod("TestMethod1");

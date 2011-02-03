@@ -52,7 +52,14 @@ class HashedMetricTable implements MetricTable {
 			}
 		}
 		
+		if (cnt == 0) return 0;
+		
 		return sum / cnt;
+	}
+	
+	@Override
+	public MetricSummary getSummary() {
+		return new MetricSummary("", this);
 	}
 
 	@Override

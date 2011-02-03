@@ -5,8 +5,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.Random;
 
 public final class ACMAUtil {
+	public static final Random RANDOM = new Random();
+	
 	public static String splitCamelCase(String in) {
 		StringBuilder sb = new StringBuilder();
 		
