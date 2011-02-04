@@ -33,10 +33,26 @@ public class DecreaseFieldSecurity {
 		}
 	}
 	
-	public static class Performer extends IncreaseFieldSecurity.Performer {
+	public static class Performer implements Action {
+		private String typeName;
+		private String fieldName;
+		private Accessibility newAccess;
+
 		public Performer(String typeName, String fieldName,
 				Accessibility newAccess) {
-			super(typeName, fieldName, newAccess);
+			this.typeName = typeName;
+			this.fieldName = fieldName;
+			this.newAccess = newAccess;
+		}
+
+		@Override
+		public void perform(Design d) {
+			d.getType(typeName).getField(fieldName).setAccess(newAccess);
+		}
+		
+		@Override
+		public String toString() {
+			return String.format("[Decrease Field Security] '%s' of '%s' to '%s'", fieldName, typeName, newAccess);
 		}
 	}
 }

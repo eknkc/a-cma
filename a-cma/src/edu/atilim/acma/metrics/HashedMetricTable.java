@@ -84,6 +84,11 @@ class HashedMetricTable implements MetricTable {
 		public void increase(String metric) {
 			add(metric, 1.0);
 		}
+		
+		@Override
+		public double get(String metric) {
+			return HashedMetricTable.this.get(key, metric);
+		}
 
 		@Override
 		public void add(String metric, double value) {

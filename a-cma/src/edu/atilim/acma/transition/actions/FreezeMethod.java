@@ -16,7 +16,6 @@ public class FreezeMethod {
 		
 		@Override
 		public void findPossibleActions(Design design, Set<Action> set) {
-			
 			for (Type t : design.getTypes()) {
 				for (Method m : t.getMethods()) {
 

@@ -33,13 +33,20 @@ public class MetricNormalizer {
 		double[] normals = getNormals(table, nummetrics, numdesigns + 1);
 		
 		double normalvalue = 0;
+		double minimalizevalue = 0;
 		
 		for (int i = 0; i < nummetrics; i++) {
-			if (!Double.isNaN(weights[i]) && !Double.isNaN(normals[i]))
-				normalvalue += weights[i] * normals[i];
+			if (!config.isMetricEnabled(metrics.get(i).getName())) continue;
+			
+			if (!Double.isNaN(weights[i]) && !Double.isNaN(normals[i])) {
+				if (metrics.get(i).isMinimized())
+					minimalizevalue += weights[i] * Math.abs(normals[i]);
+				else
+					normalvalue += weights[i] * Math.abs(normals[i]);
+			}
 		}
 		
-		return normalvalue;
+		return normalvalue + minimalizevalue;
 	}
 	
 	private static double[] getNormals(double[][] table, int rows, int cols) {
@@ -71,7 +78,7 @@ public class MetricNormalizer {
 		double[] normals = new double[rows];
 		
 		for (int i = 0; i < rows; i++) {
-			normals[i] = Math.abs((table[i][cols - 1] - means[i]) / stdevs[i]);
+			normals[i] = ((table[i][cols - 1] - means[i]) / stdevs[i]);
 		}
 		
 		return normals;

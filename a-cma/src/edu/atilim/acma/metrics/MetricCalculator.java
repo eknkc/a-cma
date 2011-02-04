@@ -36,9 +36,9 @@ public class MetricCalculator {
     	
     	for (Method m : c.getDeclaredMethods()) {
     		Class<?>[] paramTypes = m.getParameterTypes();
-    		if (paramTypes.length != 2)	throw new Exception("Metric calculator methods should accept two parameters.");
 
     		if (m.isAnnotationPresent(TypeMetric.class)) {
+    			if (paramTypes.length != 2)	throw new Exception("Metric calculator methods should accept two parameters.");
     			if (paramTypes[0] != Type.class) throw new Exception("Type metric calculator methods should accept a type parameter.");
     			int type = 0;
     			if (paramTypes[1] == MetricTable.MetricRow.class)
@@ -52,6 +52,7 @@ public class MetricCalculator {
     		}
     		
     		if (m.isAnnotationPresent(PackageMetric.class)) {
+    			if (paramTypes.length != 2)	throw new Exception("Metric calculator methods should accept two parameters.");
     			if (paramTypes[0] != Package.class) throw new Exception("Package metric calculator methods should accept a package parameter.");
     			int type = 0;
     			if (paramTypes[1] == MetricTable.MetricRow.class)

@@ -43,6 +43,10 @@ import edu.atilim.acma.design.Type;
 import edu.atilim.acma.metrics.MetricCalculator;
 import edu.atilim.acma.metrics.MetricSummary;
 import edu.atilim.acma.metrics.MetricTable;
+import edu.atilim.acma.search.AbstractAlgorithm;
+import edu.atilim.acma.search.HillClimbingAlgorithm;
+import edu.atilim.acma.search.SimAnnAlgorithm;
+import edu.atilim.acma.search.SolutionDesign;
 import edu.atilim.acma.transition.TransitionManager;
 import edu.atilim.acma.transition.actions.Action;
 import edu.atilim.acma.ui.MainWindow.WindowEventListener;
@@ -63,10 +67,65 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 		MainWindow.getInstance().addEventListener(this);
 		
 		initPossibleActions();
+		initAppliedActions();
 		initMetrics();
 		initConfigSelector();
+		initRunButtons();
 		
 		validateDesignData();
+	}
+	
+	public void setCompactView(boolean cv) {
+		configPanel.setVisible(!cv);
+		algorithmsPanel.setVisible(!cv);
+	}
+	
+	private void initRunButtons() {
+		ActionListener algoListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				AbstractAlgorithm algo = null;
+				
+				if (e.getActionCommand().equals("HC")) {
+					int rc = (Integer)hcRestartCount.getValue();
+					int rd = (Integer)hcRestartDepth.getValue();
+					
+					algo = new HillClimbingAlgorithm(new SolutionDesign(design, getRunConfig()), null);
+					
+					((HillClimbingAlgorithm)algo).setRestartCount(rc);
+					((HillClimbingAlgorithm)algo).setRestartDepth(rd);
+				} else if (e.getActionCommand().equals("SA")) {
+					int mi = (Integer)saIterationCnt.getValue();
+					algo = new SimAnnAlgorithm(new SolutionDesign(design, getRunConfig()), null, mi);
+				}
+				
+				RunPanel rp = new RunPanel(algo);
+				
+				MainWindow.getInstance().getTabs().addTab(algo.getName(), 
+						new ImageIcon(DesignPanel.class.getResource("/resources/icons/play_16.png")), 
+						rp, 
+						null);
+
+				MainWindow.getInstance().getTabs().setSelectedComponent(rp);
+			}
+		};
+		
+		hcBtnStart.addActionListener(algoListener);
+		saBtnStart.addActionListener(algoListener);
+	}
+	
+	private void initAppliedActions() {
+		List<String> mods = design.getModifications();
+		
+		if (mods.size() == 0) {
+			tabbedPane.remove(appliedActionsPanel);
+		}
+		
+		final DefaultListModel model = new DefaultListModel();
+		for (String act : design.getModifications()) {
+			model.addElement(act);
+		}
+		appliedActionsList.setModel(model);
 	}
 	
 	private void initPossibleActions() {

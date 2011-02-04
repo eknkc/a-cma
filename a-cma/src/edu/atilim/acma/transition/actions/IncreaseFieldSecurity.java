@@ -63,7 +63,7 @@ public class IncreaseFieldSecurity {
 		
 		@Override
 		public String toString() {
-			return String.format("Change accessibility of field '%s' of '%s' to '%s'", fieldName, typeName, newAccess);
+			return String.format("[Increase Field Security] '%s' of '%s' to '%s'", fieldName, typeName, newAccess);
 		}
 	}
 }

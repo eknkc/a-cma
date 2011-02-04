@@ -16,12 +16,27 @@ public final class SizeMetrics {
 		row.set("numPubFields", 0);
 		row.set("numConstants", 0);
 		
+		int totVis = 0;
+		
 		for (Field f : type.getFields()) {
 			if (f.isConstant())
 				row.increase("numConstants");
-			else if (f.getAccess() == Accessibility.PUBLIC)
+			
+			switch (f.getAccess()) {
+			case PUBLIC:
 				row.increase("numPubFields");
+				totVis += 3;
+				break;
+			case PROTECTED:
+				totVis += 2;
+				break;
+			case PACKAGE:
+				totVis += 1;
+				break;
+			}
 		}
+		
+		row.set("avrgFieldVisibility", totVis / row.get("numFields"));
  	}
 	
 	@TypeMetric

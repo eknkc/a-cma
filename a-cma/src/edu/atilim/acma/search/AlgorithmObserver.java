@@ -1,14 +1,18 @@
 package edu.atilim.acma.search;
 
-import edu.atilim.acma.design.Design;
 
 public interface AlgorithmObserver {
-	void onStart(Algorithm algorithm, Design initial);
-	void onFinish(Algorithm algorithm, Design last);
+	public static final int UPDATE_CURRENT = 1;
+	public static final int UPDATE_BEST = 2;
 	
-	void onExpansion(Algorithm algorithm, int currentExpanded, int totalExpanded);
-	void onUpdateCurrent(Algorithm algorithm, Solution solution);
-	void onUpdateBest(Algorithm algorithm, Solution solution);
+	void onStart(AbstractAlgorithm algorithm, SolutionDesign initial);
+	void onFinish(AbstractAlgorithm algorithm, SolutionDesign last);
 	
-	void onLog(Algorithm algorithm, String log);
+	void onExpansion(AbstractAlgorithm algorithm, int currentExpanded, int totalExpanded);
+	
+	void onUpdateItems(AbstractAlgorithm algorithm, SolutionDesign current, SolutionDesign best, int updateType);
+	
+	void onLog(AbstractAlgorithm algorithm, String log);
+	
+	void onAdvance(AbstractAlgorithm algorithm, int current, int total);
 }

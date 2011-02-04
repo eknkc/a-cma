@@ -11,7 +11,7 @@ import edu.atilim.acma.transition.TransitionManager;
 import edu.atilim.acma.transition.actions.Action;
 import edu.atilim.acma.util.ACMAUtil;
 
-public class SolutionDesign implements Iterable<SolutionDesign> {
+public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<SolutionDesign> {
 	private Design design;
 	private RunConfig config;
 	private List<Action> actions;
@@ -28,7 +28,7 @@ public class SolutionDesign implements Iterable<SolutionDesign> {
 	
 	public double getScore() {
 		if (Double.isNaN(score)) {
-			score = MetricCalculator.normalize(MetricCalculator.calculate(design, config));
+			score = MetricCalculator.normalize(MetricCalculator.calculate(design, config), config);
 		}
 		return score;
 	}
@@ -36,7 +36,7 @@ public class SolutionDesign implements Iterable<SolutionDesign> {
 	public SolutionDesign getBestNeighbor() {
 		SolutionDesign best = this;
 		for (SolutionDesign sd : this) {
-			if (sd.getScore() > best.getScore())
+			if (sd.isBetterThan(best))
 				best = sd;
 		}
 		return best;
@@ -46,6 +46,13 @@ public class SolutionDesign implements Iterable<SolutionDesign> {
 		List<Action> actions = getAllActions();
 		if (actions.isEmpty()) return this;
 		return apply(actions.get(ACMAUtil.RANDOM.nextInt(actions.size())));
+	}
+	
+	public SolutionDesign getRandomNeighbor(int depth) {
+		SolutionDesign random = this;
+		for (int i = 0; i < depth; i++)
+			random = random.getRandomNeighbor();
+		return random;
 	}
 	
 	public List<Action> getAllActions() {
@@ -59,6 +66,19 @@ public class SolutionDesign implements Iterable<SolutionDesign> {
 		this.design = design;
 		this.config = config;
 	}
+	
+	public boolean isBetterThan(SolutionDesign other) {
+		return compareTo(other) > 0;
+	}
+	
+	@Override
+	public int compareTo(SolutionDesign o) {
+		return Double.compare(compareScoreTo(o), 0.0);
+	}
+	
+	public double compareScoreTo(SolutionDesign o) {
+		return o.getScore() - getScore();
+	}
 
 	@Override
 	public Iterator<SolutionDesign> iterator() {
@@ -68,6 +88,7 @@ public class SolutionDesign implements Iterable<SolutionDesign> {
 	private SolutionDesign apply(Action action) {
 		Design copyDesign = design.copy();
 		action.perform(copyDesign);
+		copyDesign.logModification(action.toString());
 		return new SolutionDesign(copyDesign, config);
 	}
 	

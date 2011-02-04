@@ -21,5 +21,6 @@ public interface MetricTable {
 		public void set(String metric, double value);
 		public void increase(String metric);
 		public void add(String metric, double value);
+		public double get(String metric);
 	}
 }

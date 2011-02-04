@@ -87,10 +87,16 @@ public class DesignPanelBase extends JPanel {
 	protected JButton bsBtnStart;
 	protected JButton btnSave;
 	protected JButton btnPreset;
-	protected JPanel panel;
+	protected JPanel configPanel;
 	protected JComboBox runConfigBox;
 	protected JButton btnConfigure;
 	protected Component horizontalStrut;
+	protected JPanel appliedActionsPanel;
+	protected JScrollPane appliedActionsScrollPane;
+	protected JList appliedActionsList;
+	protected JPanel appliedActionsButtonPanel;
+	protected JButton appliedActionsRefreshButton;
+	protected JPanel appliedActionsScrollPanePanel;
 
 	public DesignPanelBase() {
 		setOpaque(false);
@@ -229,19 +235,6 @@ public class DesignPanelBase extends JPanel {
 		algorithmsPanel = new JPanel();
 		algorithmsPanel.setOpaque(false);
 		algorithmsPanel.setBorder(new CompoundBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Initiate Search", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)), new EmptyBorder(5, 5, 5, 5)));
-		GroupLayout gl_actionsPanel = new GroupLayout(actionsPanel);
-		gl_actionsPanel.setHorizontalGroup(
-			gl_actionsPanel.createParallelGroup(Alignment.LEADING)
-				.addComponent(posActionsPanel, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
-				.addComponent(algorithmsPanel, GroupLayout.DEFAULT_SIZE, 847, Short.MAX_VALUE)
-		);
-		gl_actionsPanel.setVerticalGroup(
-			gl_actionsPanel.createParallelGroup(Alignment.LEADING)
-				.addGroup(gl_actionsPanel.createSequentialGroup()
-					.addComponent(algorithmsPanel, GroupLayout.PREFERRED_SIZE, 111, GroupLayout.PREFERRED_SIZE)
-					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(posActionsPanel, GroupLayout.DEFAULT_SIZE, 443, Short.MAX_VALUE))
-		);
 		
 		algorithmsTabPane = new JTabbedPane(JTabbedPane.TOP);
 		GroupLayout gl_algorithmsPanel = new GroupLayout(algorithmsPanel);
@@ -287,6 +280,7 @@ public class DesignPanelBase extends JPanel {
 		hillClimbingPanel.add(hg1);
 		
 		hcBtnStart = new JButton("Start");
+		hcBtnStart.setActionCommand("HC");
 		hcBtnStart.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/next_16.png")));
 		hillClimbingPanel.add(hcBtnStart);
 		
@@ -310,6 +304,7 @@ public class DesignPanelBase extends JPanel {
 		simAnnPanel.add(hg2);
 		
 		saBtnStart = new JButton("Start");
+		saBtnStart.setActionCommand("SA");
 		saBtnStart.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/next_16.png")));
 		simAnnPanel.add(saBtnStart);
 		
@@ -333,9 +328,11 @@ public class DesignPanelBase extends JPanel {
 		beamSearchPanel.add(hg3);
 		
 		bsBtnStart = new JButton("Start");
+		bsBtnStart.setActionCommand("BS");
 		bsBtnStart.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/next_16.png")));
 		beamSearchPanel.add(bsBtnStart);
 		algorithmsPanel.setLayout(gl_algorithmsPanel);
+		actionsPanel.setLayout(new BorderLayout(0, 0));
 		
 		posActionsListPanel = new JPanel();
 		posActionsListPanel.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
@@ -376,24 +373,53 @@ public class DesignPanelBase extends JPanel {
 		posActionsList.setCellRenderer(new PossibleActionsRenderer());
 		postActionsListScroller.setViewportView(posActionsList);
 		posActionsPanel.setLayout(gl_posActionsPanel);
-		actionsPanel.setLayout(gl_actionsPanel);
+		actionsPanel.add(posActionsPanel, BorderLayout.CENTER);
+		actionsPanel.add(algorithmsPanel, BorderLayout.NORTH);
 		
-		panel = new JPanel();
-		panel.setOpaque(false);
-		panel.setBorder(new CompoundBorder(new EmptyBorder(5, 5, 0, 5), new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Metric & Action Configuration", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0))));
-		add(panel, BorderLayout.NORTH);
-		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
+		appliedActionsPanel = new JPanel();
+		appliedActionsPanel.setOpaque(false);
+		tabbedPane.addTab("Applied Actions", new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/misc1_16.png")), appliedActionsPanel, null);
+		appliedActionsPanel.setLayout(new BorderLayout(0, 0));
+		
+		appliedActionsButtonPanel = new JPanel();
+		appliedActionsButtonPanel.setOpaque(false);
+		appliedActionsPanel.add(appliedActionsButtonPanel, BorderLayout.EAST);
+		
+		appliedActionsRefreshButton = new JButton("");
+		appliedActionsRefreshButton.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/refresh.png")));
+		appliedActionsButtonPanel.add(appliedActionsRefreshButton);
+		
+		appliedActionsScrollPanePanel = new JPanel();
+		appliedActionsScrollPanePanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		appliedActionsPanel.add(appliedActionsScrollPanePanel, BorderLayout.CENTER);
+		appliedActionsScrollPanePanel.setLayout(new BorderLayout(0, 0));
+		
+		appliedActionsScrollPane = new JScrollPane();
+		appliedActionsScrollPanePanel.add(appliedActionsScrollPane);
+		appliedActionsScrollPanePanel.setOpaque(false);
+		appliedActionsScrollPane.setBorder(new EtchedBorder(EtchedBorder.LOWERED, null, null));
+		
+		appliedActionsList = new JList();
+		appliedActionsList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		appliedActionsList.setCellRenderer(new AppliedActionsRenderer());
+		appliedActionsScrollPane.setViewportView(appliedActionsList);
+		
+		configPanel = new JPanel();
+		configPanel.setOpaque(false);
+		configPanel.setBorder(new CompoundBorder(new EmptyBorder(5, 5, 0, 5), new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Metric & Action Configuration", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0))));
+		add(configPanel, BorderLayout.NORTH);
+		configPanel.setLayout(new BoxLayout(configPanel, BoxLayout.X_AXIS));
 		
 		runConfigBox = new JComboBox();
 		runConfigBox.setModel(new DefaultComboBoxModel(new String[] {"Default"}));
-		panel.add(runConfigBox);
+		configPanel.add(runConfigBox);
 		
 		horizontalStrut = Box.createHorizontalStrut(5);
-		panel.add(horizontalStrut);
+		configPanel.add(horizontalStrut);
 		
 		btnConfigure = new JButton("Configure");
 		btnConfigure.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/engine_16.png")));
-		panel.add(btnConfigure);
+		configPanel.add(btnConfigure);
 		
 		btnConfigure.addActionListener(new ActionListener() {
 			@Override
@@ -407,6 +433,24 @@ public class DesignPanelBase extends JPanel {
 		private static final long serialVersionUID = 1L;
 		
 		private static final Icon actionIcon = new ImageIcon(PossibleActionsRenderer.class.getResource("/resources/icons/misc3_16.png"));
+		
+		@Override
+		public Component getListCellRendererComponent(JList list, Object value,
+				int index, boolean isSelected, boolean cellHasFocus) {
+			
+			super.getListCellRendererComponent(list, value, index, isSelected,
+					cellHasFocus);
+			
+			setIcon(actionIcon);
+			
+			return this;
+		}
+	}
+	
+	private static class AppliedActionsRenderer extends DefaultListCellRenderer {
+		private static final long serialVersionUID = 1L;
+		
+		private static final Icon actionIcon = new ImageIcon(AppliedActionsRenderer.class.getResource("/resources/icons/misc1_16.png"));
 		
 		@Override
 		public Component getListCellRendererComponent(JList list, Object value,
