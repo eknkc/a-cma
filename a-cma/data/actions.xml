@@ -7,4 +7,5 @@
 	<action class = "RemoveField" />
 	<action class = "RemoveClass" />
 	<action class = "RemoveInterface" />
+	<action class = "FreezeMethod" />
 </actions>

@@ -34,6 +34,7 @@ public class RemoveActionsTests {
 	@AfterClass
 	public static void destroyDesign() {
 		design = null;
+		actions = null;
 	}
 	
 	@Test
@@ -58,8 +59,7 @@ public class RemoveActionsTests {
 	}
 	
 	@Test
-	public void testRemoveClass() {
-		
+	public void testRemoveClass() {	
 		Design d = design.copy();
 		d.create("TestType2", Type.class);
 		d.create("TestType3", Type.class);
@@ -77,8 +77,7 @@ public class RemoveActionsTests {
 	}
 	
 	@Test
-	public void testRemoveField() {
-		
+	public void testRemoveField() {	
 		Design d = design.copy();
 		d.getType("TestType").createField("TestField1");
 		Field f2 = d.getType("TestType").createField("TestField2");
@@ -100,8 +99,7 @@ public class RemoveActionsTests {
 	}
 	
 	@Test
-	public void testRemoveInterface() {
-		
+	public void testRemoveInterface() {		
 		Design d = design.copy();
 		d.getType("TestType").setInterface(true);
 		RemoveInterface.Checker c = new RemoveInterface.Checker();
