@@ -82,9 +82,7 @@ public class FieldTests {
 	
 	@Test
 	public void testPackage(){
-		
-		//TODO : testPackage metodu yazilacak
-		
+		//TODO:
 	}
 	
 	@Test
@@ -125,9 +123,17 @@ public class FieldTests {
 	
 	@Test
 	public void testRemove(){
-		//TODO : testRemove yazilacak
-		//testField.setOwnerType(testType);
 		
-		//assertTrue(testField.remove());
+		Type typeRemoveTest = new Type("type", testDesign);
+		Field fieldRemoveTest = new Field("field", testDesign);
+		fieldRemoveTest.setOwnerType(typeRemoveTest);
+		
+		assertTrue(fieldRemoveTest.remove());
+		
+		fieldRemoveTest = new Field("field", testDesign);
+		fieldRemoveTest.setType(typeRemoveTest);
+		
+		assertTrue(fieldRemoveTest.remove());
+	
 	}
 }
