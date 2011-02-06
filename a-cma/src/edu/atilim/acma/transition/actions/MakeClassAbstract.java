@@ -44,7 +44,7 @@ public final class MakeClassAbstract {
 		
 		@Override
 		public String toString() {
-			return String.format("Make type '%s' abstract", typeName);
+			return String.format("[Make Class Abstract] %s", typeName);
 		}
 	}
 }

@@ -227,7 +227,7 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 				
 				if (name == null) return;
 				
-				MetricSummary ms = new MetricSummary(name, designData.getTable());
+				MetricSummary ms = new MetricSummary(name, design.getMetrics());
 				ConfigManager.add(ms);
 				ConfigManager.saveChanges();
 			}

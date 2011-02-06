@@ -26,6 +26,9 @@ import edu.atilim.acma.ui.design.RunPanelBase;
 
 public class RunPanel extends RunPanelBase implements AlgorithmObserver {
 	private static final long serialVersionUID = 1L;
+	
+	private long startTime;
+	private long endTime;
 
 	private TimeSeries currentSeries;
 	private TimeSeries bestSeries;
@@ -114,6 +117,8 @@ public class RunPanel extends RunPanelBase implements AlgorithmObserver {
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				startTime = System.currentTimeMillis();
+				
 				DesignPanel dp = new DesignPanel(idesign);
 				
 				dp.setCompactView(true);
@@ -127,12 +132,14 @@ public class RunPanel extends RunPanelBase implements AlgorithmObserver {
 	}
 
 	@Override
-	public void onFinish(AbstractAlgorithm algorithm, SolutionDesign last) {
+	public void onFinish(final AbstractAlgorithm algorithm, SolutionDesign last) {
 		final Design ldesign = last.getDesign().copy();
 		
 		SwingUtilities.invokeLater(new Runnable() {
 			@Override
 			public void run() {
+				endTime = System.currentTimeMillis();
+				
 				pauseContinueButton.setEnabled(false);
 				chartTimer.stop();
 				
@@ -144,6 +151,8 @@ public class RunPanel extends RunPanelBase implements AlgorithmObserver {
 						new ImageIcon(RunPanel.class.getResource("/resources/icons/design_16.png")), 
 						dp, 
 						null);
+				
+				onLog(algorithm, String.format("Entire process took %.4f econds", (endTime - startTime) / 1000.0));
 			}
 		});
 	}

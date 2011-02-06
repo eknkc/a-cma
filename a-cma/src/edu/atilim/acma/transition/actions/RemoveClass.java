@@ -35,7 +35,7 @@ public class RemoveClass {
 			
 			Type t = d.getType(typeName);
 			if (t == null) {
-				Log.severe("[RemoveClass] Can not find type: %s.", typeName);
+				Log.severe("[Remove Class] Can not find type: %s.", typeName);
 				return;
 			}
 			t.remove();
@@ -44,7 +44,7 @@ public class RemoveClass {
 		
 		@Override
 		public String toString() {
-			return String.format("Remove class '%s'", typeName);
+			return String.format("[Remove Class] %s", typeName);
 		}
 	}
 

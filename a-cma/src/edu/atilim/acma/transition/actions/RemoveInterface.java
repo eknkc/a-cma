@@ -50,7 +50,7 @@ public class RemoveInterface {
 		
 		@Override
 		public String toString() {
-			return String.format("Remove interface '%s' ", typeName);
+			return String.format("[Remove Interface] %s", typeName);
 		}
 	}
 

@@ -6,6 +6,10 @@ import edu.atilim.acma.RunConfig;
 
 public class MetricNormalizer {
 	public static double normalize(MetricSummary current, RunConfig config) {
+		return weightedNormalize(current, config);
+	}
+	
+	private static double weightedNormalize(MetricSummary current, RunConfig config) {
 		// All metrics
 		List<MetricRegistry.Entry> metrics = MetricRegistry.entries();
 		
@@ -36,13 +40,16 @@ public class MetricNormalizer {
 		double minimalizevalue = 0;
 		
 		for (int i = 0; i < nummetrics; i++) {
-			if (!config.isMetricEnabled(metrics.get(i).getName())) continue;
+			MetricRegistry.Entry metric = metrics.get(i);
 			
-			if (!Double.isNaN(weights[i]) && !Double.isNaN(normals[i])) {
-				if (metrics.get(i).isMinimized())
-					minimalizevalue += weights[i] * Math.abs(normals[i]);
-				else
+			if (!config.isMetricEnabled(metric.getName())) continue;
+			
+			if (metric.isMinimized()) {
+				normalvalue += current.get(metric.getName());
+			} else {
+				if (!Double.isNaN(weights[i]) && !Double.isNaN(normals[i])) {
 					normalvalue += weights[i] * Math.abs(normals[i]);
+				}
 			}
 		}
 		

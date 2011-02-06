@@ -36,9 +36,9 @@ public class FreezeMethod {
 					}
 					
 					if(flag)
-						set.add(new Performer(t.getName(), m.getName(), false));
+						set.add(new Performer(t.getName(), m.getSignature(), false));
 					else
-						set.add(new Performer(t.getName(), m.getName(), true));
+						set.add(new Performer(t.getName(), m.getSignature(), true));
 				}
 			}		
 		}
@@ -80,7 +80,7 @@ public class FreezeMethod {
 		@Override
 		public String toString() {
 			
-			return String.format("Make method '%s' of '%s' to static ", methodName,typeName);
+			return String.format("[Freeze Method] Convert '%s' of '%s' to static ", methodName,typeName);
 		}
 	}//end of performer
 }

@@ -21,7 +21,7 @@ public class RemoveMethod {
 					if(m.getAccess() == Accessibility.PUBLIC || m.getAccess() == Accessibility.PROTECTED || m.isClassConstructor() ||  m.isCompilerGenerated() || !m.getCallerMethods().isEmpty() || m.isOverride()) 
 						continue;
 					
-					set.add(new Performer(t.getName(), m.getName()));
+					set.add(new Performer(t.getName(), m.getSignature()));
 				}
 			}
 		}
@@ -52,7 +52,7 @@ public class RemoveMethod {
 		
 		@Override
 		public String toString() {
-			return String.format("Remove method '%s' of type '%s'", methodName,typeName);
+			return String.format("[Remove Method] '%s' of type '%s'", methodName,typeName);
 		}
 	}
 

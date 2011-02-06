@@ -50,7 +50,7 @@ public class RemoveField {
 		
 		@Override
 		public String toString() {
-			return String.format("Remove field '%s' of type '%s'", fieldName,typeName);
+			return String.format("[Remove Field] '%s' of type '%s'", fieldName,typeName);
 		}
 	}
 
