@@ -152,7 +152,7 @@ public class RunPanel extends RunPanelBase implements AlgorithmObserver {
 						dp, 
 						null);
 				
-				onLog(algorithm, String.format("Entire process took %.4f econds", (endTime - startTime) / 1000.0));
+				onLog(algorithm, String.format("Entire process took %.4f seconds", (endTime - startTime) / 1000.0));
 			}
 		});
 	}

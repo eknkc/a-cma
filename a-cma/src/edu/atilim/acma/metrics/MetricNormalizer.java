@@ -1,132 +1,96 @@
 package edu.atilim.acma.metrics;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import edu.atilim.acma.RunConfig;
 
 public class MetricNormalizer {
-	public static double normalize(MetricSummary current, RunConfig config) {
-		return weightedNormalize(current, config);
+	private static HashMap<UUID, double[][]> normalizationCache = new HashMap<UUID, double[][]>();
+	
+	public static void clearCache() {
+		normalizationCache.clear();
 	}
 	
-	private static double weightedNormalize(MetricSummary current, RunConfig config) {
+	public static double normalize(MetricSummary current, RunConfig config) {
+		return unweightedNormalize(current, config);
+	}
+	
+	private static double unweightedNormalize(MetricSummary current, RunConfig config) {
 		// All metrics
 		List<MetricRegistry.Entry> metrics = MetricRegistry.entries();
-		
-		// Design set
-		List<MetricSummary> designs = config.getNormalMetrics();
-		
 		int nummetrics = metrics.size();
-		int numdesigns = designs.size();
 		
-		// Table
-		double[][] table = new double[nummetrics][numdesigns + 1];
+		if (!normalizationCache.containsKey(config.getId())) {
+			// Design set
+			List<MetricSummary> designs = config.getNormalMetrics();
+			int numdesigns = designs.size();
 			
-		for (int i = 0; i < nummetrics; i++) {
-			MetricRegistry.Entry metric = metrics.get(i);
-			
-			for (int j = 0; j < numdesigns; j++) {
-				MetricSummary design = designs.get(j);
-				table[i][j] = design.get(metric.getName());
+			// Table
+			double[][] table = new double[nummetrics][numdesigns];
+				
+			for (int i = 0; i < nummetrics; i++) {
+				MetricRegistry.Entry metric = metrics.get(i);
+				
+				for (int j = 0; j < numdesigns; j++) {
+					MetricSummary design = designs.get(j);
+					table[i][j] = design.get(metric.getName());
+				}
 			}
 			
-			table[i][numdesigns] = current.get(metric.getName());
+			normalizationCache.put(config.getId(), getMeansAndStDevs(table, nummetrics, numdesigns));
 		}
 		
-		double[] weights = getWeights(table, nummetrics, numdesigns);
-		double[] normals = getNormals(table, nummetrics, numdesigns + 1);
+		double[][] mn = normalizationCache.get(config.getId());
 		
 		double normalvalue = 0;
-		double minimalizevalue = 0;
 		
 		for (int i = 0; i < nummetrics; i++) {
 			MetricRegistry.Entry metric = metrics.get(i);
 			
 			if (!config.isMetricEnabled(metric.getName())) continue;
 			
+			double curmetric = current.get(metric.getName());
+			
+			if (Double.isNaN(curmetric) || Double.isNaN(mn[i][0]) || Double.isNaN(mn[i][1]) || mn[i][1] == 0.0) continue;
+			
+			double curnormal = (curmetric - mn[i][0]) / mn[i][1];
+			
 			if (metric.isMinimized()) {
-				normalvalue += current.get(metric.getName());
+				normalvalue += Math.abs(curnormal - ((0.0 - mn[i][0]) / mn[i][1]));
 			} else {
-				if (!Double.isNaN(weights[i]) && !Double.isNaN(normals[i])) {
-					normalvalue += weights[i] * Math.abs(normals[i]);
-				}
+				normalvalue += Math.abs(curnormal);
 			}
 		}
 		
-		return normalvalue + minimalizevalue;
+		return normalvalue;
 	}
 	
-	private static double[] getNormals(double[][] table, int rows, int cols) {
-		double[] means = new double[rows];
+	private static double[][] getMeansAndStDevs(double[][] table, int metrics, int designs) {
+		double[][] result = new double[metrics][2];
 		
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				means[i] += table[i][j];
+		for (int i = 0; i < metrics; i++) {
+			for (int j = 0; j < designs; j++) {
+				result[i][0] += table[i][j];
 			}
 		}
 		
-		for (int i = 0; i < rows; i++) {
-			means[i] /= cols;
+		for (int i = 0; i < metrics; i++) {
+			result[i][0] /= designs;
 		}
 		
-		double[] stdevs = new double[rows];
-		
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				double diff = table[i][j] - means[i];
-				stdevs[i] += diff * diff;
+		for (int i = 0; i < metrics; i++) {
+			for (int j = 0; j < designs; j++) {
+				double diff = table[i][j] - result[i][0];
+				result[i][1] += diff * diff;
 			}
 		}
 		
-		for (int i = 0; i < rows; i++) {
-			stdevs[i] = Math.sqrt(stdevs[i] / cols);
+		for (int i = 0; i < metrics; i++) {
+			result[i][1] = Math.sqrt(result[i][1] / designs);
 		}
 		
-		double[] normals = new double[rows];
-		
-		for (int i = 0; i < rows; i++) {
-			normals[i] = ((table[i][cols - 1] - means[i]) / stdevs[i]);
-		}
-		
-		return normals;
-	}
-	
-	private static double[] getWeights(double[][] table, int rows, int cols) {
-		double[] means = new double[cols];
-		
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				means[j] += table[i][j];
-			}
-		}
-		
-		for (int j = 0; j < cols; j++) {
-			means[j] /= rows;
-		}
-		
-		double[] stdevs = new double[cols];
-		
-		for (int i = 0; i < rows; i++) {
-			for (int j = 0; j < cols; j++) {
-				double diff = table[i][j] - means[j];
-				stdevs[j] += diff * diff;
-			}
-		}
-		
-		for (int j = 0; j < cols; j++) {
-			stdevs[j] = Math.sqrt(stdevs[j] / rows);
-		}
-		
-		double[] weights = new double[rows];
-		
-		for (int i = 0; i < rows; i++) {
-			double sum = 0;
-			for (int j = 0; j < cols; j++) {
-				sum += Math.abs((table[i][j] - means[j]) / stdevs[j]);
-			}
-			weights[i] = sum / cols;
-		}
-		
-		return weights;
+		return result;
 	}
 }

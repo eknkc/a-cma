@@ -18,7 +18,7 @@ public class SimAnnAlgorithm extends AbstractAlgorithm {
 		this.maxIters = maxIters;
 		
 		energySet = new EnergySet(100);
-		cooler = new DefaultCooler(3.5, maxIters);
+		cooler = new DefaultCooler(1.0, maxIters);
 	}
 
 	@Override

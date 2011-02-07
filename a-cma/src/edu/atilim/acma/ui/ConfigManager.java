@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import edu.atilim.acma.RunConfig;
+import edu.atilim.acma.metrics.MetricNormalizer;
 import edu.atilim.acma.metrics.MetricRegistry;
 import edu.atilim.acma.metrics.MetricSummary;
 import edu.atilim.acma.transition.ActionRegistry;
@@ -49,6 +50,7 @@ final class ConfigManager {
 		for (RunConfig rc : runConfigs) {
 			rc.getNormalMetrics().add(normal);
 		}
+		MetricNormalizer.clearCache();
 	}
 	
 	static void remove(RunConfig config) {
@@ -179,6 +181,7 @@ final class ConfigManager {
 					return;
 				}
 			}
+			MetricNormalizer.clearCache();
 		}
 		
 		public UUID getID() {

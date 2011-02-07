@@ -44,9 +44,6 @@ public class SizeMetricsTests {
 		assertEquals(2.0, table.get("test.Test1", "numFields"), 0.1);
 		assertEquals(2.0, table.get("test.Test2", "numFields"), 0.1);
 		
-		assertEquals(0.0, table.get("test.Test1", "numPubFields"), 0.1);
-		assertEquals(1.0, table.get("test.Test2", "numPubFields"), 0.1);
-		
 		assertEquals(0.0, table.get("test.Test1", "numConstants"), 0.1);
 		assertEquals(1.0, table.get("test.Test2", "numConstants"), 0.1);
 	}
@@ -57,10 +54,7 @@ public class SizeMetricsTests {
 		
 		assertEquals(2.0, table.get("test.Test1", "numOps"), 0.1);
 		assertEquals(1.0, table.get("test.Test2", "numOps"), 0.1);
-		
-		assertEquals(1.0, table.get("test.Test1", "numPubOps"), 0.1);
-		assertEquals(0.0, table.get("test.Test2", "numPubOps"), 0.1);
-		
+			
 		assertEquals(1.0, table.get("test.Test1", "getters"), 0.1);
 		assertEquals(0.0, table.get("test.Test2", "getters"), 0.1);
 		

@@ -13,7 +13,6 @@ public final class SizeMetrics {
 	public static void calculateFieldMetrics(Type type, MetricRow row) {
 		row.set("numFields", type.getFields().size());
 		
-		row.set("numPubFields", 0);
 		row.set("numConstants", 0);
 		
 		int totVis = 0;
@@ -21,19 +20,7 @@ public final class SizeMetrics {
 		for (Field f : type.getFields()) {
 			if (f.isConstant())
 				row.increase("numConstants");
-			
-			switch (f.getAccess()) {
-			case PUBLIC:
-				row.increase("numPubFields");
-				totVis += 3;
-				break;
-			case PROTECTED:
-				totVis += 2;
-				break;
-			case PACKAGE:
-				totVis += 1;
-				break;
-			}
+			totVis += getVisibility(f.getAccess());
 		}
 		
 		row.set("avrgFieldVisibility", totVis / row.get("numFields"));
@@ -45,18 +32,38 @@ public final class SizeMetrics {
 		
 		row.set("numOps", methods.size());
 		
-		row.set("numPubOps", 0);
 		row.set("getters", 0);
 		row.set("setters", 0);
 		
+		int totVis = 0;
+		int totStatic = 0;
+		
 		for (Method m : methods) {
-			if (m.getAccess() == Accessibility.PUBLIC)
-				row.increase("numPubOps");
+			if (m.isStatic())
+				totStatic++;
+			
+			totVis += getVisibility(m.getAccess());
 			
 			if (m.isGetter())
 				row.increase("getters");
 			else if (m.isSetter())
 				row.increase("setters");
 		}
+		
+		row.set("avrgMethodVisibility", totVis / row.get("numOps"));
+		row.set("staticness", totStatic / row.get("numOps"));
+	}
+	
+	private static int getVisibility(Accessibility access) {
+		switch (access) {
+		case PUBLIC:
+			return 3;
+		case PROTECTED:
+			return 2;
+		case PACKAGE:
+			return 1;
+		}
+		
+		return 0;
 	}
 }

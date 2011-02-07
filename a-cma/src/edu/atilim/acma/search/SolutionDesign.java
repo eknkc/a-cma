@@ -17,6 +17,8 @@ import edu.atilim.acma.util.ACMAUtil;
 import edu.atilim.acma.util.Log;
 
 public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<SolutionDesign> {
+	private static final int numProcs = Runtime.getRuntime().availableProcessors();
+	
 	private Design design;
 	private RunConfig config;
 	private List<Action> actions;
@@ -39,10 +41,9 @@ public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<Solu
 	}
 	
 	public SolutionDesign getBestNeighbor() {
-		int numparts = Runtime.getRuntime().availableProcessors();
 		SolutionDesign best = this;
 		
-		if (numparts == 1) {
+		if (numProcs == 1) {
 			for (SolutionDesign sd : this) {
 				if (sd.isBetterThan(best))
 					best = sd;
@@ -52,10 +53,10 @@ public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<Solu
 		
 		List<Action> actions = getAllActions();
 		
-		int perthread = actions.size() / numparts;
+		int perthread = actions.size() / numProcs;
 		
-		List<BestDesignFinder> bdf = new ArrayList<SolutionDesign.BestDesignFinder>(numparts);
-		for (int i = 0; i < 2; i++) {
+		List<BestDesignFinder> bdf = new ArrayList<SolutionDesign.BestDesignFinder>(numProcs);
+		for (int i = 0; i < numProcs; i++) {
 			bdf.add(new BestDesignFinder(actions, i * perthread, perthread));
 		}
 		
@@ -64,7 +65,7 @@ public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<Solu
 			List<Future<SolutionDesign>> futures = threadPool.invokeAll(bdf);
 			
 			// Remainder
-			for (int i = perthread * numparts; i < actions.size(); i++) {
+			for (int i = perthread * numProcs; i < actions.size(); i++) {
 				SolutionDesign cur = apply(actions.get(i));
 				if (cur.isBetterThan(best)) best = cur;
 			}
