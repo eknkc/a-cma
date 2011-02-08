@@ -8,4 +8,8 @@
 	<action class = "RemoveClass" />
 	<action class = "RemoveInterface" />
 	<action class = "FreezeMethod" />
+	<action class = "MoveUpMethod" />
+	<action class = "MoveDownMethod" />
+	<action class = "MoveMethod" />
+	<action class = "InstantiateMethod" />
 </actions>

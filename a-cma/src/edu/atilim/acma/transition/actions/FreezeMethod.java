@@ -18,21 +18,22 @@ public class FreezeMethod {
 		public void findPossibleActions(Design design, Set<Action> set) {
 			for (Type t : design.getTypes()) {
 				for (Method m : t.getMethods()) {
-
 					flag = true;
 					
 					if(m.isCompilerGenerated() || m.isOverride() || m.isStatic() || m.isConstructor() || m.isClassConstructor()) continue;
 					
-					for (Field f : m.getAccessedFields()) {
-						
-						if (f.getOwnerType() != t || !f.isStatic()) 
+					for (Field f : m.getAccessedFields()) {			
+						if (f.getOwnerType() != t || !f.isStatic()){
 							flag = false;
+							break;
+						}
 					}
 					
-					for(Method mt : m.getCalledMethods())
-					{
-						if(mt.getOwnerType() != t ||  !mt.isStatic() )
+					for(Method mt : m.getCalledMethods()){
+						if(mt.getOwnerType() != t ||  !mt.isStatic() ){
 							flag = false;
+							break;
+						}
 					}
 					
 					if(flag)
@@ -44,14 +45,12 @@ public class FreezeMethod {
 		}
 	}//end of checker
 	
-	public static class Performer implements Action {
-		
+	public static class Performer implements Action {	
 			private String typeName;
 			private String methodName;
 			private boolean parameterizeFlag;
 		
 		public Performer(String typeName, String methodName, boolean parameterizeFlag) {
-			
 			this.typeName = typeName;
 			this.methodName = methodName;
 			this.parameterizeFlag = parameterizeFlag;
@@ -59,18 +58,17 @@ public class FreezeMethod {
 
 		@Override
 		public void perform(Design d) {
-			
-			Method m = d.getType(typeName).getMethod(methodName);
+			Type t = d.getType(typeName);
+			Method m = t.getMethod(methodName);
 			
 			if (m == null) {
 				Log.severe("[FreezeMethod] Can not find method: %s.", methodName);
 				return;
 			}
 			
-			if(parameterizeFlag)
-			{
+			if(parameterizeFlag){
 				m.setStatic(true);
-				m.addParameter(typeName,0);
+				m.addParameter(t);
 			}
 				
 			else

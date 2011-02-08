@@ -92,6 +92,40 @@ public class Method extends Node {
 		ref.setDimension(dimension);
 		paramTypes.add(ref);
 	}
+	
+	public boolean canBeMovedTo (Type type){
+		if(type == null || type.isAbstract() || type.isAnnotation() || type.isCompilerGenerated() || type.isInterface())
+			return false;
+		
+		if(isFinal() && !type.isFinal()) return false;
+		
+		for(Method m : type.getMethods()){
+			if(m.getSignature().equals(getSignature()))
+				return false;
+		}
+		
+		for (Field f : getAccessedFields()) {
+			if (!f.getOwnerType().getPackage().equals(type.getPackage()) && f.getAccess() != Accessibility.PUBLIC) 
+				return false;
+		}
+		
+		for(Method m : getCalledMethods()){
+			if(!m.getOwnerType().getPackage().equals(type.getPackage()) && m.getAccess() != Accessibility.PUBLIC)
+				return false;	
+		}
+		
+		for(Parameter p : getParameters()){
+			if(!p.getType().getPackage().equals(type.getPackage()) && p.getType().getAccess() != Accessibility.PUBLIC)
+				return false;
+		}
+		
+		if(getReturnType() != null){
+			if(!getReturnType().getPackage().equals(type.getPackage()) && getReturnType().getAccess() != Accessibility.PUBLIC)
+				return false;
+		}
+		
+		return true;
+	}
 
 	public boolean containsParameter(Type t) {
 		return containsParameter(t, false);
