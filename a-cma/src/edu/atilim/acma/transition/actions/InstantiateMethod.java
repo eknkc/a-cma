@@ -21,7 +21,6 @@ public class InstantiateMethod {
 				if(type.isInterface() || type.isAbstract() || type.isCompilerGenerated() || type.isAnnotation()) 
 					continue;
 			
-				method:
 				for(Method m : type.getMethods() ){
 					parameterList = m.getParameters();
 						
@@ -32,10 +31,8 @@ public class InstantiateMethod {
 						for(Parameter p : parameterList){
 							if(!m.canBeMovedTo(p.getType())) 
 								continue;
-							else{
+							else
 								set.add(new Performer(type.getName(), m.getSignature(), p.getType().getName()));
-								break method;
-							}
 						}
 					}
 				}

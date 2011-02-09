@@ -21,7 +21,6 @@ public class MoveDownMethod {
 				if(childTypeList == null || type.isInterface() || type.isAbstract() || type.isCompilerGenerated() || type.isAnnotation()) 
 					continue;
 				
-				method:
 				for(Method m : type.getMethods() ){
 					if(m.getAccess() == Accessibility.PRIVATE || m.getAccess() == Accessibility.PUBLIC ||  m.isCompilerGenerated() || m.isStatic() || m.isConstructor() ||  m.isClassConstructor()) 
 						continue;
@@ -29,10 +28,8 @@ public class MoveDownMethod {
 					for(Type t : childTypeList){
 						if(!m.canBeMovedTo(t)) 
 							continue;
-						else{
+						else
 							set.add(new Performer(type.getName(), m.getSignature(), t.getName()));
-							break method;
-						}
 					}
 				}
 			}
@@ -56,8 +53,8 @@ public class MoveDownMethod {
 			Type t = d.getType(newOwnerTypeName);
 		
 			if (m == null) {
-			Log.severe("[MoveDownMethod] Can not find method: %s.", methodName);
-			return;
+				Log.severe("[MoveDownMethod] Can not find method: %s.", methodName);
+				return;
 			}
 			
 			m.setOwnerType(t);	

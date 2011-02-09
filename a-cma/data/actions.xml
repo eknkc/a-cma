@@ -12,4 +12,8 @@
 	<action class = "MoveDownMethod" />
 	<action class = "MoveMethod" />
 	<action class = "InstantiateMethod" />
+	<action class = "MoveUpField" />
+	<action class = "MoveDownField" />
+	<action class = "MakeClassFinal" />
+	<action class = "MakeClassConcrete" />
 </actions>
