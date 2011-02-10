@@ -16,4 +16,7 @@
 	<action class = "MoveDownField" />
 	<action class = "MakeClassFinal" />
 	<action class = "MakeClassConcrete" />
+	<action class = "MakeClassNonFinal" />
+	<action class = "IncreaseMethodSecurity" />
+	<action class = "DecreaseMethodSecurity" />
 </actions>

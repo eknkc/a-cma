@@ -44,7 +44,7 @@ public abstract class Node implements Serializable {
 		}
 		
 		if (otheroverride == Accessibility.PRIVATE) {
-			return getOwnerType() == other.getOwnerType();
+			return getOwnerType().equals(other.getOwnerType());
 		}
 		
 		return false;
