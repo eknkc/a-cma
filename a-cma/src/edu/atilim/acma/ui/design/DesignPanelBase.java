@@ -106,6 +106,14 @@ public class DesignPanelBase extends JPanel {
 	protected JButton saBtnAddTask;
 	protected JButton bsBtnAddTask;
 	protected JButton rsBtnAddTask;
+	protected JLabel lblRandomizationDepth;
+	protected JSpinner bsRandomDepth;
+	protected Component hs7;
+	protected Component hs8;
+	protected Component hs9;
+	protected JLabel lblIterations;
+	protected Component horizontalStrut_1;
+	protected JSpinner bsIterations;
 
 	public DesignPanelBase() {
 		setOpaque(false);
@@ -340,8 +348,34 @@ public class DesignPanelBase extends JPanel {
 		beamSearchPanel.add(hs5);
 		
 		bsBeamLength = new JSpinner();
-		bsBeamLength.setModel(new SpinnerNumberModel(50, 10, 500, 1));
+		bsBeamLength.setModel(new SpinnerNumberModel(50, 1, 1000, 1));
 		beamSearchPanel.add(bsBeamLength);
+		
+		hs7 = Box.createHorizontalStrut(5);
+		beamSearchPanel.add(hs7);
+		
+		lblRandomizationDepth = new JLabel("Randomization Depth:");
+		beamSearchPanel.add(lblRandomizationDepth);
+		
+		hs9 = Box.createHorizontalStrut(5);
+		beamSearchPanel.add(hs9);
+		
+		bsRandomDepth = new JSpinner();
+		bsRandomDepth.setModel(new SpinnerNumberModel(100, 10, 2000, 1));
+		beamSearchPanel.add(bsRandomDepth);
+		
+		hs8 = Box.createHorizontalStrut(5);
+		beamSearchPanel.add(hs8);
+		
+		lblIterations = new JLabel("Iterations:");
+		beamSearchPanel.add(lblIterations);
+		
+		horizontalStrut_1 = Box.createHorizontalStrut(5);
+		beamSearchPanel.add(horizontalStrut_1);
+		
+		bsIterations = new JSpinner();
+		bsIterations.setModel(new SpinnerNumberModel(500, 5, 1000000, 1));
+		beamSearchPanel.add(bsIterations);
 		
 		hg3 = Box.createHorizontalGlue();
 		beamSearchPanel.add(hg3);

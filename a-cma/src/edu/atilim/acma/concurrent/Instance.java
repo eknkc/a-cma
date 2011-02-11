@@ -8,4 +8,5 @@ public interface Instance {
 	public void setInstanceListener(InstanceListener listener);
 	public void send(Serializable message);
 	public <T extends Serializable> T receive(Class<T> cls);
+	public Serializable receive();
 }

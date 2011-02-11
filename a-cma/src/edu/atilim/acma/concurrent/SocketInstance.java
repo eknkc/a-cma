@@ -125,6 +125,16 @@ public class SocketInstance implements Instance, Runnable {
 		}
 		return null;
 	}
+	
+	@Override
+	public Serializable receive() {
+		try {
+			return receiveBuffer.take();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	@Override
 	public void run() {

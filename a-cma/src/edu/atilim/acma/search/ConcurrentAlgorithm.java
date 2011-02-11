@@ -1,6 +1,9 @@
 package edu.atilim.acma.search;
 
+import java.io.BufferedWriter;
 import java.io.Externalizable;
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
@@ -35,8 +38,26 @@ public abstract class ConcurrentAlgorithm implements ConcurrentTask, Externaliza
 		this.initialDesign = initialDesign;
 	}
 	
-	protected void onFinish(Design finalDesign) {
+	protected void onFinish(Design fDesign) {
+		String pathName = String.format("./data/results/%s/", getName().replace('/', '-'));
+		String runName = String.format("%sresults.txt", pathName);
 		
+		File dir = new File(pathName);
+		if (!dir.exists()) dir.mkdirs();
+		
+		SolutionDesign initialDesign = new SolutionDesign(this.initialDesign, config);
+		SolutionDesign finalDesign = new SolutionDesign(fDesign, config);
+		
+		BufferedWriter bw = null;
+		try {
+			bw = new BufferedWriter(new FileWriter(runName, true));
+			bw.write(String.format("Initial Design Score: %.8f\n", initialDesign.getScore()));
+			bw.write(String.format("Final Design Score: %.8f\n\n", finalDesign.getScore()));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		} finally {
+			try { bw.close(); } catch (Exception e) { }
+		}
 	}
 	
 	@Override

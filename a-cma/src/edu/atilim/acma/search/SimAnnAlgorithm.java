@@ -17,8 +17,8 @@ public class SimAnnAlgorithm extends AbstractAlgorithm {
 		current = best = initialDesign;
 		this.maxIters = maxIters;
 		
-		energySet = new EnergySet(100);
-		cooler = new DefaultCooler(1.0, maxIters);
+		energySet = new EnergySet(10);
+		cooler = new DefaultCooler(0.5, maxIters);
 	}
 
 	@Override
@@ -70,6 +70,12 @@ public class SimAnnAlgorithm extends AbstractAlgorithm {
 		
 		if (checkProbability(current, randomNeighbor, t)) {
 			current = randomNeighbor;
+			
+			if (observer != null) {
+				observer.onUpdateItems(this, current, best, AlgorithmObserver.UPDATE_CURRENT);
+			}
+		} else {
+			current = current.getBestNeighbor();
 			
 			if (observer != null) {
 				observer.onUpdateItems(this, current, best, AlgorithmObserver.UPDATE_CURRENT);

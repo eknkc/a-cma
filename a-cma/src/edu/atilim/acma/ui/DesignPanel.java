@@ -46,6 +46,7 @@ import edu.atilim.acma.metrics.MetricCalculator;
 import edu.atilim.acma.metrics.MetricSummary;
 import edu.atilim.acma.metrics.MetricTable;
 import edu.atilim.acma.search.AbstractAlgorithm;
+import edu.atilim.acma.search.ConcurrentBeamSearch;
 import edu.atilim.acma.search.ConcurrentHillClimbing;
 import edu.atilim.acma.search.ConcurrentRandomSearch;
 import edu.atilim.acma.search.ConcurrentSimAnn;
@@ -144,6 +145,11 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 				} else if (e.getActionCommand().equals("SA")) {
 					int mi = (Integer)saIterationCnt.getValue();
 					task = new ConcurrentSimAnn(name, getRunConfig(), design, mi, runs);
+				} else if (e.getActionCommand().equals("BS")) {
+					int bl = (Integer)bsBeamLength.getValue();
+					int bi = (Integer)bsIterations.getValue();
+					int br = (Integer)bsRandomDepth.getValue();
+					task = new ConcurrentBeamSearch(name, getRunConfig(), design, bl, br, bi, runs);
 				} else if (e.getActionCommand().equals("RS")) {
 					int mi = (Integer)rsIterationCount.getValue();
 					task = new ConcurrentRandomSearch(name, getRunConfig(), design, mi, runs);
@@ -156,6 +162,7 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 		
 		hcBtnAddTask.addActionListener(taskListener);
 		saBtnAddTask.addActionListener(taskListener);
+		bsBtnAddTask.addActionListener(taskListener);
 		rsBtnAddTask.addActionListener(taskListener);
 	}
 	

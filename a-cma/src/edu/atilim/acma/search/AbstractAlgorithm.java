@@ -87,7 +87,7 @@ public abstract class AbstractAlgorithm {
 		Log.info("[%s] %s", getName(), log);
 		
 		if (getObserver() != null)
-			getObserver().onLog(this, log); //TODO: this!
+			getObserver().onLog(this, log);
 	}
 	
 	protected void log(String log, Object... args) {

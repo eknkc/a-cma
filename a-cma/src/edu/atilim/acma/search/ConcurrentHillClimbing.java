@@ -32,7 +32,10 @@ public class ConcurrentHillClimbing extends ConcurrentMultiRunAlgorithm {
 	
 	@Override
 	public AbstractAlgorithm spawnAlgorithm() {
-		return new HillClimbingAlgorithm(new SolutionDesign(getInitialDesign(), getConfig()), null);
+		HillClimbingAlgorithm algo = new HillClimbingAlgorithm(new SolutionDesign(getInitialDesign(), getConfig()), null);
+		algo.setRestartCount(resCount);
+		algo.setRestartDepth(resDepth);
+		return algo;
 	}
 	
 	@Override
