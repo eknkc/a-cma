@@ -26,7 +26,7 @@ public class MoveMethod {
 					parameterList = m.getParameters();
 						
 					if(parameterList == null || m.getAccess() == Accessibility.PRIVATE || m.getAccess() == Accessibility.PUBLIC ||  m.isCompilerGenerated() || m.isConstructor() ||  m.isClassConstructor()) 
-							continue;
+						continue;
 				
 					for(Parameter p : parameterList){
 						if(!m.canBeMovedTo(p.getType())) 

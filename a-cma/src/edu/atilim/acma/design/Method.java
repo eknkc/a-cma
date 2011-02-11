@@ -84,7 +84,7 @@ public class Method extends Node {
 	}
 	
 	public void addParameter(Type t) {
-		addParameter(t, 1);
+		addParameter(t, 0);
 	}
 	
 	public void addParameter(Type t, int dimension) {

@@ -38,13 +38,19 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 
 import edu.atilim.acma.RunConfig;
+import edu.atilim.acma.TaskQueue;
+import edu.atilim.acma.concurrent.ConcurrentTask;
 import edu.atilim.acma.design.Design;
 import edu.atilim.acma.design.Type;
 import edu.atilim.acma.metrics.MetricCalculator;
 import edu.atilim.acma.metrics.MetricSummary;
 import edu.atilim.acma.metrics.MetricTable;
 import edu.atilim.acma.search.AbstractAlgorithm;
+import edu.atilim.acma.search.ConcurrentHillClimbing;
+import edu.atilim.acma.search.ConcurrentRandomSearch;
+import edu.atilim.acma.search.ConcurrentSimAnn;
 import edu.atilim.acma.search.HillClimbingAlgorithm;
+import edu.atilim.acma.search.RandomSearchAlgorithm;
 import edu.atilim.acma.search.SimAnnAlgorithm;
 import edu.atilim.acma.search.SolutionDesign;
 import edu.atilim.acma.transition.TransitionManager;
@@ -97,6 +103,9 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 				} else if (e.getActionCommand().equals("SA")) {
 					int mi = (Integer)saIterationCnt.getValue();
 					algo = new SimAnnAlgorithm(new SolutionDesign(design, getRunConfig()), null, mi);
+				} else if (e.getActionCommand().equals("RS")) {
+					int mi = (Integer)rsIterationCount.getValue();
+					algo = new RandomSearchAlgorithm(new SolutionDesign(design, getRunConfig()), null, mi);
 				}
 				
 				RunPanel rp = new RunPanel(algo);
@@ -112,6 +121,42 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 		
 		hcBtnStart.addActionListener(algoListener);
 		saBtnStart.addActionListener(algoListener);
+		rsBtnStart.addActionListener(algoListener);
+		
+		ActionListener taskListener = new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ConcurrentTask task = null;
+				
+				String name = null;
+				while (name == null || name.trim().equals(""))
+					name = JOptionPane.showInputDialog(DesignPanel.this, "Name of the task:");
+				
+				int runs = -1;
+				while (runs <= 0)
+					try { runs = Integer.parseInt(JOptionPane.showInputDialog(DesignPanel.this, "# of runs:")); } catch(Exception ex) { }
+				
+				if (e.getActionCommand().equals("HC")) {
+					int rc = (Integer)hcRestartCount.getValue();
+					int rd = (Integer)hcRestartDepth.getValue();
+					task = new ConcurrentHillClimbing(name, getRunConfig(), design, rc, rd, runs);
+				} else if (e.getActionCommand().equals("SA")) {
+					int mi = (Integer)saIterationCnt.getValue();
+					task = new ConcurrentSimAnn(name, getRunConfig(), design, mi, runs);
+				} else if (e.getActionCommand().equals("RS")) {
+					int mi = (Integer)rsIterationCount.getValue();
+					task = new ConcurrentRandomSearch(name, getRunConfig(), design, mi, runs);
+				}
+				
+				if (task != null)
+					TaskQueue.push(task);
+			}
+		};
+		
+		hcBtnAddTask.addActionListener(taskListener);
+		saBtnAddTask.addActionListener(taskListener);
+		rsBtnAddTask.addActionListener(taskListener);
 	}
 	
 	private void initAppliedActions() {

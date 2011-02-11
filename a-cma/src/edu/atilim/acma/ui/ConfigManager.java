@@ -19,7 +19,7 @@ import edu.atilim.acma.transition.ActionRegistry;
 import edu.atilim.acma.util.ACMAUtil;
 import edu.atilim.acma.util.Log;
 
-final class ConfigManager {
+public final class ConfigManager {
 	static {
 		load();
 	}
@@ -28,7 +28,7 @@ final class ConfigManager {
 	
 	private static ArrayList<RunConfig> runConfigs;
 	
-	static List<RunConfig> runConfigs() {
+	public static List<RunConfig> runConfigs() {
 		return runConfigs;
 	}
 	
@@ -57,7 +57,7 @@ final class ConfigManager {
 		runConfigs.remove(config);
 	}
 	
-	static RunConfig getRunConfig(String name) {
+	public static RunConfig getRunConfig(String name) {
 		for (RunConfig rc : runConfigs) {
 			if (rc.getName().equals(name))
 				return rc;

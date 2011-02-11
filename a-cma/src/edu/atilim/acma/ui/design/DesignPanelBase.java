@@ -84,7 +84,6 @@ public class DesignPanelBase extends JPanel {
 	protected Component hs5;
 	protected JSpinner bsBeamLength;
 	protected Component hg3;
-	protected JButton bsBtnStart;
 	protected JButton btnSave;
 	protected JButton btnPreset;
 	protected JPanel configPanel;
@@ -97,6 +96,16 @@ public class DesignPanelBase extends JPanel {
 	protected JPanel appliedActionsButtonPanel;
 	protected JButton appliedActionsRefreshButton;
 	protected JPanel appliedActionsScrollPanePanel;
+	protected JButton hcBtnAddTask;
+	protected JPanel randomSearchPanel;
+	protected JLabel lblIterationCount_rnd;
+	protected Component hs6;
+	protected JSpinner rsIterationCount;
+	protected Component horizontalGlue;
+	protected JButton rsBtnStart;
+	protected JButton saBtnAddTask;
+	protected JButton bsBtnAddTask;
+	protected JButton rsBtnAddTask;
 
 	public DesignPanelBase() {
 		setOpaque(false);
@@ -284,6 +293,11 @@ public class DesignPanelBase extends JPanel {
 		hcBtnStart.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/next_16.png")));
 		hillClimbingPanel.add(hcBtnStart);
 		
+		hcBtnAddTask = new JButton("Add Task");
+		hcBtnAddTask.setActionCommand("HC");
+		hcBtnAddTask.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/save_16.png")));
+		hillClimbingPanel.add(hcBtnAddTask);
+		
 		simAnnPanel = new JPanel();
 		simAnnPanel.setOpaque(false);
 		simAnnPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -308,6 +322,11 @@ public class DesignPanelBase extends JPanel {
 		saBtnStart.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/next_16.png")));
 		simAnnPanel.add(saBtnStart);
 		
+		saBtnAddTask = new JButton("Add Task");
+		saBtnAddTask.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/save_16.png")));
+		saBtnAddTask.setActionCommand("SA");
+		simAnnPanel.add(saBtnAddTask);
+		
 		beamSearchPanel = new JPanel();
 		beamSearchPanel.setOpaque(false);
 		beamSearchPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -327,10 +346,39 @@ public class DesignPanelBase extends JPanel {
 		hg3 = Box.createHorizontalGlue();
 		beamSearchPanel.add(hg3);
 		
-		bsBtnStart = new JButton("Start");
-		bsBtnStart.setActionCommand("BS");
-		bsBtnStart.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/next_16.png")));
-		beamSearchPanel.add(bsBtnStart);
+		bsBtnAddTask = new JButton("Add Task");
+		bsBtnAddTask.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/save_16.png")));
+		bsBtnAddTask.setActionCommand("BS");
+		beamSearchPanel.add(bsBtnAddTask);
+		
+		randomSearchPanel = new JPanel();
+		randomSearchPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		randomSearchPanel.setOpaque(false);
+		algorithmsTabPane.addTab("Random Search", null, randomSearchPanel, null);
+		randomSearchPanel.setLayout(new BoxLayout(randomSearchPanel, BoxLayout.X_AXIS));
+		
+		lblIterationCount_rnd = new JLabel("Iteration Count:");
+		randomSearchPanel.add(lblIterationCount_rnd);
+		
+		hs6 = Box.createHorizontalStrut(5);
+		randomSearchPanel.add(hs6);
+		
+		rsIterationCount = new JSpinner();
+		rsIterationCount.setModel(new SpinnerNumberModel(1000, 0, 1000000000, 1));
+		randomSearchPanel.add(rsIterationCount);
+		
+		horizontalGlue = Box.createHorizontalGlue();
+		randomSearchPanel.add(horizontalGlue);
+		
+		rsBtnStart = new JButton("Start");
+		rsBtnStart.setActionCommand("RS");
+		rsBtnStart.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/next_16.png")));
+		randomSearchPanel.add(rsBtnStart);
+		
+		rsBtnAddTask = new JButton("Add Task");
+		rsBtnAddTask.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/save_16.png")));
+		rsBtnAddTask.setActionCommand("RS");
+		randomSearchPanel.add(rsBtnAddTask);
 		algorithmsPanel.setLayout(gl_algorithmsPanel);
 		actionsPanel.setLayout(new BorderLayout(0, 0));
 		

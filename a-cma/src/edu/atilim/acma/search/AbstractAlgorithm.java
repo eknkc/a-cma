@@ -27,6 +27,7 @@ public abstract class AbstractAlgorithm {
 		this.observer = observer;
 		this.initialDesign = initialDesign;
 		this.state = STATE_NEW;
+		this.stepCount = 0;
 	}
 	
 	public abstract String getName();
@@ -49,12 +50,16 @@ public abstract class AbstractAlgorithm {
 	}
 	
 	public void start() {
+		start(true);
+	}
+	
+	public void start(boolean threaded) {		
 		if (state == STATE_NEW)
 			beforeStart();
 		
 		state = STATE_RUNNING;
 			
-		new Thread(new Runnable() {
+		Runnable algo = new Runnable() {
 			@Override
 			public void run() {
 				while (state == STATE_RUNNING) {
@@ -66,7 +71,12 @@ public abstract class AbstractAlgorithm {
 					}
 				}
 			}
-		}).start();
+		};
+		
+		if (threaded)
+			new Thread(algo).start();
+		else
+			algo.run();
 	}
 	
 	public void pause() {
