@@ -24,7 +24,7 @@ public class InstantiateMethod {
 				for(Method m : type.getMethods() ){
 					parameterList = m.getParameters();
 						
-					if(parameterList == null || m.getAccess() == Accessibility.PRIVATE || m.getAccess() == Accessibility.PUBLIC ||  m.isCompilerGenerated() || m.isConstructor() ||  m.isClassConstructor()) 
+					if(parameterList == null || m.getAccess() == Accessibility.PROTECTED || m.getAccess() == Accessibility.PUBLIC ||  m.isCompilerGenerated() || m.isConstructor() ||  m.isClassConstructor()) 
 							continue;
 				
 					if(m.isStatic()){

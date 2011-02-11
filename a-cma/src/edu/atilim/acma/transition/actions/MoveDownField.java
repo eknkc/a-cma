@@ -31,7 +31,7 @@ public class MoveDownField {
 						if(t.isAnnotation() || t.isCompilerGenerated()) continue;
 						
 						for (Method m : f.getAccessors()) {
-							if (!m.canAccess(t) || !m.canAccess(t, f.getAccess())) 
+							if (!m.canAccess(t) || !m.canAccess(t, f.getAccess()) || !t.isAncestorOf(m.getOwnerType())) 
 								break type;
 						}
 						

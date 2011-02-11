@@ -25,7 +25,7 @@ public class MoveMethod {
 				for(Method m : type.getMethods() ){
 					parameterList = m.getParameters();
 						
-					if(parameterList == null || m.getAccess() == Accessibility.PRIVATE || m.getAccess() == Accessibility.PUBLIC ||  m.isCompilerGenerated() || m.isConstructor() ||  m.isClassConstructor()) 
+					if(parameterList == null || m.isMoved() || m.getAccess() == Accessibility.PRIVATE || m.getAccess() == Accessibility.PUBLIC ||  m.isCompilerGenerated() || m.isConstructor() ||  m.isClassConstructor()) 
 						continue;
 				
 					for(Parameter p : parameterList){
@@ -64,6 +64,7 @@ public class MoveMethod {
 		
 			m.setOwnerType(t);	
 			m.addParameter(d.getType(typeName));
+			m.setMoved(true);
 		}
 
 		@Override

@@ -27,4 +27,7 @@ public final class Tags {
 	// Type flags
 	public static final int TYP_INTERFACE = 0x00000100;
 	public static final int TYP_ANNOTATION = 0x00000200;
+	
+	// A-CMA specific
+	public static final int ACMA_MOVED = 0x01000000;
 }

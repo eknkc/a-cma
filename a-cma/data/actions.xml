@@ -19,4 +19,5 @@
 	<action class = "MakeClassNonFinal" />
 	<action class = "IncreaseMethodSecurity" />
 	<action class = "DecreaseMethodSecurity" />
+	<action class = "InlineMethod" />
 </actions>

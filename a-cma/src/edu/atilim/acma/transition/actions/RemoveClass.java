@@ -14,7 +14,16 @@ public class RemoveClass {
 			
 			for (Type t : design.getTypes())
 			{	
-				if(!t.isAnnotation() && !t.isCompilerGenerated() && t.getExtenders().isEmpty() && t.getDependentFields().isEmpty() && t.getMethods().isEmpty() && t.getDependentMethodsAsInstantiator().isEmpty() && t.getDependentMethodsAsParameter().isEmpty() && t.getDependentMethodsAsReturnType().isEmpty() )
+				if(		!t.isAnnotation() && 
+						!t.isCompilerGenerated() && 
+						t.getExtenders().isEmpty() && 
+						t.getDependentFields().isEmpty() && 
+						t.getMethods().isEmpty() && 
+						t.getDependentMethodsAsInstantiator().isEmpty() && 
+						t.getDependentMethodsAsParameter().isEmpty() && 
+						t.getNestedTypes().isEmpty() &&
+						t.getDependentMethodsAsReturnType().isEmpty())
+					
 					set.add(new Performer(t.getName()));
 			}
 		}

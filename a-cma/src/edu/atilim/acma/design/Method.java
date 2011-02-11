@@ -97,30 +97,28 @@ public class Method extends Node {
 		if(type == null || type.isAbstract() || type.isAnnotation() || type.isCompilerGenerated() || type.isInterface())
 			return false;
 		
-		if(isFinal() && !type.isFinal()) return false;
-		
 		for(Method m : type.getMethods()){
 			if(m.getSignature().equals(getSignature()))
 				return false;
 		}
 		
 		for (Field f : getAccessedFields()) {
-			if (!f.getOwnerType().getPackage().equals(type.getPackage()) && f.getAccess() != Accessibility.PUBLIC) 
+			if (!type.canAccess(f)) 
 				return false;
 		}
 		
 		for(Method m : getCalledMethods()){
-			if(!m.getOwnerType().getPackage().equals(type.getPackage()) && m.getAccess() != Accessibility.PUBLIC)
+			if(!type.canAccess(m))
 				return false;	
 		}
 		
 		for(Parameter p : getParameters()){
-			if(!p.getType().getPackage().equals(type.getPackage()) && p.getType().getAccess() != Accessibility.PUBLIC)
+			if(!type.canAccess(p.getType()))
 				return false;
 		}
 		
 		if(getReturnType() != null){
-			if(!getReturnType().getPackage().equals(type.getPackage()) && getReturnType().getAccess() != Accessibility.PUBLIC)
+			if(!type.canAccess(getReturnType()))
 				return false;
 		}
 		
@@ -216,6 +214,10 @@ public class Method extends Node {
 	
 	public boolean isAccessingThisPointer() {
 		return getFlag(Tags.ACCESSES_THIS);
+	}
+	
+	public boolean isMoved() {
+		return getFlag(Tags.ACMA_MOVED);
 	}
 	
 	public boolean isClassConstructor() {
@@ -330,6 +332,10 @@ public class Method extends Node {
 	
 	public void setAccessingThisPointer(boolean value) {
 		setFlag(Tags.ACCESSES_THIS, value);
+	}
+	
+	public void setMoved(boolean value) {
+		setFlag(Tags.ACMA_MOVED, value);
 	}
 	
 	public void setOwnerType(Type ownerType) {
