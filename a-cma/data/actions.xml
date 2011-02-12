@@ -20,4 +20,5 @@
 	<action class = "IncreaseMethodSecurity" />
 	<action class = "DecreaseMethodSecurity" />
 	<action class = "InlineMethod" />
+	<action class = "IntroduceFactory" />
 </actions>

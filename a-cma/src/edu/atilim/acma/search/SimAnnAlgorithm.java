@@ -18,7 +18,7 @@ public class SimAnnAlgorithm extends AbstractAlgorithm {
 		this.maxIters = maxIters;
 		
 		energySet = new EnergySet(10);
-		cooler = new DefaultCooler(0.5, maxIters);
+		cooler = new DefaultCooler(5, maxIters);
 	}
 
 	@Override
@@ -117,7 +117,10 @@ public class SimAnnAlgorithm extends AbstractAlgorithm {
 			if (iteration >= maxIters)
 				return -1.0;
 			
-			return start * Math.sqrt((maxIters - iteration) / (double)maxIters);
+			//return start * Math.sqrt((maxIters - iteration) / (double)maxIters);
+			
+			double step = (maxIters - iteration) / (double)maxIters;
+			return start * step * step;
 		}
 	}
 	
