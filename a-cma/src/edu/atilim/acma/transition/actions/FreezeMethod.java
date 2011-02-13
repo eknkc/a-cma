@@ -10,15 +10,12 @@ import edu.atilim.acma.util.Log;
 
 public class FreezeMethod {
 
-	public static class Checker implements ActionChecker {
-		
-		boolean flag;
-		
+	public static class Checker implements ActionChecker {		
 		@Override
 		public void findPossibleActions(Design design, Set<Action> set) {
 			for (Type t : design.getTypes()) {
 				for (Method m : t.getMethods()) {
-					flag = true;
+					boolean flag = true;
 					
 					if(m.isCompilerGenerated() || m.isOverride() || m.isStatic() || m.isConstructor() || m.isClassConstructor()) continue;
 					

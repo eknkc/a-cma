@@ -10,12 +10,10 @@ import edu.atilim.acma.util.Log;
 
 public class MoveUpField {
 	public static class Checker implements ActionChecker {
-		Type superType;
-		
 		@Override
 		public void findPossibleActions(Design design, Set<Action> set) {
 			for (Type t : design.getTypes()) {
-				superType = t.getSuperType();
+				Type superType = t.getSuperType();
 				
 				if(superType == null || t.isCompilerGenerated() || t.isAnnotation()) 
 					continue;

@@ -6,9 +6,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.Random;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public final class ACMAUtil {
 	public static final Random RANDOM = new Random();
+	public static final ExecutorService threadPool = Executors.newCachedThreadPool();
 	
 	public static String splitCamelCase(String in) {
 		StringBuilder sb = new StringBuilder();

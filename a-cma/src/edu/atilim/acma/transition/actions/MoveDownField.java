@@ -12,12 +12,10 @@ import edu.atilim.acma.util.Log;
 
 public class MoveDownField {
 	public static class Checker implements ActionChecker {
-		List<Type> childTypeList;
-		
 		@Override
 		public void findPossibleActions(Design design, Set<Action> set) {
 			for (Type type : design.getTypes()) {
-				childTypeList = type.getExtenders();
+				List<Type> childTypeList = type.getExtenders();
 				
 				if(childTypeList == null || type.isAnnotation() || type.isCompilerGenerated())
 					continue;

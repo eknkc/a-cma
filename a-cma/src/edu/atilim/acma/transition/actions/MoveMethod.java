@@ -12,8 +12,6 @@ import edu.atilim.acma.util.Log;
 
 public class MoveMethod {
 	public static class Checker implements ActionChecker {
-		List<Parameter> parameterList;
-	
 		@Override
 		public void findPossibleActions(Design design, Set<Action> set) {
 			for (Type type : design.getTypes()) {
@@ -23,7 +21,7 @@ public class MoveMethod {
 			
 				method:
 				for(Method m : type.getMethods() ){
-					parameterList = m.getParameters();
+					List<Parameter> parameterList = m.getParameters();
 						
 					if(parameterList == null || m.isMoved() || m.getAccess() == Accessibility.PRIVATE || m.getAccess() == Accessibility.PUBLIC ||  m.isCompilerGenerated() || m.isConstructor() ||  m.isClassConstructor()) 
 						continue;

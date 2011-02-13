@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import edu.atilim.acma.RunConfig;
@@ -33,13 +31,17 @@ public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<Solu
 		return config;
 	}
 	
-	public double getScore() {
+	public void ensureScore() {
 		if (Double.isNaN(score)) {
 			score = MetricCalculator.normalize(MetricCalculator.calculate(design, config), config);
 		}
-		return score;
 	}
 	
+	public double getScore() {
+		ensureScore();
+		return score;
+	}
+		
 	public SolutionDesign getBestNeighbor() {
 		SolutionDesign best = this;
 		
@@ -62,7 +64,7 @@ public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<Solu
 		
 		try {
 			// Submit to thread pool
-			List<Future<SolutionDesign>> futures = threadPool.invokeAll(bdf);
+			List<Future<SolutionDesign>> futures = ACMAUtil.threadPool.invokeAll(bdf);
 			
 			// Remainder
 			for (int i = perthread * numProcs; i < actions.size(); i++) {
@@ -133,8 +135,6 @@ public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<Solu
 		copyDesign.logModification(action.toString());
 		return new SolutionDesign(copyDesign, config);
 	}
-	
-	private static ExecutorService threadPool = Executors.newCachedThreadPool();
 	
 	private class BestDesignFinder implements Callable<SolutionDesign> {
 		private List<Action> actions;

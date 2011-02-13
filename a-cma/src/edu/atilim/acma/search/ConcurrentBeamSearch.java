@@ -6,14 +6,18 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.UUID;
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
 import edu.atilim.acma.RunConfig;
 import edu.atilim.acma.concurrent.Instance;
 import edu.atilim.acma.concurrent.InstanceSet;
 import edu.atilim.acma.design.Design;
+import edu.atilim.acma.util.ACMAUtil;
 
 public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 	private int beamLength;
@@ -99,11 +103,42 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 	@SuppressWarnings("unchecked")
 	private void expandPopulationWorker(Instance master) {
 		System.out.println("Waiting for population");
-		ArrayList<Design> designs = (ArrayList<Design>)master.receive();
+		final ArrayList<Design> designs = (ArrayList<Design>)master.receive();
 		System.out.printf("Received %d designs. Expanding neighbors.\n", designs.size());
 		
-		SortedSet<FoundDesign> neighbors = new TreeSet<FoundDesign>();
+		final SortedSet<FoundDesign> neighbors = new TreeSet<FoundDesign>();
+		final List<Callable<Void>> tasks = new ArrayList<Callable<Void>>();
 		
+		for (Design d : designs) {
+			final SolutionDesign design = new SolutionDesign(d, getConfig());
+			tasks.add(new Callable<Void>() {
+				@Override
+				public Void call() throws Exception {
+					for (SolutionDesign neighbor : design) {
+						neighbor.ensureScore();
+						
+						synchronized (neighbors) {
+							neighbors.add(new FoundDesign(neighbor.getScore(), neighbor.getDesign()));
+							
+							if (neighbors.size() > beamLength) {
+								neighbors.remove(neighbors.first());
+							}
+						}
+					}
+					
+					return null;
+				}
+			});
+		}
+		
+		try {
+			List<Future<Void>> futures = ACMAUtil.threadPool.invokeAll(tasks);
+			for (Future<Void> f : futures) f.get();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
+		
+		/*
 		for (Design d : designs) {
 			SolutionDesign design = new SolutionDesign(d, getConfig());
 			
@@ -115,7 +150,8 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 				}
 			}
 		}
-
+		 */
+		
 		ArrayList<Double> scores = new ArrayList<Double>();
 		for (FoundDesign fd : neighbors)
 			scores.add(fd.score);
