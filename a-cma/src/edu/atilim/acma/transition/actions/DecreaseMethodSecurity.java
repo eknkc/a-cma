@@ -17,7 +17,7 @@ public class DecreaseMethodSecurity {
 			for (Type t : design.getTypes()) {
 				for (Method m : t.getMethods()) {
 					
-					if (m.isCompilerGenerated() || m.isFinal() ||  m.getAccess() == Accessibility.PUBLIC || m.isConstructor() || m.isClassConstructor()) 
+					if (m.isCompilerGenerated() || m.isOverride() || m.isFinal() ||  m.getAccess() == Accessibility.PUBLIC || m.isConstructor() || m.isClassConstructor()) 
 						continue;
 					
 					Accessibility newaccess = Accessibility.PUBLIC;

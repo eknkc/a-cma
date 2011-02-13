@@ -19,19 +19,19 @@ public class MoveMethod {
 				if(type.isInterface() || type.isAbstract() || type.isCompilerGenerated() || type.isAnnotation()) 
 					continue;
 			
-				method:
+				//method:
 				for(Method m : type.getMethods() ){
 					List<Parameter> parameterList = m.getParameters();
 						
-					if(parameterList == null || m.isMoved() || m.getAccess() == Accessibility.PRIVATE || m.getAccess() == Accessibility.PUBLIC ||  m.isCompilerGenerated() || m.isConstructor() ||  m.isClassConstructor()) 
+					if(parameterList == null || m.getAccess() == Accessibility.PRIVATE || m.getAccess() == Accessibility.PUBLIC ||  m.isCompilerGenerated() || m.isConstructor() ||  m.isClassConstructor()) 
 						continue;
 				
 					for(Parameter p : parameterList){
-						if(!m.canBeMovedTo(p.getType())) 
+						if(p.getDimension() != 0 || !m.canBeMovedTo(p.getType())) 
 							continue;
 						else{
 							set.add(new Performer(type.getName(), m.getSignature(), p.getType().getName()));
-							break method;
+							//break method;
 						}
 					}
 				}
@@ -62,7 +62,13 @@ public class MoveMethod {
 		
 			m.setOwnerType(t);	
 			m.addParameter(d.getType(typeName));
-			m.setMoved(true);
+			
+			for (Parameter p : m.getParameters()) {
+				if (p.getType() == t && p.getDimension() == 0) {
+					m.removeParameter(p);
+					break;
+				}
+			}
 		}
 
 		@Override

@@ -38,7 +38,7 @@ public abstract class ConcurrentAlgorithm implements ConcurrentTask, Externaliza
 		this.initialDesign = initialDesign;
 	}
 	
-	protected void onFinish(Design fDesign) {
+	protected synchronized void onFinish(Design fDesign) {
 		String pathName = String.format("./data/results/%s/", getName().replace('/', '-'));
 		String runName = String.format("%sresults.txt", pathName);
 		
@@ -51,13 +51,30 @@ public abstract class ConcurrentAlgorithm implements ConcurrentTask, Externaliza
 		BufferedWriter bw = null;
 		try {
 			bw = new BufferedWriter(new FileWriter(runName, true));
-			bw.write(String.format("Initial Design Score: %.8f\n", initialDesign.getScore()));
-			bw.write(String.format("Final Design Score: %.8f\n\n", finalDesign.getScore()));
+			bw.write("##### Run Result #####\n");
+			bw.write("> Initial Design:\n");
+			bw.write(getDesignInfo(initialDesign));
+			bw.write("\n");
+			bw.write("> Final Design:\n");
+			bw.write(getDesignInfo(finalDesign));
+			bw.write("\n");
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		} finally {
 			try { bw.close(); } catch (Exception e) { }
 		}
+	}
+	
+	private String getDesignInfo(SolutionDesign design) {
+		StringBuilder builder = new StringBuilder();
+		
+		builder.append("Score: ").append(String.format("%.6f", design.getScore())).append("\n");
+		builder.append("Possible Actions: ").append(design.getAllActions().size()).append("\n");
+		builder.append("Applied Actions: ").append(design.getDesign().getModifications().size()).append("\n");
+		builder.append("# Types: ").append(design.getDesign().getTypes().size()).append("\n");
+		builder.append("# Packages: ").append(design.getDesign().getPackages().size()).append("\n");
+		
+		return builder.toString();
 	}
 	
 	@Override

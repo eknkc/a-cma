@@ -10,6 +10,7 @@ public class SimAnnAlgorithm extends AbstractAlgorithm {
 	private int maxIters;
 	private EnergySet energySet;
 	private Cooler cooler;
+	private int badSteps;
 
 	public SimAnnAlgorithm(SolutionDesign initialDesign, AlgorithmObserver observer, int maxIters) {
 		super(initialDesign, observer);
@@ -18,7 +19,8 @@ public class SimAnnAlgorithm extends AbstractAlgorithm {
 		this.maxIters = maxIters;
 		
 		energySet = new EnergySet(10);
-		cooler = new DefaultCooler(5, maxIters);
+		cooler = new DefaultCooler(1.5, maxIters);
+		badSteps = 0;
 	}
 
 	@Override
@@ -65,6 +67,15 @@ public class SimAnnAlgorithm extends AbstractAlgorithm {
 			
 			if (observer != null) {
 				observer.onUpdateItems(this, current, best, AlgorithmObserver.UPDATE_BEST);
+			}
+			
+			badSteps = 0;
+		} else {
+			badSteps++;
+			
+			if (badSteps > maxIters / 10.0) {
+				current = best;
+				return false;
 			}
 		}
 		

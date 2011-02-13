@@ -20,7 +20,7 @@ public class IncreaseMethodSecurity {
 				method:
 				for (Method m : t.getMethods()) {
 					
-					if (m.isCompilerGenerated() || m.isFinal() ||  m.getAccess() == Accessibility.PRIVATE || m.isConstructor() || m.isClassConstructor()) continue;
+					if (m.isCompilerGenerated() || m.isOverride() || m.isFinal() ||  m.getAccess() == Accessibility.PRIVATE || m.isConstructor() || m.isClassConstructor()) continue;
 					
 					Accessibility newaccess = Accessibility.PRIVATE;
 					

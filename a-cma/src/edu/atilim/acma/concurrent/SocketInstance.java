@@ -102,6 +102,7 @@ public class SocketInstance implements Instance, Runnable {
 	public void send(Serializable message) {
 		try {
 			out.writeObject(message);
+			out.reset();
 			out.flush();
 		} catch (IOException e) { }
 		
