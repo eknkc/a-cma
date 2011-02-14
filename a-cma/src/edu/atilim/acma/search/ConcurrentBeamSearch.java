@@ -44,13 +44,13 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 			
 			System.out.printf("Generating %d random designs for initial population.\n", beamLength);
 			SolutionDesign initial = new SolutionDesign(getInitialDesign(), getConfig());
-			for (int i = 0; i < beamLength; i++) {
+			for (int i = 0; i < beamLength; i++) {			
 				SolutionDesign random = initial.getRandomNeighbor(randomDepth);
 				population.put(random.getDesign().getId(), random.getDesign());
 			}
 			System.out.println("Generated initial population.");
 			
-			for (int i = 0 ; i < iterations; i++) {
+			for (int i = 0 ; i < iterations; i++) {				
 				System.out.printf("Starting iteration %d.\n", i + 1);
 				instances.broadcast(Boolean.TRUE);
 				expandPopulationMaster(instances, population);

@@ -199,4 +199,8 @@ public class RunPanel extends RunPanelBase implements AlgorithmObserver {
 			}
 		});
 	}
+	
+	@Override
+	public void onStep(AbstractAlgorithm algorithm, int step) {
+	}
 }

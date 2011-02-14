@@ -15,4 +15,6 @@ public interface AlgorithmObserver {
 	void onLog(AbstractAlgorithm algorithm, String log);
 	
 	void onAdvance(AbstractAlgorithm algorithm, int current, int total);
+	
+	void onStep(AbstractAlgorithm algorithm, int step);
 }

@@ -7,8 +7,8 @@ import java.io.ObjectOutput;
 import edu.atilim.acma.RunConfig;
 import edu.atilim.acma.concurrent.Command;
 import edu.atilim.acma.concurrent.Instance;
-import edu.atilim.acma.concurrent.InstanceListener;
 import edu.atilim.acma.concurrent.InstanceSet;
+import edu.atilim.acma.concurrent.TaskInterruptedException;
 import edu.atilim.acma.design.Design;
 import edu.atilim.acma.util.Delegate;
 
@@ -34,8 +34,6 @@ public abstract class ConcurrentMultiRunAlgorithm extends ConcurrentAlgorithm {
 		
 		completed = assigned = 0;
 		
-		final Object syncFinalize = new Object();
-		
 		final Delegate.Void1P<Instance> assigner = new Delegate.Void1P<Instance>() {
 			@Override
 			public void run(Instance in) {
@@ -55,32 +53,6 @@ public abstract class ConcurrentMultiRunAlgorithm extends ConcurrentAlgorithm {
 			}
 		};
 		
-		final InstanceListener listener = new InstanceListener() {
-			@Override
-			public void onReceive(Instance from) {
-				Design finalDesign = from.receive(Design.class);
-				System.out.printf("Received design from %s.\n", from.getName());
-				
-				if (assigned < runCount) {
-					assigner.run(from);
-				} else {
-					finalizer.run(from);
-				}
-				
-				completed++;
-				
-				onFinish(finalDesign);
-				
-				if (completed == runCount) {
-					synchronized (syncFinalize) {
-						syncFinalize.notify();
-					}
-				}
-			}
-		};
-		
-		instances.setInstanceListener(listener);
-		
 		for (Instance i : instances) {
 			if (assigned < runCount) {
 				assigner.run(i);
@@ -89,11 +61,32 @@ public abstract class ConcurrentMultiRunAlgorithm extends ConcurrentAlgorithm {
 			}
 		}
 		
-		try {
-			synchronized (syncFinalize) {
-				syncFinalize.wait();
+		while(true) {
+			if (isInterrupted())
+				throw new TaskInterruptedException();
+			
+			for (Instance i : instances) {
+				Design fdesign = i.tryReceive(Design.class);
+				
+				if (fdesign != null) {
+					System.out.printf("Received design from %s.\n", i.getName());
+					
+					if (assigned < runCount) {
+						assigner.run(i);
+					} else {
+						finalizer.run(i);
+					}
+					
+					completed++;
+					onFinish(fdesign);
+					
+					if (completed == runCount)
+						return;
+				}
 			}
-		} catch (InterruptedException e) {}
+			
+			try { Thread.sleep(50);	} catch (InterruptedException e) {}
+		}
 	}
 
 	@Override
@@ -129,6 +122,12 @@ public abstract class ConcurrentMultiRunAlgorithm extends ConcurrentAlgorithm {
 			
 			@Override
 			public void onAdvance(AbstractAlgorithm algorithm, int current, int total) {
+			}
+			
+			@Override
+			public void onStep(AbstractAlgorithm algorithm, int step) {
+				if (isInterrupted())
+					throw new TaskInterruptedException();
 			}
 		};
 		

@@ -11,11 +11,11 @@ import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.util.UUID;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.TimeUnit;
 
 public class SocketInstance implements Instance, Runnable {
 	private Socket socket;
 	private LinkedBlockingQueue<Serializable> receiveBuffer;
-	private InstanceListener instanceListener;
 	private ConnectionListener connectionListener;
 	private Thread readThread;
 	private UUID id;
@@ -38,8 +38,9 @@ public class SocketInstance implements Instance, Runnable {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
+				ServerSocket socket = null;
 				try {
-					ServerSocket socket = new ServerSocket(port);
+					socket = new ServerSocket(port);
 					socket.setSoTimeout(1000);
 					
 					while (listener.isRunning()) {
@@ -54,6 +55,8 @@ public class SocketInstance implements Instance, Runnable {
 					socket.close();
 				} catch (IOException e) {
 					throw new RuntimeException(e);
+				} finally {
+					try { socket.close(); } catch(Exception e) { }
 				}
 			}
 		});
@@ -61,11 +64,6 @@ public class SocketInstance implements Instance, Runnable {
 		thread.start();
 		
 		return listener;
-	}
-	
-	@Override
-	public void setInstanceListener(InstanceListener instanceListener) {
-		this.instanceListener = instanceListener;
 	}
 	
 	@Override
@@ -111,30 +109,50 @@ public class SocketInstance implements Instance, Runnable {
 			buffer.reset();
 		} catch (IOException e) {
 			dispose();
-			throw new RuntimeException(e);
+			throw new TaskInterruptedException();
 		}
 	}
 	
 	@Override
 	@SuppressWarnings("unchecked")
 	public <T extends Serializable> T receive(Class<T> cls) {
-		try {
-			Serializable item = receiveBuffer.take();
-			return (T)item;
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		return null;
+		return (T)receive();
 	}
 	
 	@Override
 	public Serializable receive() {
 		try {
-			return receiveBuffer.take();
+			Serializable item = null;
+			
+			while(!disposed && item == null) {
+				item = receiveBuffer.poll(250, TimeUnit.MILLISECONDS);
+			}
+			
+			if (disposed || item == null) {
+				throw new TaskInterruptedException();
+			}
+			
+			return item;
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			throw new TaskInterruptedException();
 		}
+	}
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public <T extends Serializable> T tryReceive(Class<T> cls) {
+		Serializable item = tryReceive();
+		if (item == null) return null;
+		try { return (T)item; } catch (ClassCastException e) {}
 		return null;
+	}
+	
+	@Override
+	public Serializable tryReceive() {
+		if (disposed) 
+			throw new TaskInterruptedException();
+		
+		return receiveBuffer.poll();
 	}
 
 	@Override
@@ -143,28 +161,30 @@ public class SocketInstance implements Instance, Runnable {
 			ObjectInputStream in = new ObjectInputStream(socket.getInputStream());
 			while (true) {
 				receiveBuffer.put((Serializable)in.readObject());
-				onReceived();
 			}
 		} catch (IOException e) {
 			dispose();
 		} catch (InterruptedException e) {
 			dispose();
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			e.printStackTrace();
+			dispose();
 		}
 	}
 	
-	private void onReceived() {
-		if (instanceListener != null)
-			instanceListener.onReceive(this);
-	}
+	private volatile boolean disposed = false;
 	
-	public void dispose() {
-		try { socket.close(); } catch (Exception e) { }
-		receiveBuffer.clear();
-		
-		if (connectionListener != null)
-			connectionListener.onDisconnect(this);
+	@Override
+	public synchronized void dispose() {
+		if (!disposed) {
+			disposed = true;
+			
+			try { socket.close(); } catch (Exception e) { }
+			receiveBuffer.clear();
+			
+			if (connectionListener != null)
+				connectionListener.onDisconnect(this);
+		}
 	}
 	
 	@Override

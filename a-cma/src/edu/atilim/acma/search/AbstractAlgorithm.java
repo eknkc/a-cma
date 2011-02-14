@@ -64,6 +64,10 @@ public abstract class AbstractAlgorithm {
 			public void run() {
 				while (state == STATE_RUNNING) {
 					stepCount++;
+					
+					if (observer != null)
+						observer.onStep(AbstractAlgorithm.this, stepCount);
+					
 					if (step()) {
 						state = STATE_FINISHED;
 						afterFinish();

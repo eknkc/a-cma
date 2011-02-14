@@ -4,12 +4,14 @@ import edu.atilim.acma.concurrent.ConcurrentTask;
 import edu.atilim.acma.concurrent.ConnectionListener;
 import edu.atilim.acma.concurrent.Instance;
 import edu.atilim.acma.concurrent.SocketInstance;
+import edu.atilim.acma.concurrent.TaskInterruptedException;
 
 public class Client implements Runnable, ConnectionListener {
 	private String hostname;
 	private int port;
 	
 	private Instance master;
+	private ConcurrentTask currentTask;
 	
 	public Client(String hostname, int port) {
 		this.hostname = hostname;
@@ -18,6 +20,16 @@ public class Client implements Runnable, ConnectionListener {
 
 	@Override
 	public void run() {
+		while(true) {
+			try {
+				new Client(hostname, port).runInternal();
+			} catch (TaskInterruptedException e) {
+				
+			}
+		}
+	}
+	
+	private void runInternal() {
 		System.out.printf("[Client] Connecting to %s:%d\n", hostname, port);
 		for(;;) {
 			master = SocketInstance.tryConnect(hostname, port);
@@ -33,8 +45,9 @@ public class Client implements Runnable, ConnectionListener {
 		
 		while(true) {
 			System.out.println("[Client] Waiting for task assignment.");
-			ConcurrentTask task = master.receive(ConcurrentTask.class);
-			task.runWorker(master);
+			currentTask = master.receive(ConcurrentTask.class);
+			currentTask.runWorker(master);
+			currentTask = null;
 		}
 	}
 
@@ -44,7 +57,19 @@ public class Client implements Runnable, ConnectionListener {
 
 	@Override
 	public void onDisconnect(Instance instance) {
-		System.out.printf("Connection to server %s closed. Ceasing operations!\n", instance.getName());
-		System.exit(1);
+		System.out.printf("[Client] Connection to server %s closed. Ceasing operations!\n", instance.getName());
+		dispose();
+	}
+	
+	private volatile boolean disposed = false;
+	
+	private synchronized void dispose() {
+		if (!disposed) {
+			disposed = true;
+			
+			System.out.println("[Client] Disposing client.");
+			try { master.dispose(); } catch(Exception e) {}
+			try { currentTask.interrupt(); } catch(Exception e) {}
+		}
 	}
 }

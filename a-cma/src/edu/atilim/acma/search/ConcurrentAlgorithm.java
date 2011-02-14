@@ -16,6 +16,7 @@ public abstract class ConcurrentAlgorithm implements ConcurrentTask, Externaliza
 	private String name;
 	private RunConfig config;
 	private Design initialDesign;
+	private volatile boolean interrupted = false;
 	
 	public String getName() {
 		return name;
@@ -29,6 +30,15 @@ public abstract class ConcurrentAlgorithm implements ConcurrentTask, Externaliza
 		return initialDesign;
 	}
 	
+	protected boolean isInterrupted() {
+		return interrupted;
+	}
+	
+	@Override
+	public void interrupt() {
+		interrupted = true;
+	}
+
 	public ConcurrentAlgorithm() {
 	}
 	

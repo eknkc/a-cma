@@ -14,4 +14,8 @@ public class TerminateTask implements ConcurrentTask {
 		System.out.println("Terminating worker instance!");
 		System.exit(0);
 	}
+	
+	@Override
+	public void interrupt() {
+	}
 }
