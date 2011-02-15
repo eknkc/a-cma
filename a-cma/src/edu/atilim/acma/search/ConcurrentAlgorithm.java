@@ -34,6 +34,10 @@ public abstract class ConcurrentAlgorithm implements ConcurrentTask, Externaliza
 		return interrupted;
 	}
 	
+	public void clearInterrupt() {
+		interrupted = false;
+	}
+	
 	@Override
 	public void interrupt() {
 		interrupted = true;

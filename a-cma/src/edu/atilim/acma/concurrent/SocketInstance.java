@@ -184,6 +184,8 @@ public class SocketInstance implements Instance, Runnable {
 			
 			if (connectionListener != null)
 				connectionListener.onDisconnect(this);
+			
+			connectionListener = null;
 		}
 	}
 	

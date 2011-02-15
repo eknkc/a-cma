@@ -15,6 +15,7 @@ public class Server implements Runnable, ConnectionListener {
 	
 	private InstanceSet instances;
 	private ConcurrentTask currentTask = null;
+	private Listener listener = null;
 	private volatile boolean running = false;
 	
 	public Server(int port) {
@@ -30,12 +31,13 @@ public class Server implements Runnable, ConnectionListener {
 			try {
 				Server server = new Server(port);
 				if (!first)
-					server.autostart = 60;
+					server.autostart = 30;
 				first = false;
 				
 				server.runInternal();
+				server.dispose();
 				
-				try { Thread.sleep(2000); } catch (InterruptedException e) { }
+				try { Thread.sleep(5000); } catch (InterruptedException e) { }
 			} catch (TaskInterruptedException e) {
 			}
 		}
@@ -44,7 +46,7 @@ public class Server implements Runnable, ConnectionListener {
 	private void runInternal() {
 		System.out.printf("[Server] Listening port %d for incoming connections.\n", port);
 		
-		Listener listener = SocketInstance.tryListen(port, this);
+		listener = SocketInstance.tryListen(port, this);
 		
 		if (listener == null) {
 			System.out.printf("[Server] Can not listen port %d\n", port);
@@ -98,6 +100,8 @@ public class Server implements Runnable, ConnectionListener {
 				run(new TerminateTask());
 			}
 			
+			currentTask.clearInterrupt();
+			
 			System.out.printf("[Server] Running algorithm task %s, Remaining: %d.\n", currentTask, TaskQueue.size() - 1);
 			
 			run(currentTask);
@@ -139,6 +143,7 @@ public class Server implements Runnable, ConnectionListener {
 			System.out.println("[Server] Disposing server.");
 			try { instances.dispose(); } catch (Exception e) { }
 			try { currentTask.interrupt(); } catch (Exception e) { }
+			try { listener.stop(); } catch (Exception e) { }
 		}
 	}
 }

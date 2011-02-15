@@ -18,4 +18,8 @@ public class TerminateTask implements ConcurrentTask {
 	@Override
 	public void interrupt() {
 	}
+
+	@Override
+	public void clearInterrupt() {
+	}
 }
