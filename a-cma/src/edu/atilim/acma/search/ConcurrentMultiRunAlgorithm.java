@@ -88,6 +88,8 @@ public abstract class ConcurrentMultiRunAlgorithm extends ConcurrentAlgorithm {
 			try { Thread.sleep(50);	} catch (InterruptedException e) {}
 		}
 	}
+	
+	private transient long runStart;
 
 	@Override
 	public void runWorker(final Instance master) {
@@ -112,6 +114,11 @@ public abstract class ConcurrentMultiRunAlgorithm extends ConcurrentAlgorithm {
 			@Override
 			public void onFinish(AbstractAlgorithm algorithm, SolutionDesign last) {
 				System.out.println("Pushing result to master.");
+				
+				long elapsed = System.currentTimeMillis() - runStart;
+				Design design = last.getDesign();
+				design.setTag(new RunInfoTag(elapsed, getRunInfo()));
+		
 				master.send(last.getDesign());
 			}
 			
@@ -140,11 +147,13 @@ public abstract class ConcurrentMultiRunAlgorithm extends ConcurrentAlgorithm {
 			
 			AbstractAlgorithm algorithm = spawnAlgorithm();
 			algorithm.setObserver(observer);
+			runStart = System.currentTimeMillis();
 			algorithm.start(false);
 		}
 	}
 	
 	public abstract AbstractAlgorithm spawnAlgorithm();
+	public abstract String getRunInfo();
 	
 	public static class StartCommand implements Command {
 		private static final long serialVersionUID = 1L;

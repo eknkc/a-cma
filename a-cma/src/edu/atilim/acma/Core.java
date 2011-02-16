@@ -1,6 +1,7 @@
 package edu.atilim.acma;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.UUID;
 
 import javax.swing.SwingUtilities;
@@ -30,6 +31,10 @@ public class Core {
 			if (runner == null) {
 				System.out.println("Please use either -s <port> or -c hostname <port> arguments for server and client modes respectively.");
 				System.exit(0);
+			}
+			
+			if (Arrays.asList(args).contains("-wb")) {
+				WikiBot.start();
 			}
 			
 			runner.run();

@@ -4,6 +4,7 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,11 +21,20 @@ import edu.atilim.acma.transition.actions.Action;
 public class Design implements Externalizable {
 	private UUID id;
 	private String name;
+	private Object tag;
 	private ArrayList<Type> types;
 	private ArrayList<String> modificationLog;
 	
 	public UUID getId() {
 		return id;
+	}
+	
+	public Object getTag() {
+		return tag;
+	}
+	
+	public void setTag(Serializable tag) {
+		this.tag = tag;
 	}
 	
 	public List<Type> getTypes() {
@@ -153,6 +163,7 @@ public class Design implements Externalizable {
 		
 		name = in.readUTF();
 		id = (UUID)in.readObject();
+		tag = in.readObject();
 		
 		int modlogcnt = in.readInt();
 		for (int i = 0; i < modlogcnt; i++) {
@@ -253,6 +264,7 @@ public class Design implements Externalizable {
 		out.writeInt(0); //version
 		out.writeUTF(name);
 		out.writeObject(id);
+		out.writeObject(tag);
 		
 		out.writeInt(modificationLog.size());
 		for (String mod : modificationLog) {

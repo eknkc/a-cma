@@ -39,6 +39,11 @@ public class ConcurrentHillClimbing extends ConcurrentMultiRunAlgorithm {
 	}
 	
 	@Override
+	public String getRunInfo() {
+		return String.format("Hill Climbing. Restart Count: %d, Depth: %d.", resCount, resDepth);
+	}
+	
+	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 		super.readExternal(in);
 		

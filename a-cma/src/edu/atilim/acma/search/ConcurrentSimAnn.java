@@ -23,6 +23,11 @@ public class ConcurrentSimAnn extends ConcurrentMultiRunAlgorithm {
 	public AbstractAlgorithm spawnAlgorithm() {
 		return new SimAnnAlgorithm(new SolutionDesign(getInitialDesign(), getConfig()), null, iterations);
 	}
+	
+	@Override
+	public String getRunInfo() {
+		return String.format("Simulated Annealing. Iterations: %d.", iterations);
+	}
 
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {

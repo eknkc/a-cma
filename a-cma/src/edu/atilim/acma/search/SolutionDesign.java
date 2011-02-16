@@ -9,6 +9,7 @@ import java.util.concurrent.Future;
 import edu.atilim.acma.RunConfig;
 import edu.atilim.acma.design.Design;
 import edu.atilim.acma.metrics.MetricCalculator;
+import edu.atilim.acma.metrics.MetricSummary;
 import edu.atilim.acma.transition.TransitionManager;
 import edu.atilim.acma.transition.actions.Action;
 import edu.atilim.acma.util.ACMAUtil;
@@ -40,6 +41,10 @@ public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<Solu
 	public double getScore() {
 		ensureScore();
 		return score;
+	}
+	
+	public MetricSummary getMetricSummary() {
+		return MetricCalculator.calculate(design, config).getSummary();
 	}
 		
 	public SolutionDesign getBestNeighbor() {

@@ -77,7 +77,7 @@ public class HillClimbingAlgorithm extends AbstractAlgorithm {
 			if (numRestarts < restartCount) {
 				numRestarts++;
 				log("Restarting from random point with %d depth.", restartDepth);
-				current = current.getRandomNeighbor(restartDepth);
+				current = best.getRandomNeighbor(restartDepth);
 				
 				if (observer != null)
 					observer.onAdvance(this, numRestarts, restartCount + 1);

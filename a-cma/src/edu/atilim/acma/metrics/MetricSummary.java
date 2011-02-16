@@ -10,7 +10,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 import java.util.Map.Entry;
 
@@ -70,6 +72,10 @@ public class MetricSummary implements Externalizable {
 		Double val = metrics.get(metric);
 		if (val == null) return 0;
 		return val;
+	}
+	
+	public Map<String, Double> getMetrics() {
+		return Collections.unmodifiableMap(metrics);
 	}
 
 	public void save(OutputStream out) throws Exception {

@@ -40,6 +40,8 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 	@Override
 	public void runMaster(InstanceSet instances) {
 		for (int runs = 0; runs < runCount; runs++) {
+			long startTime = System.currentTimeMillis();
+			
 			HashMap<UUID, Design> population = new HashMap<UUID, Design>();
 			
 			System.out.printf("Generating %d random designs for initial population.\n", beamLength);
@@ -65,7 +67,10 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 			
 			System.out.printf("Finished %d iterations. Found best design with score: %.6f.\n", iterations, best.getScore());
 			
-			onFinish(best.getDesign());
+			Design bestDesign = best.getDesign();
+			bestDesign.setTag(new RunInfoTag(System.currentTimeMillis() - startTime, 
+					String.format("Beam Search. Beam Length: %d, Randomization: %d, Iterations: %d", beamLength, randomDepth, iterations)));
+			onFinish(bestDesign);
 		}
 		
 		instances.broadcast(Boolean.FALSE);
@@ -137,20 +142,6 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		
-		/*
-		for (Design d : designs) {
-			SolutionDesign design = new SolutionDesign(d, getConfig());
-			
-			for (SolutionDesign neighbor : design) {
-				neighbors.add(new FoundDesign(neighbor.getScore(), neighbor.getDesign()));
-				
-				if (neighbors.size() > beamLength) {
-					neighbors.remove(neighbors.first());
-				}
-			}
-		}
-		 */
 		
 		ArrayList<Double> scores = new ArrayList<Double>();
 		for (FoundDesign fd : neighbors)

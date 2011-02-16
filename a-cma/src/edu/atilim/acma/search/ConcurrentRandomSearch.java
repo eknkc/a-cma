@@ -26,6 +26,11 @@ public class ConcurrentRandomSearch extends ConcurrentMultiRunAlgorithm {
 	}
 	
 	@Override
+	public String getRunInfo() {
+		return String.format("Random Search. Iterations: %d.", iterations);
+	}
+	
+	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
 		super.writeExternal(out);
 		
