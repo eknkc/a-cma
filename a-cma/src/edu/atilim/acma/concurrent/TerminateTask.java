@@ -5,8 +5,7 @@ public class TerminateTask implements ConcurrentTask {
 
 	@Override
 	public void runMaster(InstanceSet instances) {
-		System.out.println("Terminating server instance in a minute!");
-		try { Thread.sleep(60000); } catch (InterruptedException e) {}
+		System.out.println("Terminating server instance!");
 		System.exit(0);
 	}
 

@@ -1,5 +1,6 @@
 package edu.atilim.acma.design;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +12,9 @@ public final class DesignCloner {
 		Map<Node, Node> cloneMap = new HashMap<Node, Node>();
 		
 		Design nd = new Design(new ArrayList<String>(d.getModifications()));
+		
+		if (d.getTag() != null)
+			nd.setTag((Serializable)d.getTag());
 		
 		//Explore
 		for (Type t : d.getTypes()) {

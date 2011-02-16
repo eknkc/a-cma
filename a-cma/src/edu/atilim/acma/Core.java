@@ -26,6 +26,8 @@ public class Core {
 				int port = 2593;
 				try { port = Integer.parseInt(args[2]); } catch(Exception e) { }
 				runner = new Client(args[1], port);
+			} else if (args[0].equals("-ai")) {
+				runner = new ActionImpactCalculator();
 			}
 			
 			if (runner == null) {

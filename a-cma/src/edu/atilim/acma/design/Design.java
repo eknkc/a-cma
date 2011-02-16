@@ -19,15 +19,10 @@ import edu.atilim.acma.transition.TransitionManager;
 import edu.atilim.acma.transition.actions.Action;
 
 public class Design implements Externalizable {
-	private UUID id;
 	private String name;
 	private Object tag;
 	private ArrayList<Type> types;
 	private ArrayList<String> modificationLog;
-	
-	public UUID getId() {
-		return id;
-	}
 	
 	public Object getTag() {
 		return tag;
@@ -135,8 +130,7 @@ public class Design implements Externalizable {
 	Design(ArrayList<String> modlog) {
 		types = new ArrayList<Type>();
 		modificationLog = modlog;
-		id = UUID.randomUUID();
-		name = String.format("Design #%s", id.toString());
+		name = String.format("Design #%s", UUID.randomUUID().toString());
 	}
 	
 	public Set<Action> getPossibleActions() {
@@ -162,7 +156,6 @@ public class Design implements Externalizable {
 		in.readInt(); //version
 		
 		name = in.readUTF();
-		id = (UUID)in.readObject();
 		tag = in.readObject();
 		
 		int modlogcnt = in.readInt();
@@ -263,7 +256,6 @@ public class Design implements Externalizable {
 		
 		out.writeInt(0); //version
 		out.writeUTF(name);
-		out.writeObject(id);
 		out.writeObject(tag);
 		
 		out.writeInt(modificationLog.size());

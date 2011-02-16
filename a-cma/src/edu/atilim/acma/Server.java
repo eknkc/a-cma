@@ -96,7 +96,8 @@ public class Server implements Runnable, ConnectionListener {
 			currentTask = TaskQueue.peek();
 			
 			if (currentTask == null) {
-				System.out.println("[Server] All tasks completed. Exiting.");
+				System.out.println("[Server] All tasks completed. Exiting in 15 seconds...");
+				try { Thread.sleep(15000); } catch (InterruptedException e) {}
 				run(new TerminateTask());
 			}
 			

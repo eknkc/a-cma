@@ -5,11 +5,10 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -42,13 +41,13 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 		for (int runs = 0; runs < runCount; runs++) {
 			long startTime = System.currentTimeMillis();
 			
-			HashMap<UUID, Design> population = new HashMap<UUID, Design>();
+			HashSet<Design> population = new HashSet<Design>();
 			
 			System.out.printf("Generating %d random designs for initial population.\n", beamLength);
 			SolutionDesign initial = new SolutionDesign(getInitialDesign(), getConfig());
 			for (int i = 0; i < beamLength; i++) {			
 				SolutionDesign random = initial.getRandomNeighbor(randomDepth);
-				population.put(random.getDesign().getId(), random.getDesign());
+				population.add(random.getDesign());
 			}
 			System.out.println("Generated initial population.");
 			
@@ -59,7 +58,7 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 			}
 			
 			SolutionDesign best = initial;
-			for (Design d : population.values()) {
+			for (Design d : population) {
 				SolutionDesign sd = new SolutionDesign(d, getConfig());
 				if (sd.isBetterThan(best))
 					best = sd;
@@ -76,9 +75,9 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 		instances.broadcast(Boolean.FALSE);
 	}
 	
-	private void expandPopulationMaster(InstanceSet instances, HashMap<UUID, Design> population) {
+	private void expandPopulationMaster(InstanceSet instances, HashSet<Design> population) {
 		System.out.println("Scattering population to instances.");
-		instances.scatter(new ArrayList<Design>(population.values()));
+		instances.scatter(new ArrayList<Design>(population));
 		System.out.println("Waiting for population expansion.");
 		
 		ArrayList<Double> scores = instances.gather(Double.class);
@@ -92,7 +91,7 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 		ArrayList<Design> newpop = instances.gather(Design.class);
 		population.clear();
 		for (Design d : newpop) {
-			population.put(d.getId(), d);
+			population.add(d);
 		}
 		System.out.printf("New population generated with %d designs. Best: %.6f\n", newpop.size(), scores.get(0));
 	}

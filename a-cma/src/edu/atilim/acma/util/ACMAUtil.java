@@ -27,6 +27,8 @@ public final class ACMAUtil {
 	
 	@SuppressWarnings("unchecked")
 	public static <T extends Serializable> T deepCopy(T item) {
+		if (item == null) return null;
+		
 		try {
 			ByteArrayOutputStream baos = new ByteArrayOutputStream();
 			ObjectOutputStream oos = new ObjectOutputStream(baos);
