@@ -200,7 +200,7 @@ public class Design implements Externalizable {
 				int interfaceindex = in.readInt();
 				
 				if (interfaceindex >= 0)
-					t.addInterface(types.get(in.readInt()));
+					t.addInterface(types.get(interfaceindex));
 			}
 		}
 		
