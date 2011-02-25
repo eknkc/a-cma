@@ -137,8 +137,9 @@ public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<Solu
 	private SolutionDesign apply(Action action) {
 		Design copyDesign = design.copy();
 		action.perform(copyDesign);
-		copyDesign.logModification(action.toString());
-		return new SolutionDesign(copyDesign, config);
+		SolutionDesign newDesign = new SolutionDesign(copyDesign, config);
+		copyDesign.logModification(String.format("[%.6f]%s", newDesign.getScore(), action.toString()));
+		return newDesign;
 	}
 	
 	private class BestDesignFinder implements Callable<SolutionDesign> {

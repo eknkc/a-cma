@@ -10,7 +10,7 @@ import javax.swing.UIManager;
 import edu.atilim.acma.ui.MainWindow;
 
 public class Core {
-	public static final String VERSION = "0.1.0.0a";
+	public static final String VERSION = "1.0.0.0a";
 	public static final UUID NODE_ID = UUID.randomUUID();
 
 	public static void main(String[] args) throws IOException {
@@ -28,6 +28,8 @@ public class Core {
 				runner = new Client(args[1], port);
 			} else if (args[0].equals("-ai")) {
 				runner = new ActionImpactCalculator();
+			} else if (args[0].equals("-abc")) {
+				runner = new BeeColonyTester();
 			}
 			
 			if (runner == null) {

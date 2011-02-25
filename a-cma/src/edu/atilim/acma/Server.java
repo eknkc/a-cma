@@ -1,13 +1,16 @@
 package edu.atilim.acma;
 
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.util.UUID;
+
 import edu.atilim.acma.concurrent.ConcurrentTask;
 import edu.atilim.acma.concurrent.ConnectionListener;
 import edu.atilim.acma.concurrent.Instance;
 import edu.atilim.acma.concurrent.InstanceSet;
 import edu.atilim.acma.concurrent.SocketInstance;
-import edu.atilim.acma.concurrent.TaskInterruptedException;
-import edu.atilim.acma.concurrent.TerminateTask;
 import edu.atilim.acma.concurrent.SocketInstance.Listener;
+import edu.atilim.acma.concurrent.TerminateTask;
 
 public class Server implements Runnable, ConnectionListener {
 	private int port;
@@ -38,7 +41,16 @@ public class Server implements Runnable, ConnectionListener {
 				server.dispose();
 				
 				try { Thread.sleep(5000); } catch (InterruptedException e) { }
-			} catch (TaskInterruptedException e) {
+			} catch (Exception e) {
+				String name = String.format("./output/%s_exception.log", UUID.randomUUID().toString());
+				PrintWriter pw =  null;
+				try {
+					pw = new PrintWriter(new FileOutputStream(name));
+					e.printStackTrace(pw);
+				} catch (Exception ie) {
+				} finally {
+					pw.close();
+				}
 			}
 		}
 	}

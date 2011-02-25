@@ -1,10 +1,13 @@
 package edu.atilim.acma;
 
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.util.UUID;
+
 import edu.atilim.acma.concurrent.ConcurrentTask;
 import edu.atilim.acma.concurrent.ConnectionListener;
 import edu.atilim.acma.concurrent.Instance;
 import edu.atilim.acma.concurrent.SocketInstance;
-import edu.atilim.acma.concurrent.TaskInterruptedException;
 
 public class Client implements Runnable, ConnectionListener {
 	private String hostname;
@@ -23,8 +26,16 @@ public class Client implements Runnable, ConnectionListener {
 		while(true) {
 			try {
 				new Client(hostname, port).runInternal();
-			} catch (TaskInterruptedException e) {
-				
+			} catch (Exception e) {
+				String name = String.format("./output/%s_exception.log", UUID.randomUUID().toString());
+				PrintWriter pw =  null;
+				try {
+					pw = new PrintWriter(new FileOutputStream(name));
+					e.printStackTrace(pw);
+				} catch (Exception ie) {
+				} finally {
+					pw.close();
+				}
 			}
 		}
 	}
