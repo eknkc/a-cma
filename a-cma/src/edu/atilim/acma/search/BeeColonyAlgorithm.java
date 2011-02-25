@@ -15,17 +15,41 @@ public class BeeColonyAlgorithm extends AbstractAlgorithm {
 	private ArrayList<FoodSource> foods;
 	private FoodSource best;
 
-	public BeeColonyAlgorithm(SolutionDesign initialDesign,	AlgorithmObserver observer) {
+	public BeeColonyAlgorithm(SolutionDesign initialDesign,	AlgorithmObserver observer, int maxTrials, int populationSize, int iterations) {
 		super(initialDesign, observer);
+		
+		this.maxTrials = maxTrials;
+		this.populationSize = populationSize;
+		this.iterations = iterations;
 	}
 
 	@Override
 	public String getName() {
 		return "Artificial Bee Colony";
 	}
+	
+	@Override
+	protected void beforeStart() {
+		AlgorithmObserver observer = getObserver();
+		if (observer != null) {
+			observer.onStart(this, initialDesign);
+			observer.onAdvance(this, 0, iterations);
+		}
+	}
+	
+	@Override
+	protected void afterFinish() {
+		AlgorithmObserver observer = getObserver();
+		if (observer != null) {
+			observer.onAdvance(this, iterations, iterations);
+			observer.onFinish(this, best.design);
+		}
+	}
 
 	@Override
 	public boolean step() {
+		AlgorithmObserver observer = getObserver();
+		
 		if (foods == null) {
 			log("Generating initial food sources.");
 			
@@ -53,6 +77,10 @@ public class BeeColonyAlgorithm extends AbstractAlgorithm {
 		sendOnlookerBees();
 		memorizeBestSource();
 		sendScoutBees();
+		
+		if (observer != null) {
+			observer.onUpdateItems(this, best.design, best.design, AlgorithmObserver.UPDATE_BEST);
+		}
 		
 		return false;
 	}
@@ -131,7 +159,10 @@ public class BeeColonyAlgorithm extends AbstractAlgorithm {
 			FoodSource current = foods.get(i);
 			
 			if (current.trialCount > maxTrials) {
-				foods.set(i, new FoodSource(initialDesign.getRandomNeighbor(randomDepth)));
+				if (best == null)
+					foods.set(i, new FoodSource(initialDesign.getRandomNeighbor(randomDepth)));
+				else
+					foods.set(i, new FoodSource(best.design.getRandomNeighbor(randomDepth)));
 			}
 		}
 	}

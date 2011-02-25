@@ -28,8 +28,6 @@ public class Core {
 				runner = new Client(args[1], port);
 			} else if (args[0].equals("-ai")) {
 				runner = new ActionImpactCalculator();
-			} else if (args[0].equals("-abc")) {
-				runner = new BeeColonyTester();
 			}
 			
 			if (runner == null) {

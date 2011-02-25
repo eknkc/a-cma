@@ -46,7 +46,9 @@ import edu.atilim.acma.metrics.MetricCalculator;
 import edu.atilim.acma.metrics.MetricSummary;
 import edu.atilim.acma.metrics.MetricTable;
 import edu.atilim.acma.search.AbstractAlgorithm;
+import edu.atilim.acma.search.BeeColonyAlgorithm;
 import edu.atilim.acma.search.ConcurrentBeamSearch;
+import edu.atilim.acma.search.ConcurrentBeeColony;
 import edu.atilim.acma.search.ConcurrentHillClimbing;
 import edu.atilim.acma.search.ConcurrentRandomSearch;
 import edu.atilim.acma.search.ConcurrentSimAnn;
@@ -107,7 +109,13 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 				} else if (e.getActionCommand().equals("RS")) {
 					int mi = (Integer)rsIterationCount.getValue();
 					algo = new RandomSearchAlgorithm(new SolutionDesign(design, getRunConfig()), null, mi);
+				} else if (e.getActionCommand().equals("ABC")) {
+					int mi = (Integer)abcIterations.getValue();
+					int mt = (Integer)abcMaxTrials.getValue();
+					int pc = (Integer)abcPopSize.getValue();
+					algo = new BeeColonyAlgorithm(new SolutionDesign(design, getRunConfig()), null, mt, pc, mi);
 				}
+				
 				
 				RunPanel rp = new RunPanel(algo);
 				
@@ -123,6 +131,7 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 		hcBtnStart.addActionListener(algoListener);
 		saBtnStart.addActionListener(algoListener);
 		rsBtnStart.addActionListener(algoListener);
+		abcBtnStart.addActionListener(algoListener);
 		
 		ActionListener taskListener = new ActionListener() {
 			
@@ -153,6 +162,11 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 				} else if (e.getActionCommand().equals("RS")) {
 					int mi = (Integer)rsIterationCount.getValue();
 					task = new ConcurrentRandomSearch(name, getRunConfig(), design, mi, runs);
+				} else if (e.getActionCommand().equals("ABC")) {
+					int mi = (Integer)abcIterations.getValue();
+					int mt = (Integer)abcMaxTrials.getValue();
+					int pc = (Integer)abcPopSize.getValue();
+					task = new ConcurrentBeeColony(name, getRunConfig(), design, mt, pc, mi, runs);
 				}
 				
 				if (task != null)
@@ -164,6 +178,7 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 		saBtnAddTask.addActionListener(taskListener);
 		bsBtnAddTask.addActionListener(taskListener);
 		rsBtnAddTask.addActionListener(taskListener);
+		abcBtnAddTask.addActionListener(taskListener);
 	}
 	
 	private void initAppliedActions() {

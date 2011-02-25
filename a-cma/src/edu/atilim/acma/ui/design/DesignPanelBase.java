@@ -114,6 +114,21 @@ public class DesignPanelBase extends JPanel {
 	protected JLabel lblIterations;
 	protected Component horizontalStrut_1;
 	protected JSpinner bsIterations;
+	protected JPanel beeColonyPanel;
+	protected JLabel lblPopulationSize;
+	protected Component hs10;
+	protected JSpinner abcPopSize;
+	protected Component hs11;
+	protected JLabel lblMaximumTrials;
+	protected Component hs12;
+	protected JSpinner abcMaxTrials;
+	protected Component hs13;
+	protected JLabel lblIterations_1;
+	protected Component hs14;
+	protected JSpinner abcIterations;
+	protected Component horizontalGlue_1;
+	protected JButton abcBtnStart;
+	protected JButton abcBtnAddTask;
 
 	public DesignPanelBase() {
 		setOpaque(false);
@@ -413,6 +428,61 @@ public class DesignPanelBase extends JPanel {
 		rsBtnAddTask.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/save_16.png")));
 		rsBtnAddTask.setActionCommand("RS");
 		randomSearchPanel.add(rsBtnAddTask);
+		
+		beeColonyPanel = new JPanel();
+		beeColonyPanel.setOpaque(false);
+		beeColonyPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
+		algorithmsTabPane.addTab("Artificial Bee Colony", null, beeColonyPanel, null);
+		beeColonyPanel.setLayout(new BoxLayout(beeColonyPanel, BoxLayout.X_AXIS));
+		
+		lblPopulationSize = new JLabel("Population Size:");
+		beeColonyPanel.add(lblPopulationSize);
+		
+		hs10 = Box.createHorizontalStrut(5);
+		beeColonyPanel.add(hs10);
+		
+		abcPopSize = new JSpinner();
+		abcPopSize.setModel(new SpinnerNumberModel(70, 20, 5000, 1));
+		beeColonyPanel.add(abcPopSize);
+		
+		hs11 = Box.createHorizontalStrut(5);
+		beeColonyPanel.add(hs11);
+		
+		lblMaximumTrials = new JLabel("Maximum Trials:");
+		beeColonyPanel.add(lblMaximumTrials);
+		
+		hs12 = Box.createHorizontalStrut(5);
+		beeColonyPanel.add(hs12);
+		
+		abcMaxTrials = new JSpinner();
+		abcMaxTrials.setModel(new SpinnerNumberModel(50, 10, 500, 1));
+		beeColonyPanel.add(abcMaxTrials);
+		
+		hs13 = Box.createHorizontalStrut(5);
+		beeColonyPanel.add(hs13);
+		
+		lblIterations_1 = new JLabel("Iterations:");
+		beeColonyPanel.add(lblIterations_1);
+		
+		hs14 = Box.createHorizontalStrut(5);
+		beeColonyPanel.add(hs14);
+		
+		abcIterations = new JSpinner();
+		abcIterations.setModel(new SpinnerNumberModel(5000, 10, 1000000, 1));
+		beeColonyPanel.add(abcIterations);
+		
+		horizontalGlue_1 = Box.createHorizontalGlue();
+		beeColonyPanel.add(horizontalGlue_1);
+		
+		abcBtnStart = new JButton("Start");
+		abcBtnStart.setActionCommand("ABC");
+		abcBtnStart.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/next_16.png")));
+		beeColonyPanel.add(abcBtnStart);
+		
+		abcBtnAddTask = new JButton("Add Task");
+		abcBtnAddTask.setActionCommand("ABC");
+		abcBtnAddTask.setIcon(new ImageIcon(DesignPanelBase.class.getResource("/resources/icons/save_16.png")));
+		beeColonyPanel.add(abcBtnAddTask);
 		algorithmsPanel.setLayout(gl_algorithmsPanel);
 		actionsPanel.setLayout(new BorderLayout(0, 0));
 		
