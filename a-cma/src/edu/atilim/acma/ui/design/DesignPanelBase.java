@@ -38,6 +38,7 @@ import javax.swing.border.TitledBorder;
 
 import edu.atilim.acma.ui.Actions;
 import edu.atilim.acma.ui.RunConfigDialog;
+import javax.swing.JCheckBox;
 
 public class DesignPanelBase extends JPanel {
 
@@ -129,6 +130,8 @@ public class DesignPanelBase extends JPanel {
 	protected Component horizontalGlue_1;
 	protected JButton abcBtnStart;
 	protected JButton abcBtnAddTask;
+	protected JCheckBox bsIsStochastic;
+	protected Component hs100;
 
 	public DesignPanelBase() {
 		setOpaque(false);
@@ -292,7 +295,7 @@ public class DesignPanelBase extends JPanel {
 		hillClimbingPanel.add(hs1);
 		
 		hcRestartCount = new JSpinner();
-		hcRestartCount.setModel(new SpinnerNumberModel(5, 0, 100, 1));
+		hcRestartCount.setModel(new SpinnerNumberModel(5, -1, 100, 1));
 		hillClimbingPanel.add(hcRestartCount);
 		
 		hs2 = Box.createHorizontalStrut(20);
@@ -355,6 +358,13 @@ public class DesignPanelBase extends JPanel {
 		beamSearchPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		algorithmsTabPane.addTab("Beam Search", null, beamSearchPanel, null);
 		beamSearchPanel.setLayout(new BoxLayout(beamSearchPanel, BoxLayout.X_AXIS));
+		
+		bsIsStochastic = new JCheckBox("Stochastic");
+		bsIsStochastic.setOpaque(false);
+		beamSearchPanel.add(bsIsStochastic);
+		
+		hs100 = Box.createHorizontalStrut(5);
+		beamSearchPanel.add(hs100);
 		
 		lblBeamLength = new JLabel("Beam Length:");
 		beamSearchPanel.add(lblBeamLength);

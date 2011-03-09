@@ -40,7 +40,10 @@ public class ConcurrentHillClimbing extends ConcurrentMultiRunAlgorithm {
 	
 	@Override
 	public String getRunInfo() {
-		return String.format("Hill Climbing. Restart Count: %d, Depth: %d.", resCount, resDepth);
+		if (resCount > 0)
+			return String.format("Multiple First Descend. Restart Count: %d, Depth: %d.", resCount, resDepth);
+		else
+			return String.format("Hill Climbing. Restart Count: %d, Depth: %d.", resCount, resDepth);
 	}
 	
 	@Override

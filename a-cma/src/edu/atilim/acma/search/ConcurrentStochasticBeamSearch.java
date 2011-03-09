@@ -1,14 +1,16 @@
 package edu.atilim.acma.search;
 
+import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
@@ -16,18 +18,22 @@ import edu.atilim.acma.RunConfig;
 import edu.atilim.acma.concurrent.Instance;
 import edu.atilim.acma.concurrent.InstanceSet;
 import edu.atilim.acma.design.Design;
+import edu.atilim.acma.transition.actions.Action;
 import edu.atilim.acma.util.ACMAUtil;
+import edu.atilim.acma.util.Pair;
+import edu.atilim.acma.util.RouletteWheel;
 
-public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
+public class ConcurrentStochasticBeamSearch extends ConcurrentAlgorithm {
+
 	private int beamLength;
 	private int randomDepth;
 	private int runCount;
 	private int iterations;
 	
-	public ConcurrentBeamSearch() {
+	public ConcurrentStochasticBeamSearch() {
 	}
 
-	public ConcurrentBeamSearch(String name, RunConfig config, Design initialDesign, int beamLength, int randomDepth, int iterations, int runCount) {
+	public ConcurrentStochasticBeamSearch(String name, RunConfig config, Design initialDesign, int beamLength, int randomDepth, int iterations, int runCount) {
 		super(name, config, initialDesign);
 		
 		this.beamLength = beamLength;
@@ -81,20 +87,55 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 		instances.scatter(new ArrayList<Design>(population));
 		System.out.println("Waiting for population expansion.");
 		
-		ArrayList<Double> scores = instances.gather(Double.class);
-		System.out.printf("Received %d scores.\n", scores.size());
-		Collections.sort(scores);
-		Double beamcut = scores.get(Math.min(scores.size() - 1, beamLength - 1));
-		System.out.printf("Beam cut at %.6f.\n", beamcut);
+		ArrayList<FoundDesignHandle> handles = instances.gather(FoundDesignHandle.class);
+		System.out.printf("Received %d design handles. Choosing %d within.\n", handles.size(), beamLength);
+			
+		instances.broadcast(selectDesigns(handles));
 		
-		instances.broadcast(beamcut);
 		System.out.println("Waiting for new population");
 		ArrayList<Design> newpop = instances.gather(Design.class);
 		population.clear();
 		for (Design d : newpop) {
 			population.add(d);
 		}
-		System.out.printf("New population generated with %d designs. Best: %.6f\n", newpop.size(), scores.get(0));
+		
+		System.out.printf("New population generated with %d designs.\n", newpop.size());
+	}
+	
+	private ArrayList<FoundDesignHandle> selectDesigns(ArrayList<FoundDesignHandle> designs) {
+		Collections.shuffle(designs);
+		
+		ArrayList<FoundDesignHandle> selected = new ArrayList<ConcurrentStochasticBeamSearch.FoundDesignHandle>();
+		
+		FoundDesignHandle min = designs.get(0);
+		FoundDesignHandle max = designs.get(0);
+		
+		for (int i = 0; i < designs.size(); i++) {
+			FoundDesignHandle cur = designs.get(i);
+			
+			if (cur.score < min.score) min = cur;
+			if (cur.score > max.score) max = cur;
+		}
+		
+		RouletteWheel<FoundDesignHandle> wheel = new RouletteWheel<ConcurrentStochasticBeamSearch.FoundDesignHandle>();
+		
+		for (int i = 0; i < designs.size(); i++) {
+			if (selected.size() > beamLength) break;
+			
+			FoundDesignHandle cur = designs.get(i);
+			
+			double probability = (max.score - cur.score) / (max.score - min.score);
+			
+			wheel.add(cur, probability);
+		}
+		
+		for (int i = 0; i < beamLength; i++) {
+			FoundDesignHandle handle = wheel.roll();
+			if (handle == null) break;
+			selected.add(handle);
+		}
+		
+		return selected;
 	}
 
 	@Override
@@ -111,7 +152,7 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 		final ArrayList<Design> designs = (ArrayList<Design>)master.receive();
 		System.out.printf("Received %d designs. Expanding neighbors.\n", designs.size());
 		
-		final SortedSet<FoundDesign> neighbors = new TreeSet<FoundDesign>();
+		final HashMap<UUID, FoundDesign> neighbors = new HashMap<UUID, FoundDesign>();
 		final List<Callable<Void>> tasks = new ArrayList<Callable<Void>>();
 		
 		for (Design d : designs) {
@@ -119,15 +160,14 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 			tasks.add(new Callable<Void>() {
 				@Override
 				public Void call() throws Exception {
-					for (SolutionDesign neighbor : design) {
-						neighbor.ensureScore();
+					Iterator<Pair<Action, Double>> iter = design.pairIterator();
+					
+					while (iter.hasNext()) {
+						Pair<Action, Double> neighbor = iter.next();
+						FoundDesign found = new FoundDesign(design, neighbor.getFirst(), neighbor.getSecond());
 						
 						synchronized (neighbors) {
-							neighbors.add(new FoundDesign(neighbor.getScore(), neighbor.getDesign()));
-							
-							if (neighbors.size() > beamLength) {
-								neighbors.remove(neighbors.first());
-							}
+							neighbors.put(found.id, found);
 						}
 					}
 					
@@ -143,33 +183,65 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 			throw new RuntimeException(e);
 		}
 		
-		ArrayList<Double> scores = new ArrayList<Double>();
-		for (FoundDesign fd : neighbors)
-			scores.add(fd.score);
-		master.send(scores);
+		ArrayList<FoundDesignHandle> handles = new ArrayList<FoundDesignHandle>();
+		for (FoundDesign fd : neighbors.values())
+			handles.add(fd.getHandle());
+		master.send(handles);
 		
- 		Double beamcut = master.receive(Double.class);
+		ArrayList<FoundDesignHandle> selected = (ArrayList<FoundDesignHandle>)master.receive();
 		
 		designs.clear();
-		for (FoundDesign d : neighbors) {
-			if (d.score <= beamcut)
-				designs.add(d.design);
+		for (FoundDesignHandle d : selected) {
+			FoundDesign design = neighbors.get(d.id);
+			
+			if (design != null)
+				designs.add(design.parent.apply(design.action).getDesign());
 		}
 		master.send(designs);
 	}
 	
-	private static class FoundDesign implements Comparable<FoundDesign> {
+	public static class FoundDesignHandle implements Externalizable {
+		private UUID id;
 		private double score;
-		private Design design;
-
-		private FoundDesign(double score, Design design) {
+		
+		public FoundDesignHandle() {
+			
+		}
+		
+		private FoundDesignHandle(UUID id, double score) {
+			this.id = id;
 			this.score = score;
-			this.design = design;
 		}
 
 		@Override
-		public int compareTo(FoundDesign o) {
-			return Double.compare(o.score, score);
+		public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+			id = (UUID)in.readObject();
+			score = in.readDouble();
+		}
+
+		@Override
+		public void writeExternal(ObjectOutput out) throws IOException {
+			out.writeObject(id);
+			out.writeDouble(score);
+		}
+		
+	}
+	
+	private static class FoundDesign {
+		private UUID id;
+		private SolutionDesign parent;
+		private Action action;
+		private double score;
+		
+		private FoundDesign(SolutionDesign parent, Action action, double score) {
+			this.id = UUID.randomUUID();
+			this.parent = parent;
+			this.action = action;
+			this.score = score;
+		}
+
+		public FoundDesignHandle getHandle() {
+			return new FoundDesignHandle(id, score);
 		}
 	}
 

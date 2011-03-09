@@ -26,7 +26,7 @@ public class ConcurrentSimAnn extends ConcurrentMultiRunAlgorithm {
 	
 	@Override
 	public String getRunInfo() {
-		return String.format("Simulated Annealing. Iterations: %d.", iterations);
+		return String.format("Simulated Annealing. Initial Temperature: 4,0 Iterations: %d.", iterations);
 	}
 
 	@Override

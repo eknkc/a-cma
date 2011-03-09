@@ -52,6 +52,7 @@ import edu.atilim.acma.search.ConcurrentBeeColony;
 import edu.atilim.acma.search.ConcurrentHillClimbing;
 import edu.atilim.acma.search.ConcurrentRandomSearch;
 import edu.atilim.acma.search.ConcurrentSimAnn;
+import edu.atilim.acma.search.ConcurrentStochasticBeamSearch;
 import edu.atilim.acma.search.HillClimbingAlgorithm;
 import edu.atilim.acma.search.RandomSearchAlgorithm;
 import edu.atilim.acma.search.SimAnnAlgorithm;
@@ -158,7 +159,11 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 					int bl = (Integer)bsBeamLength.getValue();
 					int bi = (Integer)bsIterations.getValue();
 					int br = (Integer)bsRandomDepth.getValue();
-					task = new ConcurrentBeamSearch(name, getRunConfig(), design, bl, br, bi, runs);
+					
+					if (bsIsStochastic.isSelected())
+						task = new ConcurrentStochasticBeamSearch(name, getRunConfig(), design, bl, br, bi, runs);
+					else
+						task = new ConcurrentBeamSearch(name, getRunConfig(), design, bl, br, bi, runs);
 				} else if (e.getActionCommand().equals("RS")) {
 					int mi = (Integer)rsIterationCount.getValue();
 					task = new ConcurrentRandomSearch(name, getRunConfig(), design, mi, runs);

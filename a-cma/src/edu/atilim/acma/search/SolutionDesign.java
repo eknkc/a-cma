@@ -14,6 +14,7 @@ import edu.atilim.acma.transition.TransitionManager;
 import edu.atilim.acma.transition.actions.Action;
 import edu.atilim.acma.util.ACMAUtil;
 import edu.atilim.acma.util.Log;
+import edu.atilim.acma.util.Pair;
 
 public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<SolutionDesign> {
 	private static final int numProcs = Runtime.getRuntime().availableProcessors();
@@ -34,7 +35,7 @@ public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<Solu
 	
 	public void ensureScore() {
 		if (Double.isNaN(score)) {
-			score = MetricCalculator.normalize(MetricCalculator.calculate(design, config), config);
+			score = MetricCalculator.normalize(MetricCalculator.calculate(getDesign(), config), config);
 		}
 	}
 	
@@ -44,7 +45,15 @@ public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<Solu
 	}
 	
 	public MetricSummary getMetricSummary() {
-		return MetricCalculator.calculate(design, config).getSummary();
+		return MetricCalculator.calculate(getDesign(), config).getSummary();
+	}
+	
+	public SolutionDesign getBetterNeighbor() {
+		for (SolutionDesign sd : this) {
+			if (sd.isBetterThan(this))
+				return sd;
+		}
+		return this;
 	}
 		
 	public SolutionDesign getBestNeighbor() {
@@ -134,12 +143,21 @@ public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<Solu
 		return new Iter();
 	}
 	
-	private SolutionDesign apply(Action action) {
-		Design copyDesign = design.copy();
-		action.perform(copyDesign);
+	public Iterator<Pair<Action, Double>> pairIterator() {
+		return new PairIter();
+	}
+	
+	public SolutionDesign apply(Action action) {
+		Design copyDesign = applyInternal(action);
 		SolutionDesign newDesign = new SolutionDesign(copyDesign, config);
 		copyDesign.logModification(String.format("[%.6f]%s", newDesign.getScore(), action.toString()));
 		return newDesign;
+	}
+	
+	protected Design applyInternal(Action action) {
+		Design copyDesign = getDesign().copy();
+		action.perform(copyDesign);
+		return copyDesign;
 	}
 	
 	private class BestDesignFinder implements Callable<SolutionDesign> {
@@ -183,6 +201,31 @@ public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<Solu
 		@Override
 		public SolutionDesign next() {
 			return apply(innerIterator.next());
+		}
+
+		@Override
+		public void remove() {
+			innerIterator.remove();
+		}
+	}
+	
+	private class PairIter implements Iterator<Pair<Action, Double>> {
+		private Iterator<Action> innerIterator;
+		
+		private PairIter() {
+			innerIterator = getAllActions().iterator();
+		}
+		
+		@Override
+		public boolean hasNext() {
+			return innerIterator.hasNext();
+		}
+
+		@Override
+		public Pair<Action, Double> next() {
+			Action action = innerIterator.next();
+			SolutionDesign nd = apply(action);
+			return Pair.create(action, nd.getScore());
 		}
 
 		@Override

@@ -80,8 +80,9 @@ public class BeeColonyAlgorithm extends AbstractAlgorithm {
 		
 		if (observer != null) {
 			observer.onUpdateItems(this, best.design, best.design, AlgorithmObserver.UPDATE_BEST);
+			observer.onAdvance(this, getStepCount(), iterations);
 		}
-		
+
 		return false;
 	}
 	

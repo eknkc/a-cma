@@ -60,7 +60,13 @@ public class HillClimbingAlgorithm extends AbstractAlgorithm {
 		AlgorithmObserver observer = getObserver();
 		
 		log("Starting iteration %d. Current score: %.6f, Best score: %.6f", getStepCount(), current.getScore(), best.getScore());
-		SolutionDesign bestNeighbor = current.getBestNeighbor();
+		SolutionDesign bestNeighbor = null;
+		
+		if (restartCount == 0)
+			bestNeighbor = current.getBestNeighbor();
+		else
+			bestNeighbor = current.getBetterNeighbor();
+		
 		log("Found neighbor with score %.6f score", bestNeighbor.getScore());
 		
 		if (bestNeighbor.isBetterThan(best)) {
