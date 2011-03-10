@@ -21,7 +21,6 @@ import edu.atilim.acma.design.Design;
 import edu.atilim.acma.transition.actions.Action;
 import edu.atilim.acma.util.ACMAUtil;
 import edu.atilim.acma.util.Pair;
-import edu.atilim.acma.util.RouletteWheel;
 
 public class ConcurrentStochasticBeamSearch extends ConcurrentAlgorithm {
 
@@ -107,32 +106,34 @@ public class ConcurrentStochasticBeamSearch extends ConcurrentAlgorithm {
 		
 		ArrayList<FoundDesignHandle> selected = new ArrayList<ConcurrentStochasticBeamSearch.FoundDesignHandle>();
 		
-		FoundDesignHandle min = designs.get(0);
-		FoundDesignHandle max = designs.get(0);
+		double average = 0.0;
+		double min = Double.MAX_VALUE;
+		double max = 0.0;
 		
 		for (int i = 0; i < designs.size(); i++) {
 			FoundDesignHandle cur = designs.get(i);
+			average += cur.score;
 			
-			if (cur.score < min.score) min = cur;
-			if (cur.score > max.score) max = cur;
+			if (cur.score < min) min = cur.score;
+			if (cur.score > max) max = cur.score;
 		}
 		
-		RouletteWheel<FoundDesignHandle> wheel = new RouletteWheel<ConcurrentStochasticBeamSearch.FoundDesignHandle>();
+		average /= designs.size();
 		
-		for (int i = 0; i < designs.size(); i++) {
-			if (selected.size() > beamLength) break;
+		average = (average - min) / (max - min);
+		
+		double z = (beamLength) / (Math.exp(-1) * designs.size());
 			
+		for (int i = 0; i < designs.size(); i++) {
 			FoundDesignHandle cur = designs.get(i);
 			
-			double probability = (max.score - cur.score) / (max.score - min.score);
+			double score = (cur.score - min) / (max - min);
+			double probability = z * Math.exp(-score / average);
 			
-			wheel.add(cur, probability);
-		}
-		
-		for (int i = 0; i < beamLength; i++) {
-			FoundDesignHandle handle = wheel.roll();
-			if (handle == null) break;
-			selected.add(handle);
+			//System.out.printf("%.6f\t%.6f\n", cur.score, probability);
+
+			if (probability > ACMAUtil.RANDOM.nextDouble())
+				selected.add(cur);
 		}
 		
 		return selected;

@@ -1,33 +1,47 @@
 package edu.atilim.acma.util;
 
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.ArrayList;
 
 public class RouletteWheel<T> {
-	private SortedSet<Piece> wheel;
+	private ArrayList<Piece> wheel;
+	private double total = 0;
 	
 	public RouletteWheel() {
-		wheel = new TreeSet<RouletteWheel<T>.Piece>();
+		wheel = new ArrayList<RouletteWheel<T>.Piece>();
 	}
 	
 	public void add(T item, double fitness) {
 		wheel.add(new Piece(item, fitness));
+		total += fitness;
 	}
 	
 	public T roll() {
-		double slice = ACMAUtil.RANDOM.nextDouble() * wheel.last().fitness;
+		double slice = ACMAUtil.RANDOM.nextDouble() * total;
 		
 		Piece selected = null;
+		double cumulative = 0;
 		for (Piece p : wheel) {
-			if (slice <= p.fitness) {
+			cumulative += p.fitness;
+			
+			if (cumulative >= slice) {
 				selected = p;
-			} else if (selected != null) {
 				break;
 			}
 		}
 		
 		if (selected != null) {
 			wheel.remove(selected);
+			total -= selected.fitness;
+		}
+		
+		if (selected == null) {
+			double aha = 0;
+			for (Piece p : wheel) {
+				aha += p.fitness;
+			}
+			System.out.println(aha);
+			System.out.println();
+			
 		}
 		
 		return selected.item;
