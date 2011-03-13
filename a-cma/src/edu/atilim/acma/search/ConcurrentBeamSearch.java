@@ -12,6 +12,7 @@ import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
+import edu.atilim.acma.Core;
 import edu.atilim.acma.RunConfig;
 import edu.atilim.acma.concurrent.Instance;
 import edu.atilim.acma.concurrent.InstanceSet;
@@ -55,7 +56,7 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 			for (int i = 0 ; i < iterations; i++) {				
 				System.out.printf("Starting iteration %d.\n", i + 1);
 				instances.broadcast(Boolean.TRUE);
-				expandPopulationMaster(instances, population);
+				if (!expandPopulationMaster(instances, population)) break;
 			}
 			
 			SolutionDesign best = initial;
@@ -76,13 +77,20 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 		instances.broadcast(Boolean.FALSE);
 	}
 	
-	private void expandPopulationMaster(InstanceSet instances, HashSet<Design> population) {
+	private boolean expandPopulationMaster(InstanceSet instances, HashSet<Design> population) {
 		System.out.println("Scattering population to instances.");
 		instances.scatter(new ArrayList<Design>(population));
 		System.out.println("Waiting for population expansion.");
 		
 		ArrayList<Double> scores = instances.gather(Double.class);
 		System.out.printf("Received %d scores.\n", scores.size());
+		
+		if (scores.size() == 0) {
+			System.out.println("Found optimum point!");
+			instances.broadcast(0.0);
+			return false;
+		}
+		
 		Collections.sort(scores);
 		Double beamcut = scores.get(Math.min(scores.size() - 1, beamLength - 1));
 		System.out.printf("Beam cut at %.6f.\n", beamcut);
@@ -95,6 +103,8 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 			population.add(d);
 		}
 		System.out.printf("New population generated with %d designs. Best: %.6f\n", newpop.size(), scores.get(0));
+		
+		return true;
 	}
 
 	@Override
@@ -121,6 +131,8 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 				public Void call() throws Exception {
 					for (SolutionDesign neighbor : design) {
 						neighbor.ensureScore();
+						
+						if (Core.paretoMode && !neighbor.isBetterThan(design)) continue;
 						
 						synchronized (neighbors) {
 							neighbors.add(new FoundDesign(neighbor.getScore(), neighbor.getDesign()));

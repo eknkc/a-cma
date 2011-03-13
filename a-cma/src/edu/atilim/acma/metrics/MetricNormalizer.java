@@ -60,7 +60,7 @@ public class MetricNormalizer {
 			if (metric.isMinimized()) {
 				items.put(metric.getName(), Math.abs(curnormal - ((0.0 - mn[i][0]) / mn[i][1])));
 			} else {
-				items.put(metric.getName(), Math.abs(curnormal - ((0.0 - mn[i][0]) / mn[i][1])));
+				items.put(metric.getName(), Math.abs(curnormal));
 			}
 		}
 		

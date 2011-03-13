@@ -77,6 +77,7 @@ public abstract class ConcurrentAlgorithm implements ConcurrentTask, Externaliza
 				RunInfoTag tag = (RunInfoTag)fDesign.getTag();
 				bw.write(String.format("    * Run Info: %s\n", tag.getRunInfo()));
 				bw.write(String.format("    * Time taken: %.2f seconds\n", tag.getRunDuration() / 1000.0));
+				bw.write(String.format("    * Metric Mode: %s\n", tag.isPareto() ? "Pareto" : "Aggregate"));
 				bw.write("\n");
 			}
 			

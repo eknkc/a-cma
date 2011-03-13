@@ -22,6 +22,8 @@ public class TasksPanelBase extends JPanel {
 	protected JList taskList;
 	protected JPanel buttonPanel;
 	protected JButton deleteButton;
+	protected JButton btnPareto;
+	protected JButton btnAggregate;
 
 	public TasksPanelBase() {
 		setLayout(new BorderLayout(0, 0));
@@ -47,6 +49,16 @@ public class TasksPanelBase extends JPanel {
 		flowLayout.setHgap(0);
 		flowLayout.setAlignment(FlowLayout.RIGHT);
 		panel.add(buttonPanel, BorderLayout.SOUTH);
+		
+		btnPareto = new JButton("Pareto");
+		btnPareto.setActionCommand("PARETO");
+		btnPareto.setIcon(new ImageIcon(TasksPanelBase.class.getResource("/resources/icons/statistics2_16.png")));
+		buttonPanel.add(btnPareto);
+		
+		btnAggregate = new JButton("Aggregate");
+		btnAggregate.setActionCommand("AGGREGATE");
+		btnAggregate.setIcon(new ImageIcon(TasksPanelBase.class.getResource("/resources/icons/statistics_16.png")));
+		buttonPanel.add(btnAggregate);
 		
 		deleteButton = new JButton("");
 		deleteButton.setActionCommand("delete");

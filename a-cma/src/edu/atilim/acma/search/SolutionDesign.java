@@ -1,14 +1,18 @@
 package edu.atilim.acma.search;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
+import edu.atilim.acma.Core;
 import edu.atilim.acma.RunConfig;
 import edu.atilim.acma.design.Design;
 import edu.atilim.acma.metrics.MetricCalculator;
+import edu.atilim.acma.metrics.MetricNormalizer;
 import edu.atilim.acma.metrics.MetricSummary;
 import edu.atilim.acma.transition.TransitionManager;
 import edu.atilim.acma.transition.actions.Action;
@@ -24,6 +28,7 @@ public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<Solu
 	private List<Action> actions;
 	
 	private double score = Double.NaN;
+	private HashMap<String, Double> paretoMap;
 	
 	public Design getDesign() {
 		return design;
@@ -34,8 +39,24 @@ public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<Solu
 	}
 	
 	public void ensureScore() {
+		if (Core.paretoMode) {
+			ensureParetoMap();
+			return;
+		}
+		
 		if (Double.isNaN(score)) {
 			score = MetricCalculator.normalize(MetricCalculator.calculate(getDesign(), config), config);
+		}
+	}
+	
+	public void ensureParetoMap() {
+		if (paretoMap == null) {
+			paretoMap = MetricNormalizer.normalizeEach(MetricCalculator.calculate(getDesign(), config).getSummary(), config);
+			
+			score = 0.0;
+			for (double item : paretoMap.values()) {
+				score += item;
+			}
 		}
 	}
 	
@@ -126,7 +147,26 @@ public class SolutionDesign implements Iterable<SolutionDesign>, Comparable<Solu
 	}
 	
 	public boolean isBetterThan(SolutionDesign other) {
-		return compareTo(other) > 0;
+		return Core.paretoMode ? isParetoBetterThan(other) : compareTo(other) > 0;
+	}
+	
+	public boolean isParetoBetterThan(SolutionDesign other) {
+		ensureParetoMap();
+		other.ensureParetoMap();
+		
+		boolean foundbetter = false;
+		
+		for (Entry<String, Double> pi : paretoMap.entrySet()) {
+			double otherval = other.paretoMap.get(pi.getKey());
+			
+			if (pi.getValue() < otherval) {
+				foundbetter = true;
+			} else if (pi.getValue() > otherval) {
+				return false;
+			}
+		}
+		
+		return foundbetter;
 	}
 	
 	@Override

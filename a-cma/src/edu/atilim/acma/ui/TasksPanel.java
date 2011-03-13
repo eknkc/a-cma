@@ -9,6 +9,7 @@ import javax.swing.Timer;
 
 import edu.atilim.acma.TaskQueue;
 import edu.atilim.acma.concurrent.ConcurrentTask;
+import edu.atilim.acma.concurrent.SwitchMetricModeTask;
 import edu.atilim.acma.ui.design.TasksPanelBase;
 
 public class TasksPanel extends TasksPanelBase implements ActionListener {
@@ -18,6 +19,8 @@ public class TasksPanel extends TasksPanelBase implements ActionListener {
 		Timer timer = new Timer(500, this);
 		timer.setActionCommand("update");
 		deleteButton.addActionListener(this);
+		btnPareto.addActionListener(this);
+		btnAggregate.addActionListener(this);
 		
 		refresh();
 		
@@ -47,6 +50,10 @@ public class TasksPanel extends TasksPanelBase implements ActionListener {
 			if (selected != null && selected instanceof ConcurrentTask)
 				TaskQueue.remove((ConcurrentTask)selected);
 			refresh();
+		} else if (e.getActionCommand().equals("AGGREGATE")) {
+			TaskQueue.push(new SwitchMetricModeTask(false));
+		} else if (e.getActionCommand().equals("PARETO")) {
+			TaskQueue.push(new SwitchMetricModeTask(true));
 		}
 	}
 }

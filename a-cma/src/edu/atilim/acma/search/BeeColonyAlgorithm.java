@@ -95,7 +95,7 @@ public class BeeColonyAlgorithm extends AbstractAlgorithm {
 			FoodSource current = foods.get(i);
 			FoodSource neighbor = current.mutate();
 			
-			if (neighbor.getFitness() > current.getFitness()) {
+			if (neighbor.isBetterThan(current)) {
 				foods.set(i, neighbor);
 				better++;
 			} else {
@@ -132,7 +132,7 @@ public class BeeColonyAlgorithm extends AbstractAlgorithm {
 			if (current.probability > ACMAUtil.RANDOM.nextDouble()) {
 				FoodSource neighbor = current.mutate();
 				
-				if (neighbor.getFitness() > current.getFitness()) {
+				if (neighbor.isBetterThan(current)) {
 					foods.set(i, neighbor);
 				} else {
 					current.trialCount++;
@@ -188,6 +188,10 @@ public class BeeColonyAlgorithm extends AbstractAlgorithm {
 		
 		public FoodSource mutate() {
 			return new FoodSource(design.getRandomNeighbor());
+		}
+		
+		public boolean isBetterThan(FoodSource other) {
+			return design.isBetterThan(other.design);
 		}
 		
 		@Override

@@ -5,6 +5,7 @@ import java.awt.event.ActionListener;
 
 import javax.swing.JTabbedPane;
 
+import edu.atilim.acma.Core;
 import edu.atilim.acma.ui.design.MainWindowBase;
 import edu.atilim.acma.util.WeakHashSet;
 
@@ -61,6 +62,8 @@ public class MainWindow extends MainWindowBase {
 				MainWindow.getInstance().console.clear();
 			} else if (ac.equals(Actions.CONFIG_RUN)) {
 				new RunConfigDialog().setVisible(true);
+			} else if (ac.equals("PARETO")) {
+				Core.paretoMode = MainWindow.getInstance().mnItmParetoMode.isSelected();
 			}
 		}
 	}

@@ -34,7 +34,7 @@ public class Client implements Runnable, ConnectionListener {
 					e.printStackTrace(pw);
 				} catch (Exception ie) {
 				} finally {
-					pw.close();
+					try { pw.close(); } catch (Exception iie) { }
 				}
 			}
 		}

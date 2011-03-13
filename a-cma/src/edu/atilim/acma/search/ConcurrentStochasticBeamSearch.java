@@ -108,27 +108,24 @@ public class ConcurrentStochasticBeamSearch extends ConcurrentAlgorithm {
 		
 		double average = 0.0;
 		double min = Double.MAX_VALUE;
-		double max = 0.0;
 		
 		for (int i = 0; i < designs.size(); i++) {
 			FoundDesignHandle cur = designs.get(i);
 			average += cur.score;
 			
 			if (cur.score < min) min = cur.score;
-			if (cur.score > max) max = cur.score;
 		}
 		
 		average /= designs.size();
 		
-		average = (average - min) / (max - min);
+		average -= min;
 		
 		double z = (beamLength) / (Math.exp(-1) * designs.size());
 			
 		for (int i = 0; i < designs.size(); i++) {
 			FoundDesignHandle cur = designs.get(i);
-			
-			double score = (cur.score - min) / (max - min);
-			double probability = z * Math.exp(-score / average);
+
+			double probability = z * Math.exp(-(cur.score - min) / average);
 			
 			//System.out.printf("%.6f\t%.6f\n", cur.score, probability);
 

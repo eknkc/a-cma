@@ -19,11 +19,13 @@ import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.MatteBorder;
 
+import edu.atilim.acma.Core;
 import edu.atilim.acma.ui.Actions;
 import edu.atilim.acma.ui.Console;
 import edu.atilim.acma.ui.LoadedDesigns;
 import edu.atilim.acma.ui.MainWindow;
 import edu.atilim.acma.ui.TasksPanel;
+import javax.swing.JCheckBoxMenuItem;
 
 public class MainWindowBase extends JFrame {
 
@@ -50,6 +52,7 @@ public class MainWindowBase extends JFrame {
 	protected JMenuItem mnitmClearConsole;
 	protected JMenu mnHelp;
 	protected JMenuItem mnitmAbout;
+	protected JCheckBoxMenuItem mnItmParetoMode;
 
 	public MainWindowBase() {
 		setTitle("A-CMA");
@@ -146,6 +149,12 @@ public class MainWindowBase extends JFrame {
 		mnitmRunConfig.setActionCommand(Actions.CONFIG_RUN);
 		mnitmRunConfig.addActionListener(MainWindow.getListener());
 		mnSettings.add(mnitmRunConfig);
+		
+		mnItmParetoMode = new JCheckBoxMenuItem("Pareto Mode");
+		mnItmParetoMode.setActionCommand("PARETO");
+		mnItmParetoMode.addActionListener(MainWindow.getListener());
+		mnItmParetoMode.setSelected(Core.paretoMode);
+		mnSettings.add(mnItmParetoMode);
 		
 		sp2 = new JSeparator();
 		mnSettings.add(sp2);
