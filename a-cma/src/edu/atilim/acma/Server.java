@@ -42,6 +42,7 @@ public class Server implements Runnable, ConnectionListener {
 				
 				try { Thread.sleep(5000); } catch (InterruptedException e) { }
 			} catch (Exception e) {
+				e.printStackTrace();
 				String name = String.format("./output/%s_exception.log", UUID.randomUUID().toString());
 				PrintWriter pw =  null;
 				try {

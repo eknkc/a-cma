@@ -132,6 +132,8 @@ public class DesignPanelBase extends JPanel {
 	protected JButton abcBtnAddTask;
 	protected JCheckBox bsIsStochastic;
 	protected Component hs100;
+	protected JCheckBox abcParallel;
+	protected Component horizontalStrut_2;
 
 	public DesignPanelBase() {
 		setOpaque(false);
@@ -444,6 +446,13 @@ public class DesignPanelBase extends JPanel {
 		beeColonyPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
 		algorithmsTabPane.addTab("Artificial Bee Colony", null, beeColonyPanel, null);
 		beeColonyPanel.setLayout(new BoxLayout(beeColonyPanel, BoxLayout.X_AXIS));
+		
+		abcParallel = new JCheckBox("Parallel");
+		abcParallel.setOpaque(false);
+		beeColonyPanel.add(abcParallel);
+		
+		horizontalStrut_2 = Box.createHorizontalStrut(5);
+		beeColonyPanel.add(horizontalStrut_2);
 		
 		lblPopulationSize = new JLabel("Population Size:");
 		beeColonyPanel.add(lblPopulationSize);

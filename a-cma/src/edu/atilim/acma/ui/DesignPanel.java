@@ -50,6 +50,7 @@ import edu.atilim.acma.search.BeeColonyAlgorithm;
 import edu.atilim.acma.search.ConcurrentBeamSearch;
 import edu.atilim.acma.search.ConcurrentBeeColony;
 import edu.atilim.acma.search.ConcurrentHillClimbing;
+import edu.atilim.acma.search.ConcurrentParallelBeeColony;
 import edu.atilim.acma.search.ConcurrentRandomSearch;
 import edu.atilim.acma.search.ConcurrentSimAnn;
 import edu.atilim.acma.search.ConcurrentStochasticBeamSearch;
@@ -171,7 +172,11 @@ public class DesignPanel extends DesignPanelBase implements WindowEventListener 
 					int mi = (Integer)abcIterations.getValue();
 					int mt = (Integer)abcMaxTrials.getValue();
 					int pc = (Integer)abcPopSize.getValue();
-					task = new ConcurrentBeeColony(name, getRunConfig(), design, mt, pc, mi, runs);
+					
+					if (abcParallel.isSelected())
+						task = new ConcurrentParallelBeeColony(name, getRunConfig(), design, mt, pc, mi, runs);
+					else
+						task = new ConcurrentBeeColony(name, getRunConfig(), design, mt, pc, mi, runs);
 				}
 				
 				if (task != null)

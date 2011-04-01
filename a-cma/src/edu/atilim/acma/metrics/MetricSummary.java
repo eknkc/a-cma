@@ -56,6 +56,11 @@ public class MetricSummary implements Externalizable {
 		metrics = new HashMap<String, Double>();
 	}
 	
+	public MetricSummary(HashMap<String, Double> metrics) {
+		this();
+		this.metrics = metrics;
+	}
+	
 	public String getName() {
 		return name;
 	}
