@@ -18,6 +18,8 @@ public class ConcurrentParallelBeeColony extends ConcurrentAlgorithm {
 	private static final int COMMAND_GENERATE = 1;
 	private static final int COMMAND_STEP = 2;
 	private static final int COMMAND_EXIT = 4;
+	private static final int COMMAND_RESETEXPANSION = 5;
+	private static final int COMMAND_DUMPEXPANSION = 6;
 	
 	private int maxTrials;
 	private int populationSize;
@@ -40,6 +42,8 @@ public class ConcurrentParallelBeeColony extends ConcurrentAlgorithm {
 	public void runMaster(InstanceSet instances) {
 		for (int run = 0; run < runCount; run++) {
 			long startTime = System.currentTimeMillis();
+			
+			instances.broadcast(COMMAND_RESETEXPANSION);
 			
 			System.out.printf("Ordering food source generation to %d instances.\n", instances.size());
 			
@@ -73,14 +77,22 @@ public class ConcurrentParallelBeeColony extends ConcurrentAlgorithm {
 						
 			System.out.printf("Finished %d iterations. Found best design with score: %.6f.\n", iterations, best.getScore());
 			
+			instances.broadcast(COMMAND_DUMPEXPANSION);
+			expansion = 0;
+			for (Instance i : instances) {
+				expansion += i.receive(Long.class);
+			}
+			
 			Design bestDesign = best.getDesign();
 			bestDesign.setTag(new RunInfoTag(System.currentTimeMillis() - startTime, 
-					String.format("Artificial Bee Colony. Population Size: %d, Max Trials: %d, Iterations: %d.", populationSize, maxTrials, iterations)));
+					String.format("Artificial Bee Colony. Population Size: %d, Max Trials: %d, Iterations: %d.", populationSize, maxTrials, iterations), expansion));
 			onFinish(bestDesign);
 		}
 		
 		instances.broadcast(COMMAND_EXIT);
 	}
+	
+	private transient long expansion = 0;
 
 	@Override
 	public void runWorker(Instance master) {
@@ -105,6 +117,12 @@ public class ConcurrentParallelBeeColony extends ConcurrentAlgorithm {
 				break;
 			case COMMAND_EXIT:
 				break infinite;
+			case COMMAND_RESETEXPANSION:
+				expansion = 0;
+				break;
+			case COMMAND_DUMPEXPANSION:
+				master.send(expansion);
+				break;
 			}
 		}
 		
@@ -120,6 +138,8 @@ public class ConcurrentParallelBeeColony extends ConcurrentAlgorithm {
 			foods.add(new FoodSource(initial.getRandomNeighbor(randomDepth)));
 		}
 		System.out.printf("Created food sources.\n", n);
+		
+		expansion += n;
 	}
 	
 	private void sendEmployedBees(ArrayList<FoodSource> foods) {
@@ -138,6 +158,8 @@ public class ConcurrentParallelBeeColony extends ConcurrentAlgorithm {
 				current.trialCount++;
 			}
 		}
+		
+		expansion += foods.size();
 	}
 	
 	private FoodSource getBestSource(ArrayList<FoodSource> foods) {
@@ -178,6 +200,8 @@ public class ConcurrentParallelBeeColony extends ConcurrentAlgorithm {
 				} else {
 					current.trialCount++;
 				}
+				
+				expansion++;
 			}
 		}
 	}
@@ -190,6 +214,7 @@ public class ConcurrentParallelBeeColony extends ConcurrentAlgorithm {
 			
 			if (current.trialCount > maxTrials) {
 				foods.set(i, new FoodSource(randomSource.getRandomNeighbor(randomDepth)));
+				expansion++;
 			}
 		}
 	}

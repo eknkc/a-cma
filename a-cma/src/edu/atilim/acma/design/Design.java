@@ -146,7 +146,6 @@ public class Design implements Externalizable {
 		return name;
 	}
 
-	//TODO: These are not tested. I mean really, I just wrote them and it compiles. Don't know if they work.
 	@Override
 	public void readExternal(ObjectInput in) throws IOException,
 			ClassNotFoundException {

@@ -45,6 +45,7 @@ public class ConcurrentStochasticBeamSearch extends ConcurrentAlgorithm {
 	public void runMaster(InstanceSet instances) {
 		for (int runs = 0; runs < runCount; runs++) {
 			long startTime = System.currentTimeMillis();
+			long expansion = 0;
 			
 			HashSet<Design> population = new HashSet<Design>();
 			
@@ -57,10 +58,14 @@ public class ConcurrentStochasticBeamSearch extends ConcurrentAlgorithm {
 			}
 			System.out.println("Generated initial population.");
 			
+			expansion += population.size();
+			
 			for (int i = 0 ; i < iterations; i++) {				
 				System.out.printf("Starting iteration %d.\n", i + 1);
 				instances.broadcast(Boolean.TRUE);
-				expandPopulationMaster(instances, population);
+				int expanded = expandPopulationMaster(instances, population);
+				
+				expansion += expanded;
 			}
 			
 			SolutionDesign best = initial;
@@ -74,20 +79,22 @@ public class ConcurrentStochasticBeamSearch extends ConcurrentAlgorithm {
 			
 			Design bestDesign = best.getDesign();
 			bestDesign.setTag(new RunInfoTag(System.currentTimeMillis() - startTime, 
-					String.format("Beam Search. Beam Length: %d, Randomization: %d, Iterations: %d", beamLength, randomDepth, iterations)));
+					String.format("Beam Search. Beam Length: %d, Randomization: %d, Iterations: %d", beamLength, randomDepth, iterations), expansion));
 			onFinish(bestDesign);
 		}
 		
 		instances.broadcast(Boolean.FALSE);
 	}
 	
-	private void expandPopulationMaster(InstanceSet instances, HashSet<Design> population) {
+	private int expandPopulationMaster(InstanceSet instances, HashSet<Design> population) {
 		System.out.println("Scattering population to instances.");
 		instances.scatter(new ArrayList<Design>(population));
 		System.out.println("Waiting for population expansion.");
 		
 		ArrayList<FoundDesignHandle> handles = instances.gather(FoundDesignHandle.class);
 		System.out.printf("Received %d design handles. Choosing %d within.\n", handles.size(), beamLength);
+		
+		int expansion = handles.size();
 			
 		instances.broadcast(selectDesigns(handles));
 		
@@ -99,6 +106,8 @@ public class ConcurrentStochasticBeamSearch extends ConcurrentAlgorithm {
 		}
 		
 		System.out.printf("New population generated with %d designs.\n", newpop.size());
+		
+		return expansion;
 	}
 	
 	private ArrayList<FoundDesignHandle> selectDesigns(ArrayList<FoundDesignHandle> designs) {

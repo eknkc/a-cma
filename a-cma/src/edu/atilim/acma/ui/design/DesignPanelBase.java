@@ -461,7 +461,7 @@ public class DesignPanelBase extends JPanel {
 		beeColonyPanel.add(hs10);
 		
 		abcPopSize = new JSpinner();
-		abcPopSize.setModel(new SpinnerNumberModel(70, 20, 5000, 1));
+		abcPopSize.setModel(new SpinnerNumberModel(70, 1, 5000, 1));
 		beeColonyPanel.add(abcPopSize);
 		
 		hs11 = Box.createHorizontalStrut(5);

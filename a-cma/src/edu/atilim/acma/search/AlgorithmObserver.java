@@ -8,7 +8,7 @@ public interface AlgorithmObserver {
 	void onStart(AbstractAlgorithm algorithm, SolutionDesign initial);
 	void onFinish(AbstractAlgorithm algorithm, SolutionDesign last);
 	
-	void onExpansion(AbstractAlgorithm algorithm, int currentExpanded, int totalExpanded);
+	void onExpansion(AbstractAlgorithm algorithm, int count);
 	
 	void onUpdateItems(AbstractAlgorithm algorithm, SolutionDesign current, SolutionDesign best, int updateType);
 	

@@ -158,8 +158,7 @@ public class RunPanel extends RunPanelBase implements AlgorithmObserver {
 	}
 
 	@Override
-	public void onExpansion(AbstractAlgorithm algorithm, int currentExpanded,
-			int totalExpanded) {
+	public void onExpansion(AbstractAlgorithm algorithm, int currentExpanded) {
 
 	}
 	

@@ -25,6 +25,8 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 	private int runCount;
 	private int iterations;
 	
+	private transient int expansion = 0;
+	
 	public ConcurrentBeamSearch() {
 	}
 
@@ -40,6 +42,8 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 	@Override
 	public void runMaster(InstanceSet instances) {
 		for (int runs = 0; runs < runCount; runs++) {
+			expansion = 0;
+			
 			long startTime = System.currentTimeMillis();
 			
 			HashSet<Design> population = new HashSet<Design>();
@@ -52,6 +56,8 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 				population.add(random.getDesign());
 			}
 			System.out.println("Generated initial population.");
+			
+			expansion += population.size();
 			
 			for (int i = 0 ; i < iterations; i++) {				
 				System.out.printf("Starting iteration %d.\n", i + 1);
@@ -70,7 +76,7 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 			
 			Design bestDesign = best.getDesign();
 			bestDesign.setTag(new RunInfoTag(System.currentTimeMillis() - startTime, 
-					String.format("Beam Search. Beam Length: %d, Randomization: %d, Iterations: %d", beamLength, randomDepth, iterations)));
+					String.format("Beam Search. Beam Length: %d, Randomization: %d, Iterations: %d", beamLength, randomDepth, iterations), expansion)); //TODO: expansion
 			onFinish(bestDesign);
 		}
 		
@@ -81,6 +87,10 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 		System.out.println("Scattering population to instances.");
 		instances.scatter(new ArrayList<Design>(population));
 		System.out.println("Waiting for population expansion.");
+		
+		for (Instance i : instances) {
+			expansion += i.receive(Integer.class);
+		}
 		
 		ArrayList<Double> scores = instances.gather(Double.class);
 		System.out.printf("Received %d scores.\n", scores.size());
@@ -124,6 +134,8 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 		final SortedSet<FoundDesign> neighbors = new TreeSet<FoundDesign>();
 		final List<Callable<Void>> tasks = new ArrayList<Callable<Void>>();
 		
+		expansion = 0;
+		
 		for (Design d : designs) {
 			final SolutionDesign design = new SolutionDesign(d, getConfig());
 			tasks.add(new Callable<Void>() {
@@ -135,6 +147,8 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 						if (Core.paretoMode && !neighbor.isBetterThan(design)) continue;
 						
 						synchronized (neighbors) {
+							expansion++;
+							
 							neighbors.add(new FoundDesign(neighbor.getScore(), neighbor.getDesign()));
 							
 							if (neighbors.size() > beamLength) {
@@ -154,6 +168,8 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
+		
+		master.send(expansion);
 		
 		ArrayList<Double> scores = new ArrayList<Double>();
 		for (FoundDesign fd : neighbors)

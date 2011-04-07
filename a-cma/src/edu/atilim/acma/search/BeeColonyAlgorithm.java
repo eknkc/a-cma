@@ -102,6 +102,9 @@ public class BeeColonyAlgorithm extends AbstractAlgorithm {
 				current.trialCount++;
 			}
 		}
+		
+		if (getObserver() != null)
+			getObserver().onExpansion(this, foods.size());
 	}
 	
 	private void calculateProbabilities() {
@@ -126,6 +129,8 @@ public class BeeColonyAlgorithm extends AbstractAlgorithm {
 	private void sendOnlookerBees() {
 		log("Sending onlooker bees.");
 		
+		int expanded = 0;
+		
 		for (int i = 0; i < foods.size(); i++) {
 			FoodSource current = foods.get(i);
 			
@@ -137,8 +142,13 @@ public class BeeColonyAlgorithm extends AbstractAlgorithm {
 				} else {
 					current.trialCount++;
 				}
+				
+				expanded++;
 			}
 		}
+		
+		if (getObserver() != null)
+			getObserver().onExpansion(this, expanded);
 	}
 	
 	private void memorizeBestSource() {
@@ -164,6 +174,9 @@ public class BeeColonyAlgorithm extends AbstractAlgorithm {
 					foods.set(i, new FoodSource(initialDesign.getRandomNeighbor(randomDepth)));
 				else
 					foods.set(i, new FoodSource(best.design.getRandomNeighbor(randomDepth)));
+				
+				if (getObserver() != null)
+					getObserver().onExpansion(this, 1);
 			}
 		}
 	}

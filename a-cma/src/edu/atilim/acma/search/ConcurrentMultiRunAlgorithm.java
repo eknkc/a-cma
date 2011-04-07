@@ -90,6 +90,7 @@ public abstract class ConcurrentMultiRunAlgorithm extends ConcurrentAlgorithm {
 	}
 	
 	private transient long runStart;
+	private transient long expansion = 0;
 
 	@Override
 	public void runWorker(final Instance master) {
@@ -117,14 +118,14 @@ public abstract class ConcurrentMultiRunAlgorithm extends ConcurrentAlgorithm {
 				
 				long elapsed = System.currentTimeMillis() - runStart;
 				Design design = last.getDesign();
-				design.setTag(new RunInfoTag(elapsed, getRunInfo()));
+				design.setTag(new RunInfoTag(elapsed, getRunInfo(), expansion));
 		
 				master.send(last.getDesign());
 			}
 			
 			@Override
-			public void onExpansion(AbstractAlgorithm algorithm, int currentExpanded,
-					int totalExpanded) {
+			public void onExpansion(AbstractAlgorithm algorithm, int count) {
+				expansion += count;
 			}
 			
 			@Override
@@ -148,6 +149,7 @@ public abstract class ConcurrentMultiRunAlgorithm extends ConcurrentAlgorithm {
 			AbstractAlgorithm algorithm = spawnAlgorithm();
 			algorithm.setObserver(observer);
 			runStart = System.currentTimeMillis();
+			expansion = 0;
 			algorithm.start(false);
 		}
 	}

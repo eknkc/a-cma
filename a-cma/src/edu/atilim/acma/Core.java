@@ -31,7 +31,10 @@ public class Core {
 				runner = new ActionImpactCalculator();
 			} else if (args[0].equals("-pf")) {
 				runner = new ParetoFrontCalculator();
+			} else if (args[0].equals("-ne")) {
+				runner = new NodeExpansionRunGenerator();
 			}
+			
 			
 			if (runner == null) {
 				System.out.println("Please use either -s <port> or -c hostname <port> arguments for server and client modes respectively.");

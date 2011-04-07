@@ -11,9 +11,14 @@ public class RunInfoTag implements Externalizable {
 	private long runDuration;
 	private String runInfo;
 	private boolean pareto;
+	private long expansionCount;
 	
 	public long getRunDuration() {
 		return runDuration;
+	}
+
+	public long getExpansionCount() {
+		return expansionCount;
 	}
 
 	public String getRunInfo() {
@@ -24,10 +29,11 @@ public class RunInfoTag implements Externalizable {
 		return pareto;
 	}
 
-	public RunInfoTag(long runDuration, String runInfo) {
+	public RunInfoTag(long runDuration, String runInfo, long expansionCount) {
 		this.runDuration = runDuration;
 		this.runInfo = runInfo;
 		this.pareto = Core.paretoMode;
+		this.expansionCount = expansionCount;
 	}
 
 	public RunInfoTag() {
@@ -38,6 +44,7 @@ public class RunInfoTag implements Externalizable {
 		runDuration = in.readLong();
 		runInfo = in.readUTF();
 		pareto = in.readBoolean();
+		expansionCount = in.readLong();
 	}
 
 	@Override
@@ -45,5 +52,6 @@ public class RunInfoTag implements Externalizable {
 		out.writeLong(runDuration);
 		out.writeUTF(runInfo);
 		out.writeBoolean(pareto);
+		out.writeLong(expansionCount);
 	}
 }

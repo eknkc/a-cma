@@ -41,9 +41,31 @@ public class ParetoFrontCalculator implements Runnable {
 		
 		results = getParetoFront(results);
 		
+		int b = 0;
+		int h = 0;
+		int a = 0;
+		int s = 0;
+		
 		for (RunResult r : results) {
-			System.out.println(r.getRunInfo());
+			switch(r.getAttribute("Algorithm").charAt(0)) {
+			case 'B':
+				b++;
+				break;
+			case 'H':
+				h++;
+				break;
+			case 'A':
+				a++;
+				break;
+			case 'S':
+				s++;
+				break;
+			}
+			
+			System.out.println(r.toCSVString());
 		}
+		
+		System.out.printf("b=%d, h=%d, a=%d, s=%d", b, h, a, s);
 	}
 	
 	private ArrayList<RunResult> getParetoFront(ArrayList<RunResult> res) {
