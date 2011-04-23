@@ -15,6 +15,7 @@ import java.util.regex.Pattern;
 public class RunResult {
 	public class DesignInfo {
 		private double score;
+		private int appliedActions;
 		
 		private HashMap<String, Double> metrics;
 		
@@ -26,6 +27,10 @@ public class RunResult {
 			return score;
 		}
 		
+		public int getAppliedActions() {
+			return appliedActions;
+		}
+
 		private DesignInfo() {
 			metrics = new HashMap<String, Double>();
 		}
@@ -79,7 +84,14 @@ public class RunResult {
 				result.setAttribute("Depth", match.trim());
 			if ((match = matchRegex("Iterations: ([\\d]+)", line, 1)) != null)
 				result.setAttribute("Iterations", match.trim());
-			
+			if ((match = matchRegex("Expanded Designs: ([\\d]+)", line, 1)) != null)
+				result.setAttribute("NodeExpansion", match.trim());
+			/*
+			if (line.trim().startsWith(" - ")) {
+				int numActs = Integer.parseInt(result.getAttribute("NumActions", "0"));
+				result.setAttribute("NumActions", String.valueOf(numActs + 1));
+			}
+			*/
 			if (stage == ReadStage.HEADER) {
 				if (line.startsWith("* Name:"))
 					result.runName = line.substring(8);
@@ -92,6 +104,8 @@ public class RunResult {
 				
 				if (line.startsWith("* Score:"))
 					design.score = Double.parseDouble(line.substring(9).replace(',', '.'));
+				else if (line.startsWith("* Applied Actions:"))
+					design.appliedActions = Integer.parseInt(line.substring(19));
 				else if (line.startsWith("* Metric Summary:")) {
 					if (stage == ReadStage.INITIAL) stage = ReadStage.INITIALMETRICS;
 					else if (stage == ReadStage.FINAL) stage = ReadStage.FINALMETRICS;
@@ -193,14 +207,16 @@ public class RunResult {
 		NumberFormat nf = NumberFormat.getInstance(Locale.FRENCH);
 		
 		sb.append(id.toString()).append(';');
+		sb.append(getAttribute("Benchmark", "")).append(';');
 		sb.append(getAttribute("Algorithm", "")).append(';');
 		sb.append(nf.format(initialDesign.score)).append(';');
 		sb.append(nf.format(finalDesign.score)).append(';');
 		sb.append(getAttribute("Time", "").replace('.', ',')).append(';');
 		sb.append(getAttribute("Iterations", "")).append(';');
 		sb.append(getAttribute("RestartCount", "")).append(';');
-		sb.append(getAttribute("Randomization", "")).append(';');
-		sb.append(getAttribute("Depth", "")).append(';');
+		sb.append(getAttribute("Randomization", ""));
+		sb.append(getAttribute("Depth", ""));
+		sb.append(';');
 		sb.append(getAttribute("BeamLength", "")).append(';');
 		sb.append(getAttribute("PopulationSize", "")).append(';');
 		sb.append(getAttribute("MaxTrials", "")).append(';');

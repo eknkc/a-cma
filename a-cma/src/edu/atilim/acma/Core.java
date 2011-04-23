@@ -32,7 +32,7 @@ public class Core {
 			} else if (args[0].equals("-pf")) {
 				runner = new ParetoFrontCalculator();
 			} else if (args[0].equals("-ne")) {
-				runner = new NodeExpansionRunGenerator();
+				runner = new NodeXPCalculator();
 			}
 			
 			
