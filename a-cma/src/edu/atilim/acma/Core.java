@@ -8,6 +8,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
 import edu.atilim.acma.ui.MainWindow;
+import edu.atilim.acma.ws.WebServiceEngine;
 
 public class Core {
 	public static final String VERSION = "1.0.0.0a";
@@ -33,6 +34,8 @@ public class Core {
 				runner = new ParetoFrontCalculator();
 			} else if (args[0].equals("-ne")) {
 				runner = new NodeXPCalculator();
+			} else if (args[0].equals("-ws")) {
+				runner = WebServiceEngine.getInstance();
 			}
 			
 			

@@ -44,7 +44,7 @@ public class WikiBot {
 			executor.execute(new Runnable() {
 				@Override
 				public void run() {
-					try {						
+					try {
 						client.invoke("dokuwiki.appendPage", new Object[] { page, text, new Object[] { summary, false } });
 					} catch (Exception e) {}
 				}
