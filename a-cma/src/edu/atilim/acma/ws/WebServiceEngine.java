@@ -1,11 +1,15 @@
 package edu.atilim.acma.ws;
 
-import java.io.IOException;
-
+import org.apache.xmlrpc.XmlRpcException;
+import org.apache.xmlrpc.metadata.XmlRpcSystemImpl;
 import org.apache.xmlrpc.server.PropertyHandlerMapping;
-import org.apache.xmlrpc.server.XmlRpcServer;
-import org.apache.xmlrpc.server.XmlRpcServerConfigImpl;
-import org.apache.xmlrpc.webserver.WebServer;
+import org.apache.xmlrpc.server.XmlRpcHandlerMapping;
+import org.apache.xmlrpc.webserver.XmlRpcServlet;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.HandlerList;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 public class WebServiceEngine implements Runnable {
 	private static WebServiceEngine instance;
@@ -22,27 +26,52 @@ public class WebServiceEngine implements Runnable {
 		return instance;
 	}
 	
-	WebServer server;
+	Server webServer;
 	
 	private WebServiceEngine() throws Exception {
-		server = new WebServer(81);
-		XmlRpcServer xmlrpcServer = server.getXmlRpcServer();
+		initialize(8081);
+	}
+	
+	private void initialize(int port) throws Exception {
+		System.out.println("Starting web server...");
 		
-		PropertyHandlerMapping phm = new PropertyHandlerMapping();
-		phm.addHandler("ACMA", WebService.class);
+		webServer = new Server(port);
 		
-		xmlrpcServer.setHandlerMapping(phm);
+		ServletContextHandler requestHandler = new ServletContextHandler();
+		requestHandler.setContextPath("/");
+		requestHandler.setClassLoader(Thread.currentThread().getContextClassLoader());
+		requestHandler.addServlet(new ServletHolder(new RequestServlet()), "/xmlrpc/*");
 		
-		XmlRpcServerConfigImpl serverConfig = (XmlRpcServerConfigImpl)xmlrpcServer.getConfig();
-        serverConfig.setEnabledForExtensions(true);
-        serverConfig.setContentLengthOptional(false);
+		ResourceHandler resourceHandler = new ResourceHandler();
+		resourceHandler.setDirectoriesListed(false);
+		resourceHandler.setResourceBase("./web");
+		resourceHandler.setWelcomeFiles(new String[] { "index.html" });
+		
+		HandlerList handlers = new HandlerList();
+		handlers.addHandler(requestHandler);
+		handlers.addHandler(resourceHandler);
+		
+		webServer.setHandler(handlers);
+	}
+	
+	private static class RequestServlet extends XmlRpcServlet {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		protected XmlRpcHandlerMapping newXmlRpcHandlerMapping() throws XmlRpcException {
+			PropertyHandlerMapping phm = new PropertyHandlerMapping();
+			phm.addHandler("acma", WebService.class);
+			XmlRpcSystemImpl.addSystemHandler(phm);
+			
+			return phm;
+		}
 	}
 
 	@Override
 	public void run() {
 		try {
-			server.start();
-		} catch (IOException e) {
+			webServer.start();
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}

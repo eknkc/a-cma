@@ -65,7 +65,7 @@ public final class ConfigManager {
 		return null;
 	}
 	
-	static List<Action> getActions(RunConfig config) {
+	public static List<Action> getActions(RunConfig config) {
 		Set<ActionRegistry.Entry> actions = ActionRegistry.entries();
 		List<Action> list = new ArrayList<Action>();
 		
@@ -76,7 +76,7 @@ public final class ConfigManager {
 		return Collections.unmodifiableList(list);
 	}
 	
-	static List<Metric> getMetrics(RunConfig config) {
+	public static List<Metric> getMetrics(RunConfig config) {
 		List<MetricRegistry.Entry> metrics = MetricRegistry.entries();
 		List<Metric> list = new ArrayList<Metric>();
 		
@@ -97,7 +97,7 @@ public final class ConfigManager {
 		return Collections.unmodifiableList(list);
 	}
 	
-	static class Action {
+	public static class Action {
 		private RunConfig config;
 		private String name;
 		
@@ -124,7 +124,7 @@ public final class ConfigManager {
 		}
 	}
 	
-	static class Metric {
+	public static class Metric {
 		private RunConfig config;
 		private String name;
 		private double weight;
