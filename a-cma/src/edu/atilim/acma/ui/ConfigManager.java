@@ -155,7 +155,7 @@ public final class ConfigManager {
 			return packageMetric;
 		}
 
-		protected boolean isMinimized() {
+		public boolean isMinimized() {
 			return minimized;
 		}
 

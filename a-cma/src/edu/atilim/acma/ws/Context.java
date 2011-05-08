@@ -41,6 +41,12 @@ public class Context implements Externalizable {
 		ContextManager.register(context);
 		return context;
 	}
+	
+	public static Context create(Design design) {
+		Context context = create();
+		context.setDesign(design);
+		return context;
+	}
 
 	public Context() {
 		id = UUID.randomUUID();

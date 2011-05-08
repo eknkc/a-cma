@@ -13,13 +13,17 @@ import org.apache.xmlrpc.XmlRpcException;
 
 import edu.atilim.acma.design.Design;
 import edu.atilim.acma.design.io.ZIPDesignReader;
+import edu.atilim.acma.metrics.MetricCalculator;
+import edu.atilim.acma.metrics.MetricTable;
 import edu.atilim.acma.ui.ConfigManager;
 import edu.atilim.acma.ui.ConfigManager.Action;
 import edu.atilim.acma.ui.ConfigManager.Metric;
 
 public class WebService {
 	public String createContext() {
-		return Context.create().getId().toString();
+		Context c = Context.create();
+		c.setDesign(new ZIPDesignReader("./data/benchmarks/mosaic.zip").read());
+		return c.getId().toString();
 	}
 	
 	public Map<String, Object> getStatus(String context) {
@@ -88,12 +92,16 @@ public class WebService {
 		Context c = getContext(context);
 		
 		List<Metric> metrics = ConfigManager.getMetrics(c.getRunConfig());
+		MetricTable values = MetricCalculator.calculate(c.getDesign(), c.getRunConfig());
 		
 		List<Map<String, Object>> response = new ArrayList<Map<String,Object>>();
 		for (Metric metric : metrics) {
 			Map<String, Object> aMap = new HashMap<String, Object>();
 			aMap.put("name", metric.getName());
 			aMap.put("enabled", metric.isEnabled());
+			aMap.put("package", metric.isPackageMetric());
+			aMap.put("minimized", metric.isMinimized());
+			aMap.put("value", values.getAverage(metric.getName()));
 			response.add(aMap);
 		}
 		

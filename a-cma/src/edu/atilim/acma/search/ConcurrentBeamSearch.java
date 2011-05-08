@@ -76,7 +76,7 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 			
 			Design bestDesign = best.getDesign();
 			bestDesign.setTag(new RunInfoTag(System.currentTimeMillis() - startTime, 
-					String.format("Beam Search. Beam Length: %d, Randomization: %d, Iterations: %d", beamLength, randomDepth, iterations), expansion)); //TODO: expansion
+					String.format("Beam Search. Beam Length: %d, Randomization: %d, Iterations: %d", beamLength, randomDepth, iterations), expansion));
 			onFinish(bestDesign);
 		}
 		

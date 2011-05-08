@@ -21,6 +21,8 @@ public class ContextManager {
 	}
 	
 	static void register(Context context) {
+		System.out.println("New context, deleting old!");
+		registry.clear();
 		registry.put(context.getId(), context);
 	}
 }
