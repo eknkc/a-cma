@@ -18,11 +18,11 @@ import edu.atilim.acma.metrics.MetricTable;
 import edu.atilim.acma.ui.ConfigManager;
 import edu.atilim.acma.ui.ConfigManager.Action;
 import edu.atilim.acma.ui.ConfigManager.Metric;
+import edu.atilim.acma.util.ACMAUtil;
 
 public class WebService {
 	public String createContext() {
 		Context c = Context.create();
-		c.setDesign(new ZIPDesignReader("./data/benchmarks/mosaic.zip").read());
 		return c.getId().toString();
 	}
 	
@@ -38,6 +38,13 @@ public class WebService {
 		status.put("id", c.getId().toString());
 		status.put("state", c.getState().toString());
 		status.put("hasdesign", c.getDesign() != null);
+		
+		if (c.getDesign() != null) {
+			HashMap<String, Object> df = new HashMap<String, Object>();
+			df.put("types", c.getDesign().getTypes().size());
+			df.put("packages", c.getDesign().getPackages().size());
+			status.put("dinfo", df);
+		}
 		
 		return status;
 	}
@@ -75,6 +82,7 @@ public class WebService {
 		for (Action action : actions) {
 			Map<String, Object> aMap = new HashMap<String, Object>();
 			aMap.put("name", action.getName());
+			aMap.put("splitname", ACMAUtil.splitCamelCase(action.getName()));
 			aMap.put("enabled", action.isEnabled());
 			response.add(aMap);
 		}
@@ -85,6 +93,20 @@ public class WebService {
 	public boolean setActionEnabled(String context, String action, boolean value) throws XmlRpcException {
 		Context c = getContext(context);
 		c.getRunConfig().setActionEnabled(action, value);
+		return true;
+	}
+	
+	public boolean setActionsEnabled(String context, Map<String, Object> data) throws XmlRpcException {
+		Context c = getContext(context);
+		
+		for (String ac : data.keySet()) {
+			Object vl = data.get(ac);
+			
+			if (vl instanceof Boolean) {
+				c.getRunConfig().setActionEnabled(ac, ((Boolean)vl));
+			}
+		}
+		
 		return true;
 	}
 	
@@ -114,9 +136,23 @@ public class WebService {
 		return true;
 	}
 	
+	public boolean setMetricsEnabled(String context, Map<String, Object> data) throws XmlRpcException {
+		Context c = getContext(context);
+		
+		for (String ac : data.keySet()) {
+			Object vl = data.get(ac);
+			
+			if (vl instanceof Boolean) {
+				c.getRunConfig().setMetricEnabled(ac, ((Boolean)vl));
+			}
+		}
+		
+		return true;
+	}
+	
 	private Context getContext(String context) throws XmlRpcException {
 		Context c = ContextManager.getContext(context);
-		if (c == null) throw new XmlRpcException(1, "Context not found.");
+		if (c == null) throw new XmlRpcException(1, "Context not found. ID: " + context);
 		return c;
 	}
 }
