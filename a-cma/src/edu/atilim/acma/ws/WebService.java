@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.xmlrpc.XmlRpcException;
 
@@ -15,6 +16,7 @@ import edu.atilim.acma.design.Design;
 import edu.atilim.acma.design.io.ZIPDesignReader;
 import edu.atilim.acma.metrics.MetricCalculator;
 import edu.atilim.acma.metrics.MetricTable;
+import edu.atilim.acma.transition.TransitionManager;
 import edu.atilim.acma.ui.ConfigManager;
 import edu.atilim.acma.ui.ConfigManager.Action;
 import edu.atilim.acma.ui.ConfigManager.Metric;
@@ -76,6 +78,7 @@ public class WebService {
 	public List<Map<String, Object>> getActions(String context) throws XmlRpcException {
 		Context c = getContext(context);
 		
+		Set<edu.atilim.acma.transition.actions.Action> posActions = TransitionManager.getPossibleActions(c.getDesign());
 		List<Action> actions = ConfigManager.getActions(c.getRunConfig());
 		
 		List<Map<String, Object>> response = new ArrayList<Map<String,Object>>();
@@ -84,6 +87,14 @@ public class WebService {
 			aMap.put("name", action.getName());
 			aMap.put("splitname", ACMAUtil.splitCamelCase(action.getName()));
 			aMap.put("enabled", action.isEnabled());
+			
+			int count = 0;
+			for (edu.atilim.acma.transition.actions.Action a : posActions) {
+				if (a.getClass().getEnclosingClass().getSimpleName().equals(action.getName()))
+					count++;
+			}
+			aMap.put("applicible", count);
+			
 			response.add(aMap);
 		}
 		
@@ -96,15 +107,15 @@ public class WebService {
 		return true;
 	}
 	
-	public boolean setActionsEnabled(String context, Map<String, Object> data) throws XmlRpcException {
+	public boolean setActionsEnabled(String context, List<String> data) throws XmlRpcException {
 		Context c = getContext(context);
 		
-		for (String ac : data.keySet()) {
-			Object vl = data.get(ac);
-			
-			if (vl instanceof Boolean) {
-				c.getRunConfig().setActionEnabled(ac, ((Boolean)vl));
-			}
+		List<Action> actions = ConfigManager.getActions(c.getRunConfig());
+		for (Action a : actions) {
+			if (data.contains(a.getName()))
+				c.getRunConfig().setActionEnabled(a.getName(), true);
+			else
+				c.getRunConfig().setActionEnabled(a.getName(), false);
 		}
 		
 		return true;
@@ -136,15 +147,15 @@ public class WebService {
 		return true;
 	}
 	
-	public boolean setMetricsEnabled(String context, Map<String, Object> data) throws XmlRpcException {
+	public boolean setMetricsEnabled(String context, List<String> data) throws XmlRpcException {
 		Context c = getContext(context);
 		
-		for (String ac : data.keySet()) {
-			Object vl = data.get(ac);
-			
-			if (vl instanceof Boolean) {
-				c.getRunConfig().setMetricEnabled(ac, ((Boolean)vl));
-			}
+		List<Metric> metrics = ConfigManager.getMetrics(c.getRunConfig());
+		for (Metric m : metrics) {
+			if (data.contains(m.getName()))
+				c.getRunConfig().setMetricEnabled(m.getName(), true);
+			else
+				c.getRunConfig().setMetricEnabled(m.getName(), false);
 		}
 		
 		return true;
