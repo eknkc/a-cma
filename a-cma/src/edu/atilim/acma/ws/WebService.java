@@ -40,6 +40,7 @@ public class WebService {
 		status.put("id", c.getId().toString());
 		status.put("state", c.getState().toString());
 		status.put("hasdesign", c.getDesign() != null);
+		status.put("email", c.getEmail());
 		
 		if (c.getDesign() != null) {
 			HashMap<String, Object> df = new HashMap<String, Object>();
@@ -49,6 +50,17 @@ public class WebService {
 		}
 		
 		return status;
+	}
+	
+	public boolean setEmail(String context, String email) throws XmlRpcException {
+		Context c = getContext(context);
+		c.setEmail(email);
+		return true;
+	}
+	
+	// Refactoring
+	public boolean startRefactoring(String context, Map<String, Object> parameters) {
+		return false;
 	}
 	
 	// Design

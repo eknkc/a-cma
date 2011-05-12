@@ -15,6 +15,7 @@ public class Context implements Externalizable {
 	private Design design;
 	private RunConfig runConfig;
 	private ContextState state;
+	private String email;
 	
 	public UUID getId() {
 		return id;
@@ -36,6 +37,14 @@ public class Context implements Externalizable {
 		return state;
 	}
 	
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
 	public static Context create() {
 		Context context = new Context();
 		ContextManager.register(context);
@@ -53,6 +62,7 @@ public class Context implements Externalizable {
 		design = null;
 		runConfig = ConfigManager.getRunConfig("Default");
 		state = ContextState.WAITING;
+		email = "";
 	}
 	
 	@Override
