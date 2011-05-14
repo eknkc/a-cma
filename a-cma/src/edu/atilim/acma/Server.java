@@ -10,7 +10,6 @@ import edu.atilim.acma.concurrent.Instance;
 import edu.atilim.acma.concurrent.InstanceSet;
 import edu.atilim.acma.concurrent.SocketInstance;
 import edu.atilim.acma.concurrent.SocketInstance.Listener;
-import edu.atilim.acma.concurrent.TerminateTask;
 
 public class Server implements Runnable, ConnectionListener {
 	private int port;
@@ -22,9 +21,13 @@ public class Server implements Runnable, ConnectionListener {
 	private volatile boolean running = false;
 	
 	public Server(int port) {
+		this(port, -1);
+	}
+	
+	public Server(int port, int autostart) {
 		this.port = port;
 		this.instances = new InstanceSet();
-		this.autostart = -1;
+		this.autostart = autostart;
 	}
 	
 	@Override
@@ -32,7 +35,7 @@ public class Server implements Runnable, ConnectionListener {
 		boolean first = true;
 		while(true) {
 			try {
-				Server server = new Server(port);
+				Server server = new Server(port, autostart);
 				if (!first)
 					server.autostart = 30;
 				first = false;
@@ -103,15 +106,18 @@ public class Server implements Runnable, ConnectionListener {
 		listener.stop();
 		
 		running = true;
-		System.out.printf("[Server] There are %d tasks to be executed in queue.\n", TaskQueue.size());
 		
 		while (true) {
+			System.out.printf("[Server] There are %d tasks to be executed in queue.\n", TaskQueue.size());
+			
 			currentTask = TaskQueue.peek();
 			
 			if (currentTask == null) {
-				System.out.println("[Server] All tasks completed. Exiting in 15 seconds...");
-				try { Thread.sleep(15000); } catch (InterruptedException e) {}
-				run(new TerminateTask());
+				try {
+					Thread.sleep(5000);
+				} catch (InterruptedException e) {
+				}
+				continue;
 			}
 			
 			currentTask.clearInterrupt();

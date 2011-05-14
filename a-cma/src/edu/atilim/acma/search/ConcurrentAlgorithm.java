@@ -16,13 +16,30 @@ import edu.atilim.acma.concurrent.ConcurrentTask;
 import edu.atilim.acma.design.Design;
 
 public abstract class ConcurrentAlgorithm implements ConcurrentTask, Externalizable {
+	public static interface Listener {
+		public void onAlgorithmFinish(String name, SolutionDesign finalDesign);
+	}
+	
+	private static Listener listener;
 	private String name;
 	private RunConfig config;
 	private Design initialDesign;
 	private volatile boolean interrupted = false;
 	
+	public Listener getListener() {
+		return ConcurrentAlgorithm.listener;
+	}
+
+	public static void setListener(Listener listener) {
+		ConcurrentAlgorithm.listener = listener;
+	}
+
 	public String getName() {
 		return name;
+	}
+	
+	public void setName(String name) {
+		this.name = name;
 	}
 	
 	protected RunConfig getConfig() {
@@ -56,6 +73,11 @@ public abstract class ConcurrentAlgorithm implements ConcurrentTask, Externaliza
 	}
 	
 	protected synchronized void onFinish(Design fDesign) {
+		if (listener != null) {
+			listener.onAlgorithmFinish(name, new SolutionDesign(fDesign, config));
+			return;
+		}
+		
 		UUID id = UUID.randomUUID();
 		
 		String pathName = String.format("./data/results/%s/", getName().replace('/', '-'));

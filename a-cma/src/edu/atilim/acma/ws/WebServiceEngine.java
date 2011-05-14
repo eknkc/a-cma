@@ -115,6 +115,10 @@ public class WebServiceEngine implements Runnable {
 
 	@Override
 	public void run() {
+		ContextManager.initialize();
+		new Thread(new edu.atilim.acma.Server(8082, 15)).start();
+		new Thread(new edu.atilim.acma.Client("localhost", 8082)).start();
+		
 		try {
 			webServer.start();
 		} catch (Exception e) {

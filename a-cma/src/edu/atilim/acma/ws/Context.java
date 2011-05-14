@@ -13,6 +13,7 @@ import edu.atilim.acma.ui.ConfigManager;
 public class Context implements Externalizable {
 	private UUID id;
 	private Design design;
+	private Design finalDesign;
 	private RunConfig runConfig;
 	private ContextState state;
 	private String email;
@@ -25,8 +26,16 @@ public class Context implements Externalizable {
 		return design;
 	}
 	
+	public Design getFinalDesign() {
+		return finalDesign;
+	}
+	
 	public void setDesign(Design design) {
 		this.design = design;
+	}
+
+	void setFinalDesign(Design finalDesign) {
+		this.finalDesign = finalDesign;
 	}
 
 	public RunConfig getRunConfig() {
@@ -37,6 +46,10 @@ public class Context implements Externalizable {
 		return state;
 	}
 	
+	void setState(ContextState state) {
+		this.state = state;
+	}
+
 	public void setEmail(String email) {
 		this.email = email;
 	}
@@ -69,15 +82,19 @@ public class Context implements Externalizable {
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 		id = (UUID)in.readObject();
 		design = (Design)in.readObject();
+		finalDesign = (Design)in.readObject();
 		runConfig = (RunConfig)in.readObject();
 		state = (ContextState)in.readObject();
+		email = in.readUTF();
 	}
 	
 	@Override
 	public void writeExternal(ObjectOutput out) throws IOException {
 		out.writeObject(id);
 		out.writeObject(design);
+		out.writeObject(finalDesign);
 		out.writeObject(runConfig);
 		out.writeObject(state);
+		out.writeUTF(email);
 	}
 }

@@ -8,14 +8,22 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.xmlrpc.XmlRpcException;
 
 import edu.atilim.acma.design.Design;
 import edu.atilim.acma.design.io.ZIPDesignReader;
 import edu.atilim.acma.metrics.MetricCalculator;
+import edu.atilim.acma.metrics.MetricSummary;
 import edu.atilim.acma.metrics.MetricTable;
+import edu.atilim.acma.search.ConcurrentAlgorithm;
+import edu.atilim.acma.search.ConcurrentParallelBeeColony;
+import edu.atilim.acma.search.RunInfoTag;
+import edu.atilim.acma.search.SolutionDesign;
 import edu.atilim.acma.transition.TransitionManager;
 import edu.atilim.acma.ui.ConfigManager;
 import edu.atilim.acma.ui.ConfigManager.Action;
@@ -59,8 +67,92 @@ public class WebService {
 	}
 	
 	// Refactoring
-	public boolean startRefactoring(String context, Map<String, Object> parameters) {
-		return false;
+	public boolean startRefactoring(String context, Map<String, Object> parameters) throws XmlRpcException {
+		Context c = getContext(context);
+		
+		if (!parameters.containsKey("algorithm"))
+			return false;
+		
+		ConcurrentAlgorithm task = null;
+		Object algorithm = parameters.get("algorithm");
+		
+		if ("ABC".equals(algorithm)) {
+			int population = (Integer)parameters.get("population");
+			int iterations = (Integer)parameters.get("iterations");
+			
+			task = new ConcurrentParallelBeeColony(context, c.getRunConfig(), c.getDesign(), 100, population, iterations, 1);
+		}
+		
+		if (task == null)
+			return false;
+		
+		ContextManager.startAlgorithm(c, task);
+		return true;
+	}
+	
+	public Map<String, Object> getResult(String context) throws XmlRpcException {
+		Context c = getContext(context);
+		
+		HashMap<String, Object> result = new HashMap<String, Object>();
+		
+		Object tag = c.getFinalDesign().getTag();
+		if (tag instanceof RunInfoTag) {
+			RunInfoTag rtag = (RunInfoTag)tag;
+			
+			result.put("timetakenms", (int)rtag.getRunDuration());
+			result.put("nodeexpansion", (int)rtag.getExpansionCount());
+			result.put("runinfo", rtag.getRunInfo());
+		}
+		
+		SolutionDesign id = new SolutionDesign(c.getDesign(), c.getRunConfig());
+		SolutionDesign fd = new SolutionDesign(c.getFinalDesign(), c.getRunConfig());
+		
+		result.put("initial", GetDesignInfo(id));
+		result.put("final", GetDesignInfo(fd));
+		
+		return result;
+	}
+	
+	private static Map<String, Object> GetDesignInfo(SolutionDesign design) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		
+		result.put("metrics", GetMetricInfo(design));
+		result.put("score", design.getScore());
+		result.put("numpossibleactions", design.getAllActions().size());
+		result.put("numappliedactions", design.getDesign().getModifications().size());
+		result.put("appliedactions", GetAppliedActionsInfo(design));
+		
+		return result;
+	}
+	
+	private static Map<String, Object> GetMetricInfo(SolutionDesign design) {
+		Map<String, Object> result = new HashMap<String, Object>();
+		
+		MetricSummary summary = design.getMetricSummary();
+		for (Entry<String, Double> me : summary.getMetrics().entrySet()) {
+			result.put(me.getKey(), me.getValue());
+		}
+		
+		return result;
+	}
+	
+	private static List<Object> GetAppliedActionsInfo(SolutionDesign design) {
+		List<Object> result = new ArrayList<Object>();
+		Pattern re = Pattern.compile("\\[([0-9.,]*)\\]\\[([A-z ]*)\\](.*)");
+		
+		for (String mod : design.getDesign().getModifications()) {
+			Matcher m = re.matcher(mod);
+			
+			if (m.find()) {
+				double score = Double.parseDouble(m.group(1).replace(',', '.'));
+				String action = m.group(2);
+				String description = m.group(3).trim();
+				
+				result.add(new Object[] { score, action, description });
+			}
+		}
+		
+		return result;
 	}
 	
 	// Design
