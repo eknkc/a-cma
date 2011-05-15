@@ -7,6 +7,7 @@ import java.util.UUID;
 import edu.atilim.acma.TaskQueue;
 import edu.atilim.acma.search.ConcurrentAlgorithm;
 import edu.atilim.acma.search.SolutionDesign;
+import edu.atilim.acma.util.ACMAUtil;
 
 public class ContextManager {
 	private static Map<UUID, Context> registry = new HashMap<UUID, Context>();
@@ -51,6 +52,14 @@ public class ContextManager {
 			if (context != null) {
 				context.setFinalDesign(finalDesign.getDesign());
 				context.setState(ContextState.FINISHED);
+				
+				String email = context.getEmail();
+				if (email != null && email.trim().length() != 0) {
+					String message = "Hello,\r\nYour refactoring request on A-CMA has been completed. Please collect your results using the link below:\r\nhttp://online.a-cma.com/?cid=" + name + "\r\n\r\nThank you.";
+					String subject = "Refactoring Completed";
+					
+					ACMAUtil.sendMail(email, subject, message);
+				}
 			}
 		}
 	}

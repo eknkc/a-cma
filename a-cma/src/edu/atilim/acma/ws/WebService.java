@@ -21,6 +21,8 @@ import edu.atilim.acma.metrics.MetricCalculator;
 import edu.atilim.acma.metrics.MetricSummary;
 import edu.atilim.acma.metrics.MetricTable;
 import edu.atilim.acma.search.ConcurrentAlgorithm;
+import edu.atilim.acma.search.ConcurrentBeamSearch;
+import edu.atilim.acma.search.ConcurrentHillClimbing;
 import edu.atilim.acma.search.ConcurrentParallelBeeColony;
 import edu.atilim.acma.search.RunInfoTag;
 import edu.atilim.acma.search.SolutionDesign;
@@ -81,6 +83,17 @@ public class WebService {
 			int iterations = (Integer)parameters.get("iterations");
 			
 			task = new ConcurrentParallelBeeColony(context, c.getRunConfig(), c.getDesign(), 100, population, iterations, 1);
+		} else if ("MSD".equals(algorithm)) {
+			int randomRestarts = (Integer)parameters.get("randomRestarts");
+			int restartDepth = (Integer)parameters.get("restartDepth");
+			
+			task = new ConcurrentHillClimbing(context, c.getRunConfig(), c.getDesign(), randomRestarts, restartDepth, 1);
+		} else if ("LBS".equals(algorithm)) {
+			int population = (Integer)parameters.get("population");
+			int randomDepth = (Integer)parameters.get("randomDepth");
+			int iterations = (Integer)parameters.get("iterations");
+			
+			task = new ConcurrentBeamSearch(context, c.getRunConfig(), c.getDesign(), population, randomDepth, iterations, 1);
 		}
 		
 		if (task == null)
