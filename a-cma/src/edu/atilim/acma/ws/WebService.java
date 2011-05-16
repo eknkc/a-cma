@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +60,17 @@ public class WebService {
 			status.put("dinfo", df);
 		}
 		
+		List<Map<String, Object>> requests = new ArrayList<Map<String,Object>>();
+		for (RunRequest req : c.requests()) {
+			Map<String, Object> request = new HashMap<String, Object>();
+			request.put("id", req.getId().toString());
+			request.put("date", DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(req.getDate()));
+			request.put("name", req.getName());
+			request.put("state", req.getState().toString());
+			requests.add(request);
+		}
+		status.put("runs", requests);
+		
 		return status;
 	}
 	
@@ -75,6 +87,7 @@ public class WebService {
 		if (!parameters.containsKey("algorithm"))
 			return false;
 		
+		String name = null;
 		ConcurrentAlgorithm task = null;
 		Object algorithm = parameters.get("algorithm");
 		
@@ -83,32 +96,41 @@ public class WebService {
 			int iterations = (Integer)parameters.get("iterations");
 			
 			task = new ConcurrentParallelBeeColony(context, c.getRunConfig(), c.getDesign(), 100, population, iterations, 1);
+			name = String.format("Artificial Bee Colony [%d Food Sources] [%d Iterations]", population, iterations);
 		} else if ("MSD".equals(algorithm)) {
 			int randomRestarts = (Integer)parameters.get("randomRestarts");
 			int restartDepth = (Integer)parameters.get("restartDepth");
 			
 			task = new ConcurrentHillClimbing(context, c.getRunConfig(), c.getDesign(), randomRestarts, restartDepth, 1);
+			name = String.format("Multiple Steepest Descent [%d Restarts] [%d Depth]", randomRestarts, restartDepth);
 		} else if ("LBS".equals(algorithm)) {
 			int population = (Integer)parameters.get("population");
 			int randomDepth = (Integer)parameters.get("randomDepth");
 			int iterations = (Integer)parameters.get("iterations");
 			
 			task = new ConcurrentBeamSearch(context, c.getRunConfig(), c.getDesign(), population, randomDepth, iterations, 1);
+			name = String.format("Local Beam Search [%d Population] [%d Depth] [%d Iterations]", population, randomDepth, iterations);
 		}
 		
 		if (task == null)
 			return false;
 		
-		ContextManager.startAlgorithm(c, task);
+		c.setState(ContextState.READY);
+		
+		c.addRequest(new RunRequest(c, name, task));
 		return true;
 	}
 	
-	public Map<String, Object> getResult(String context) throws XmlRpcException {
+	public Map<String, Object> getResult(String context, String run) throws XmlRpcException {
 		Context c = getContext(context);
+		RunRequest r = c.getRequest(run);
+		
+		if (r == null) throw new XmlRpcException(110, "Run request could not be found");
+		if (r.getFinalDesign() == null)  throw new XmlRpcException(111, "Run is not finished yet");
 		
 		HashMap<String, Object> result = new HashMap<String, Object>();
 		
-		Object tag = c.getFinalDesign().getTag();
+		Object tag = r.getFinalDesign().getTag();
 		if (tag instanceof RunInfoTag) {
 			RunInfoTag rtag = (RunInfoTag)tag;
 			
@@ -118,7 +140,7 @@ public class WebService {
 		}
 		
 		SolutionDesign id = new SolutionDesign(c.getDesign(), c.getRunConfig());
-		SolutionDesign fd = new SolutionDesign(c.getFinalDesign(), c.getRunConfig());
+		SolutionDesign fd = new SolutionDesign(r.getFinalDesign(), c.getRunConfig());
 		
 		result.put("initial", GetDesignInfo(id));
 		result.put("final", GetDesignInfo(fd));

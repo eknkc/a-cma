@@ -4,10 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import edu.atilim.acma.TaskQueue;
 import edu.atilim.acma.search.ConcurrentAlgorithm;
 import edu.atilim.acma.search.SolutionDesign;
 import edu.atilim.acma.util.ACMAUtil;
+import edu.atilim.acma.ws.RunRequest.State;
 
 public class ContextManager {
 	private static Map<UUID, Context> registry = new HashMap<UUID, Context>();
@@ -37,30 +37,31 @@ public class ContextManager {
 		ConcurrentAlgorithm.setListener(new FinishListener());
 	}
 	
-	public static void startAlgorithm(Context context, ConcurrentAlgorithm algorithm) {
-		context.setState(ContextState.RUNNING);
-		
-		algorithm.setName(context.getId().toString());
-		TaskQueue.push(algorithm);
-	}
-	
 	private static class FinishListener implements ConcurrentAlgorithm.Listener {
 		@Override
 		public void onAlgorithmFinish(String name, SolutionDesign finalDesign) {
-			Context context = getContext(name);
+			String cname = name.split("\\|")[0];
+			String rname = name.split("\\|")[1];
+			
+			Context context = getContext(cname);
 			
 			if (context != null) {
-				context.setFinalDesign(finalDesign.getDesign());
-				context.setState(ContextState.FINISHED);
+				RunRequest req = context.getRequest(rname);
+				
+				if (req == null) return;
+				
+				req.setState(State.COMPLETED);
+				req.setFinalDesign(finalDesign.getDesign());
 				
 				String email = context.getEmail();
 				if (email != null && email.trim().length() != 0) {
-					String message = "Hello,\r\nYour refactoring request on A-CMA has been completed. Please collect your results using the link below:\r\nhttp://online.a-cma.com/?cid=" + name + "\r\n\r\nThank you.";
+					String message = "Hello,\r\nYour refactoring request on A-CMA has been completed. Please collect your results using the link below:\r\nhttp://online.a-cma.com/?cid=" + cname + "&rid=" + rname + "\r\n\r\nThank you.";
 					String subject = "Refactoring Completed";
 					
 					ACMAUtil.sendMail(email, subject, message);
 				}
 			}
+			
 		}
 	}
 }
