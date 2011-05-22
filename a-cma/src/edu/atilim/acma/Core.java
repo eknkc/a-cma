@@ -35,6 +35,10 @@ public class Core {
 			} else if (args[0].equals("-ne")) {
 				runner = new NodeXPCalculator();
 			} else if (args[0].equals("-ws")) {
+				int port = -1;
+				try { port = Integer.parseInt(args[1]); } catch(Exception e) { }
+				if (port > 0) WebServiceEngine.port = port;
+				
 				runner = WebServiceEngine.getInstance();
 			}
 			

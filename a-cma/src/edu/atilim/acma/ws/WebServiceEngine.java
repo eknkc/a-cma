@@ -26,6 +26,7 @@ import edu.atilim.acma.design.io.ZIPDesignReader;
 
 public class WebServiceEngine implements Runnable {
 	private static WebServiceEngine instance;
+	public static int port = 8081;
 	
 	public static WebServiceEngine getInstance() {
 		if (instance == null) {
@@ -42,7 +43,7 @@ public class WebServiceEngine implements Runnable {
 	Server webServer;
 	
 	private WebServiceEngine() throws Exception {
-		initialize(8081);
+		initialize(port);
 	}
 	
 	private void initialize(int port) throws Exception {
@@ -116,8 +117,8 @@ public class WebServiceEngine implements Runnable {
 	@Override
 	public void run() {
 		ContextManager.initialize();
-		new Thread(new edu.atilim.acma.Server(8082, 15)).start();
-		new Thread(new edu.atilim.acma.Client("localhost", 8082)).start();
+		new Thread(new edu.atilim.acma.Server(4501, 15)).start();
+		new Thread(new edu.atilim.acma.Client("localhost", 4501)).start();
 		
 		try {
 			webServer.start();

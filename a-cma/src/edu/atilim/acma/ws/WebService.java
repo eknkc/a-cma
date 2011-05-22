@@ -25,6 +25,7 @@ import edu.atilim.acma.search.ConcurrentAlgorithm;
 import edu.atilim.acma.search.ConcurrentBeamSearch;
 import edu.atilim.acma.search.ConcurrentHillClimbing;
 import edu.atilim.acma.search.ConcurrentParallelBeeColony;
+import edu.atilim.acma.search.ConcurrentStochasticBeamSearch;
 import edu.atilim.acma.search.RunInfoTag;
 import edu.atilim.acma.search.SolutionDesign;
 import edu.atilim.acma.transition.TransitionManager;
@@ -110,6 +111,13 @@ public class WebService {
 			
 			task = new ConcurrentBeamSearch(context, c.getRunConfig(), c.getDesign(), population, randomDepth, iterations, 1);
 			name = String.format("Local Beam Search [%d Population] [%d Depth] [%d Iterations]", population, randomDepth, iterations);
+		} else if ("SBS".equals(algorithm)) {
+			int population = (Integer)parameters.get("population");
+			int randomDepth = (Integer)parameters.get("randomDepth");
+			int iterations = (Integer)parameters.get("iterations");
+			
+			task = new ConcurrentStochasticBeamSearch(context, c.getRunConfig(), c.getDesign(), population, randomDepth, iterations, 1);
+			name = String.format("Stochastic Beam Search [%d Population] [%d Depth] [%d Iterations]", population, randomDepth, iterations);
 		}
 		
 		if (task == null)
