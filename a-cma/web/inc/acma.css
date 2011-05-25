@@ -1,0 +1,155 @@
+body {
+	background: #0c2335 url(images/bg_gradient.png) repeat-x;
+	font-family: arial, sans-serif; font-size:12px; color:#101010;
+}
+
+a, a:hover, a:visited{
+	color:inherit;
+	text-decoration: none;
+}
+
+#container {
+	position: absolute;
+	top: 5px;
+	bottom: 2px;
+	width: 800px;
+	left: 50%;
+	margin-left: -400px;
+}
+
+#container h1 {
+	font-size:36px;
+	color: #DDDDDD;
+	font-weight: bold;
+	margin: 0;
+	padding: 0;
+	line-height: 44px;
+	float: left;
+}
+
+#container #navigation {
+	border-bottom: 5px solid #00b6e4;
+	text-align: right;
+	height: 40px;
+	margin: 0px;
+	padding-top: 4px;
+}
+
+#container #navigation li {
+	list-style-type: none;
+	display: inline;
+	padding: 5px 10px 22px 10px !important;
+	line-height: 22px;
+	font-weight: bold;
+	color: white;
+	background: #0083a4;
+	cursor: pointer;
+	margin: 0 !important;
+}
+
+#container #navigation li.active {
+	background: #00b6e4;
+}
+
+#container #navigation li a, #container #navigation li a:hover, #container #navigation li a:visited{
+	color:#EFEFEF;
+	text-decoration: none;
+}
+
+#content {
+	background: #ffffff url(images/content_gradient.png) repeat-x;
+	border-bottom: 1px solid #000000;
+	padding: 5px;
+}
+
+#container h2 {
+	margin: 0;
+	border-top: 1px solid #000000;
+	border-bottom: 1px solid #ffffff;
+	display: block;
+	background-image: url(images/headbg.jpg);
+	height: 97px;
+	line-height: 97px;
+	font-size:30px;
+	font-weight: bold;
+	color: #EFEFEF;
+	text-align: right;
+	padding: 0 10px;
+}
+
+#content h4, #content h3 {
+	margin: 2px 0 5px 0;
+	padding: 4px 10px;
+	border-bottom: 1px solid black;
+}
+
+#content p {
+	margin: 5px 0;
+	padding: 4px 10px;
+	text-align: justify;
+}
+
+#footbuttons {
+	margin-top: 2px;
+}
+
+table.datatable {
+	border-spacing: 1px;
+	padding: 5px;
+	width: 100%;
+}
+
+table.datatable th {
+	padding: 5px;
+	background-color: #CCCCCC;
+}
+
+table.datatable td {
+	padding: 5px;
+	font-weight: normal !important;
+}
+
+table.datatable tr, table.datatable td.alt1 {
+	background-color: #EEEEEE;
+}
+
+table.datatable td.alt2{
+	background-color: #FEFEFE;
+}
+
+form, input {
+	margin: 0;
+	padding: 5;
+}
+
+.align-right {
+	text-align: right;
+}
+
+.align-center {
+	text-align: center;
+}
+
+.width-full {
+	width: 100% !important;
+}
+
+.width-half {
+	width: 50% !important;
+}
+
+.width-3quarters {
+	width: 75% !important;
+}
+
+.width-quarter {
+	width: 25% !important;
+}
+
+.run-running {
+	background: #CBE0F7 !important;
+}
+
+.run-completed {
+	background: #CFF7CB !important;
+}
