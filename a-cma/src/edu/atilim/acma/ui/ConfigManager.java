@@ -109,6 +109,14 @@ public final class ConfigManager {
 			config.setActionEnabled(name, enabled);
 		}
 		
+		public double getWeight() {
+			return config.getActionWeight(name);
+		}
+		
+		public void setWeight(double weight) {
+			config.setActionWeight(name, weight);
+		}
+		
 		public String getName() {
 			return name;
 		}

@@ -59,12 +59,28 @@ class Acma {
 		return $this->request("acma.setActionsEnabled", array(XMLRPC_prepare($this->context), XMLRPC_prepare($actions, 'array')));
 	}
 	
+	public function setActionWeight($name, $weight = 1.0) {
+		return $this->request("acma.setActionWeight", array(XMLRPC_prepare($this->context), XMLRPC_prepare($name), XMLRPC_prepare((double)$weight)));
+	}
+	
+	public function setActionsWeight($data) {
+		return $this->request("acma.setActionsWeight", array(XMLRPC_prepare($this->context), XMLRPC_prepare($data, 'struct')));
+	}
+	
 	public function setMetricEnabled($name, $enabled = true) {
 		return $this->request("acma.setMetricEnabled", array(XMLRPC_prepare($this->context), XMLRPC_prepare($name), XMLRPC_prepare((bool)$enabled)));
 	}
 	
 	public function setMetricsEnabled($metrics) {
 		return $this->request("acma.setMetricsEnabled", array(XMLRPC_prepare($this->context), XMLRPC_prepare($metrics, 'array')));
+	}
+	
+	public function setMetricWeight($name, $weight = 1.0) {
+		return $this->request("acma.setMetricWeight", array(XMLRPC_prepare($this->context), XMLRPC_prepare($name), XMLRPC_prepare((double)$weight)));
+	}
+	
+	public function setMetricsWeight($data) {
+		return $this->request("acma.setMetricsWeight", array(XMLRPC_prepare($this->context), XMLRPC_prepare($data, 'struct')));
 	}
 	
 	public function putDesign($file) {

@@ -26,6 +26,8 @@ public class ConcurrentParallelBeeColony extends ConcurrentAlgorithm {
 	private int iterations;
 	private int runCount;
 	
+	private transient int exhaust = 0;
+	
 	public ConcurrentParallelBeeColony() {
 	}
 
@@ -42,6 +44,7 @@ public class ConcurrentParallelBeeColony extends ConcurrentAlgorithm {
 	public void runMaster(InstanceSet instances) {
 		for (int run = 0; run < runCount; run++) {
 			long startTime = System.currentTimeMillis();
+			exhaust = 0;
 			
 			instances.broadcast(COMMAND_RESETEXPANSION);
 			
@@ -69,10 +72,16 @@ public class ConcurrentParallelBeeColony extends ConcurrentAlgorithm {
 				for (Instance instance : instances) {
 					SolutionDesign cur = new SolutionDesign(instance.receive(Design.class), getConfig());
 					
-					if (best == null || cur.isBetterThan(best))
+					if (best == null || cur.isBetterThan(best)) {
 						best = cur;
+						exhaust = 0;
+					} else
+						exhaust++;
 				}
 				instances.broadcast(best.getDesign());
+				
+				if (iterations == Integer.MAX_VALUE && exhaust > 750)
+					break;
 			}
 						
 			System.out.printf("Finished %d iterations. Found best design with score: %.6f.\n", iterations, best.getScore());

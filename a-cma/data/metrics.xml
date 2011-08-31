@@ -6,8 +6,8 @@
 		<metric name="numConstants" weight="1.0"></metric>
 		<metric name="numOps" weight="1.0" minimize="true"></metric>
 		<metric name="avrgMethodVisibility" weight="1.0" minimize="true"></metric>
-		<metric name="setters" weight="0.5"></metric>
-		<metric name="getters" weight="0.5"></metric>
+		<metric name="setters" weight="1.0"></metric>
+		<metric name="getters" weight="1.0"></metric>
 		<metric name="staticness" weight="1.0"></metric>
 	</category>
 	<category name="miscellaneous" class="MiscMetrics">

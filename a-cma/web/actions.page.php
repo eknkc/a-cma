@@ -4,6 +4,17 @@ if ($_POST['do'] && $_POST['do'] == 'Save') {
 	if (is_array($actions)) {
 		$acma->setActionsEnabled($actions);
 	}
+	
+	$weights = array();
+	foreach ($_POST as $key => $value) {
+		if (substr($key, 0, 7) == 'weight_') {
+			$action = substr($key, 7);
+			$weight = $value;
+			
+			$weights[$action] = $weight;
+		}
+	}
+	$acma->setActionsWeight($weights);
 }
 
 if ($_POST['do'] && $_POST['do'] == 'Previous') {
@@ -51,6 +62,7 @@ $descriptions = array(	'Introduce Factory' => 'Change the security of the constr
 				<th width="5%"><img src="inc/images/info.png" /></th>
 				<th width="10%">Enabled</th>
 				<th>Name</th>
+				<th>Weight</th>
 				<th width="15%">Applicible</th>
 			</tr>
 			<tr>
@@ -68,6 +80,16 @@ $descriptions = array(	'Introduce Factory' => 'Change the security of the constr
 							echo '<td class="align-center"><input type="checkbox" name="actions[]" value="' .$action['name'] . '"/></td>';
 							
 						echo "<td>".$action['splitname']."</td>";
+						
+						echo '<td class="align-center">';
+						echo '<select name="weight_' . $action['name'] . '">';
+						for ($w = 0; $w < 10; $w+= 0.25) {
+							$sel = $action['weight'] == $w ? ' selected' : '';
+							echo '<option value="' . $w . '"' . $sel . '>' . number_format($w, 2) . '</option>';
+						}
+						echo '</select>';
+						echo '</td>';
+						
 						echo '<td class="align-center">'.$action['applicible'].'</td>';
 					echo "</tr>";
 				}

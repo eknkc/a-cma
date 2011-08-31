@@ -76,13 +76,16 @@ public class MainWindowBase extends JFrame {
 		GroupLayout gl_leftPanel = new GroupLayout(leftPanel);
 		gl_leftPanel.setHorizontalGroup(
 			gl_leftPanel.createParallelGroup(Alignment.LEADING)
-				.addComponent(tasksPanel, GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
-				.addComponent(loadedDesigns, Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 237, Short.MAX_VALUE)
+				.addGroup(gl_leftPanel.createSequentialGroup()
+					.addGroup(gl_leftPanel.createParallelGroup(Alignment.TRAILING, false)
+						.addComponent(loadedDesigns, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+						.addComponent(tasksPanel, Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE))
+					.addGap(18))
 		);
 		gl_leftPanel.setVerticalGroup(
 			gl_leftPanel.createParallelGroup(Alignment.TRAILING)
 				.addGroup(gl_leftPanel.createSequentialGroup()
-					.addComponent(loadedDesigns, GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE)
+					.addComponent(loadedDesigns, GroupLayout.DEFAULT_SIZE, 479, Short.MAX_VALUE)
 					.addPreferredGap(ComponentPlacement.RELATED)
 					.addComponent(tasksPanel, GroupLayout.PREFERRED_SIZE, 186, GroupLayout.PREFERRED_SIZE))
 		);
@@ -94,14 +97,14 @@ public class MainWindowBase extends JFrame {
 		gl_mainPanel.setHorizontalGroup(
 			gl_mainPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_mainPanel.createSequentialGroup()
-					.addComponent(leftPanel, GroupLayout.PREFERRED_SIZE, 356, GroupLayout.PREFERRED_SIZE)
+					.addComponent(leftPanel, GroupLayout.PREFERRED_SIZE, 260, GroupLayout.PREFERRED_SIZE)
 					.addPreferredGap(ComponentPlacement.RELATED)
-					.addComponent(rightPanel, GroupLayout.DEFAULT_SIZE, 675, Short.MAX_VALUE))
+					.addComponent(rightPanel, GroupLayout.DEFAULT_SIZE, 918, Short.MAX_VALUE))
 		);
 		gl_mainPanel.setVerticalGroup(
 			gl_mainPanel.createParallelGroup(Alignment.LEADING)
-				.addComponent(leftPanel, GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
-				.addComponent(rightPanel, GroupLayout.DEFAULT_SIZE, 582, Short.MAX_VALUE)
+				.addComponent(leftPanel, GroupLayout.DEFAULT_SIZE, 681, Short.MAX_VALUE)
+				.addComponent(rightPanel, GroupLayout.DEFAULT_SIZE, 681, Short.MAX_VALUE)
 		);
 		rightPanel.setLayout(new BorderLayout(0, 0));
 		

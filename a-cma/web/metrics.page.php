@@ -4,6 +4,17 @@ if ($_POST['do'] && $_POST['do'] == 'Save') {
 	if (is_array($metrics)) {
 		$acma->setMetricsEnabled($metrics);
 	}
+	
+	$weights = array();
+	foreach ($_POST as $key => $value) {
+		if (substr($key, 0, 7) == 'weight_') {
+			$metric = substr($key, 7);
+			$weight = $value;
+			
+			$weights[$metric] = $weight;
+		}
+	}
+	$acma->setMetricsWeight($weights);
 }
 
 if ($_POST['do'] && $_POST['do'] == 'Previous') {
@@ -57,6 +68,7 @@ $descriptions = array(	'avrgFieldVisibility' => 'The average number of the field
 				<th width="5%"><img src="inc/images/info.png" /></th>
 				<th width="10%">Enabled</th>
 				<th>Name</th>
+				<th>Weight</th>
 				<th>Value</th>
 				<th>Category</th>
 				<th>Domain</th>
@@ -77,6 +89,16 @@ $descriptions = array(	'avrgFieldVisibility' => 'The average number of the field
 							echo '<td class="align-center"><input type="checkbox" name="metrics[]" value="' .$metric['name'] . '"/></td>';
 							
 						echo '<td>'.$metric['name']."</td>";
+						
+						echo '<td class="align-center">';
+						echo '<select name="weight_' .$metric['name'] . '">';
+						for ($w = 0; $w < 10; $w+= 0.25) {
+							$sel = $metric['weight'] == $w ? ' selected' : '';
+							echo '<option value="' . $w . '"' . $sel . '>' . number_format($w, 2) . '</option>';
+						}
+						echo '</select>';
+						echo '</td>';
+						
 						echo '<td class="align-center">'.number_format($metric['value'], 3)."</td>";
 						
 						if($metric['minimized'])

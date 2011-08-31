@@ -28,7 +28,7 @@ if ($_GET['cid']) {
 // Create xml rpc service
 require_once('acma.php');
 try {
-	$acma = new Acma("localhost:8080", $cid);
+	$acma = new Acma("localhost:8081", $cid);
 	$acmaStatus = $acma->getStatus(); // Store status for future use
 	$_SESSION['contextId'] = $acma->getContext();
 	

@@ -16,6 +16,8 @@ public class Core {
 	public static boolean paretoMode = false;
 
 	public static void main(String[] args) throws IOException {
+		System.out.println(Integer.MAX_VALUE);
+		
 		System.out.printf("A-CMA Software Refactoring Tool - version %s\n\n", VERSION);
 		
 		if (args.length > 0) {

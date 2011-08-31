@@ -97,7 +97,7 @@ if ($_POST['algorithm'] && $_POST['algorithm'] == 'Start SBS') {
 					</tr>
 					<tr>
 						<th class="align-right width-half">Iterations:</th>
-						<td><select name="abciterations"><option selected>100</option><option>2500</option><option>5000</option><option>7500</option></td>	
+						<td><select name="abciterations"><option selected>100</option><option>2500</option><option>5000</option><option>7500</option><option value="2147483647">Exhaust Search Space</option></td>	
 					</tr>				
 					<tr>
 						<td colspan="2" class="align-center"><input type="submit" name="algorithm" value="Start ABC"></td>	
@@ -117,7 +117,7 @@ if ($_POST['algorithm'] && $_POST['algorithm'] == 'Start SBS') {
 					</tr>
 					<tr>
 						<th class="align-right width-half">Iterations:</th>
-						<td><select name="lbsiterations"><option selected>100</option><option>250</option><option>500</option><option>750</option><option>1000</option></td>	
+						<td><select name="lbsiterations"><option selected>100</option><option>250</option><option>500</option><option>750</option><option>1000</option><option value="2147483647">Exhaust Search Space</option></td>	
 					</tr>						
 					<tr>
 						<td colspan="2" class="align-center"><input type="submit" name="algorithm" value="Start LBS"></td>	

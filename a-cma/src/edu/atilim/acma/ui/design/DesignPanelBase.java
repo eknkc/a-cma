@@ -361,14 +361,14 @@ public class DesignPanelBase extends JPanel {
 		algorithmsTabPane.addTab("Beam Search", null, beamSearchPanel, null);
 		beamSearchPanel.setLayout(new BoxLayout(beamSearchPanel, BoxLayout.X_AXIS));
 		
-		bsIsStochastic = new JCheckBox("Stochastic");
+		bsIsStochastic = new JCheckBox("S");
 		bsIsStochastic.setOpaque(false);
 		beamSearchPanel.add(bsIsStochastic);
 		
 		hs100 = Box.createHorizontalStrut(5);
 		beamSearchPanel.add(hs100);
 		
-		lblBeamLength = new JLabel("Beam Length:");
+		lblBeamLength = new JLabel("Beam:");
 		beamSearchPanel.add(lblBeamLength);
 		
 		hs5 = Box.createHorizontalStrut(5);
@@ -381,7 +381,7 @@ public class DesignPanelBase extends JPanel {
 		hs7 = Box.createHorizontalStrut(5);
 		beamSearchPanel.add(hs7);
 		
-		lblRandomizationDepth = new JLabel("Randomization Depth:");
+		lblRandomizationDepth = new JLabel("Depth:");
 		beamSearchPanel.add(lblRandomizationDepth);
 		
 		hs9 = Box.createHorizontalStrut(5);
@@ -447,14 +447,14 @@ public class DesignPanelBase extends JPanel {
 		algorithmsTabPane.addTab("Artificial Bee Colony", null, beeColonyPanel, null);
 		beeColonyPanel.setLayout(new BoxLayout(beeColonyPanel, BoxLayout.X_AXIS));
 		
-		abcParallel = new JCheckBox("Parallel");
+		abcParallel = new JCheckBox("P");
 		abcParallel.setOpaque(false);
 		beeColonyPanel.add(abcParallel);
 		
 		horizontalStrut_2 = Box.createHorizontalStrut(5);
 		beeColonyPanel.add(horizontalStrut_2);
 		
-		lblPopulationSize = new JLabel("Population Size:");
+		lblPopulationSize = new JLabel("Pop:");
 		beeColonyPanel.add(lblPopulationSize);
 		
 		hs10 = Box.createHorizontalStrut(5);
@@ -467,7 +467,7 @@ public class DesignPanelBase extends JPanel {
 		hs11 = Box.createHorizontalStrut(5);
 		beeColonyPanel.add(hs11);
 		
-		lblMaximumTrials = new JLabel("Maximum Trials:");
+		lblMaximumTrials = new JLabel("Trials:");
 		beeColonyPanel.add(lblMaximumTrials);
 		
 		hs12 = Box.createHorizontalStrut(5);
@@ -480,7 +480,7 @@ public class DesignPanelBase extends JPanel {
 		hs13 = Box.createHorizontalStrut(5);
 		beeColonyPanel.add(hs13);
 		
-		lblIterations_1 = new JLabel("Iterations:");
+		lblIterations_1 = new JLabel("Iter:");
 		beeColonyPanel.add(lblIterations_1);
 		
 		hs14 = Box.createHorizontalStrut(5);

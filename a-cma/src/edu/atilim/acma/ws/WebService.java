@@ -234,6 +234,7 @@ public class WebService {
 			aMap.put("name", action.getName());
 			aMap.put("splitname", ACMAUtil.splitCamelCase(action.getName()));
 			aMap.put("enabled", action.isEnabled());
+			aMap.put("weight", action.getWeight());
 			
 			int count = 0;
 			for (edu.atilim.acma.transition.actions.Action a : posActions) {
@@ -268,6 +269,20 @@ public class WebService {
 		return true;
 	}
 	
+	public boolean setActionWeight(String context, String action, double weight) throws XmlRpcException {
+		Context c = getContext(context);
+		c.getRunConfig().setActionWeight(action, weight);
+		return true;
+	}
+	
+	public boolean setActionsWeight(String context, Map<String, Object> data) throws XmlRpcException {
+		Context c = getContext(context);
+		for(Entry<String, Object> e : data.entrySet()) {
+			c.getRunConfig().setActionWeight(e.getKey(), Double.parseDouble(e.getValue().toString()));
+		}
+		return true;
+	}
+	
 	public List<Map<String, Object>> getMetrics(String context) throws XmlRpcException {
 		Context c = getContext(context);
 		
@@ -282,6 +297,7 @@ public class WebService {
 			aMap.put("package", metric.isPackageMetric());
 			aMap.put("minimized", metric.isMinimized());
 			aMap.put("value", values.getAverage(metric.getName()));
+			aMap.put("weight", metric.getWeight());
 			response.add(aMap);
 		}
 		
@@ -305,6 +321,20 @@ public class WebService {
 				c.getRunConfig().setMetricEnabled(m.getName(), false);
 		}
 		
+		return true;
+	}
+	
+	public boolean setMetricWeight(String context, String metric, double weight) throws XmlRpcException {
+		Context c = getContext(context);
+		c.getRunConfig().setMetricWeight(metric, weight);
+		return true;
+	}
+	
+	public boolean setMetricsWeight(String context, Map<String, Object> data) throws XmlRpcException {
+		Context c = getContext(context);
+		for(Entry<String, Object> e : data.entrySet()) {
+			c.getRunConfig().setMetricWeight(e.getKey(), Double.parseDouble(e.getValue().toString()));
+		}
 		return true;
 	}
 	

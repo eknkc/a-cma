@@ -6,7 +6,6 @@ import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,7 +22,7 @@ public class RunConfig implements Externalizable {
 	private String name;
 	private UUID uuid;
 	private HashMap<String, MetricOverride> metricOverrides;
-	private HashSet<String> actionOverrides;
+	private HashMap<String, ActionOverride> actionOverrides;
 	private ArrayList<MetricSummary> normalMetrics;
 	
 	private boolean usingWeightedSum;
@@ -50,19 +49,43 @@ public class RunConfig implements Externalizable {
 
 	public RunConfig() {
 		metricOverrides = new HashMap<String, RunConfig.MetricOverride>();
-		actionOverrides = new HashSet<String>();
+		actionOverrides = new HashMap<String, RunConfig.ActionOverride>();
 		normalMetrics = new ArrayList<MetricSummary>();
 		uuid = UUID.randomUUID();
 		usingWeightedSum = false;
 	}
 	
 	public boolean isActionEnabled(String name) {
-		return !actionOverrides.contains(name);
+		ActionOverride ao = actionOverrides.get(name);
+		return ao == null || ao.enabled;
 	}
 	
 	public void setActionEnabled(String name, boolean enabled) {
-		if (enabled) actionOverrides.remove(name);
-		else actionOverrides.add(name);
+		ActionOverride mo = actionOverrides.get(name);
+		if (mo == null) {
+			mo = new ActionOverride();
+			mo.weight = Double.NaN;
+			mo.actionName = name;
+			actionOverrides.put(name, mo);
+		}
+		mo.enabled = enabled;
+	}
+	
+	public double getActionWeight(String name) {
+		ActionOverride mo = actionOverrides.get(name);
+		if (mo == null) return 1.0;
+		return Double.isNaN(mo.weight) ? 1.0 : mo.weight;
+	}
+	
+	public void setActionWeight(String name, double value) {
+		ActionOverride mo = actionOverrides.get(name);
+		if (mo == null) {
+			mo = new ActionOverride();
+			mo.enabled = true;
+			mo.actionName = name;
+			actionOverrides.put(name, mo);
+		}
+		mo.weight = value;
 	}
 	
 	public boolean isMetricEnabled(String name) {
@@ -108,6 +131,12 @@ public class RunConfig implements Externalizable {
 		private boolean enabled;
 	}
 	
+	private class ActionOverride {
+		private String actionName;
+		private double weight;
+		private boolean enabled;
+	}
+	
 	@Override
 	public String toString() {
 		return name;
@@ -134,7 +163,11 @@ public class RunConfig implements Externalizable {
 		
 		int aocnt = in.readInt();
 		for (int i = 0; i < aocnt; i++) {
-			actionOverrides.add(in.readUTF());
+			ActionOverride mo = new ActionOverride();
+			mo.actionName = in.readUTF();
+			mo.weight = in.readDouble();
+			mo.enabled = in.readBoolean();
+			actionOverrides.put(mo.actionName, mo);
 		}
 		
 		int nmcnt = in.readInt();
@@ -159,8 +192,10 @@ public class RunConfig implements Externalizable {
 		}
 		
 		out.writeInt(actionOverrides.size());
-		for (String ao : actionOverrides) {
-			out.writeUTF(ao);
+		for (ActionOverride ao : actionOverrides.values()) {
+			out.writeUTF(ao.actionName);
+			out.writeDouble(ao.weight);
+			out.writeBoolean(ao.enabled);
 		}
 		
 		out.writeInt(normalMetrics.size());

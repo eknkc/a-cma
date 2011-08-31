@@ -14,7 +14,7 @@ public class MetricNormalizer {
 	}
 	
 	public static double normalize(MetricSummary current, RunConfig config) {
-		return unweightedNormalize(current, config);
+		return weightedNormalize(current, config);
 	}
 	
 	public static HashMap<String, Double> normalizeEach(MetricSummary current, RunConfig config) {
@@ -67,6 +67,57 @@ public class MetricNormalizer {
 		return items;
 	}
 	
+	private static double weightedNormalize(MetricSummary current, RunConfig config) {
+		// All metrics
+		List<MetricRegistry.Entry> metrics = MetricRegistry.entries();
+		int nummetrics = metrics.size();
+		
+		if (!normalizationCache.containsKey(config.getId())) {
+			// Design set
+			List<MetricSummary> designs = config.getNormalMetrics();
+			int numdesigns = designs.size();
+			
+			// Table
+			double[][] table = new double[nummetrics][numdesigns];
+				
+			for (int i = 0; i < nummetrics; i++) {
+				MetricRegistry.Entry metric = metrics.get(i);
+				
+				for (int j = 0; j < numdesigns; j++) {
+					MetricSummary design = designs.get(j);
+					table[i][j] = design.get(metric.getName());
+				}
+			}
+			
+			normalizationCache.put(config.getId(), getMeansAndStDevs(table, nummetrics, numdesigns));
+		}
+		
+		double[][] mn = normalizationCache.get(config.getId());
+		
+		double normalvalue = 0;
+		
+		for (int i = 0; i < nummetrics; i++) {
+			MetricRegistry.Entry metric = metrics.get(i);
+			
+			if (!config.isMetricEnabled(metric.getName())) continue;
+			
+			double curmetric = current.get(metric.getName());
+			
+			if (Double.isNaN(curmetric) || Double.isNaN(mn[i][0]) || Double.isNaN(mn[i][1]) || mn[i][1] == 0.0) continue;
+			
+			double curnormal = (curmetric - mn[i][0]) / mn[i][1];
+			
+			if (metric.isMinimized()) {
+				normalvalue += Math.abs(curnormal - ((0.0 - mn[i][0]) / mn[i][1])) * config.getMetricWeight(metric.getName(), 1.0);
+			} else {
+				normalvalue += Math.abs(curnormal) * config.getMetricWeight(metric.getName(), 1.0);
+			}
+		}
+		
+		return normalvalue;
+	}
+	
+	@SuppressWarnings("unused")
 	private static double unweightedNormalize(MetricSummary current, RunConfig config) {
 		// All metrics
 		List<MetricRegistry.Entry> metrics = MetricRegistry.entries();

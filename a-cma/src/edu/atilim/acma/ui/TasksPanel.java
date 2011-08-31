@@ -19,8 +19,8 @@ public class TasksPanel extends TasksPanelBase implements ActionListener {
 		Timer timer = new Timer(500, this);
 		timer.setActionCommand("update");
 		deleteButton.addActionListener(this);
-		btnPareto.addActionListener(this);
-		btnAggregate.addActionListener(this);
+		//btnPareto.addActionListener(this);
+		//btnAggregate.addActionListener(this);
 		
 		refresh();
 		

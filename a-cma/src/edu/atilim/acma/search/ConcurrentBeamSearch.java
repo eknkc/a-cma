@@ -26,6 +26,7 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 	private int iterations;
 	
 	private transient int expansion = 0;
+	private transient double exhaust = 0;
 	
 	public ConcurrentBeamSearch() {
 	}
@@ -43,6 +44,7 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 	public void runMaster(InstanceSet instances) {
 		for (int runs = 0; runs < runCount; runs++) {
 			expansion = 0;
+			exhaust = Double.MAX_VALUE;
 			
 			long startTime = System.currentTimeMillis();
 			
@@ -94,14 +96,16 @@ public class ConcurrentBeamSearch extends ConcurrentAlgorithm {
 		
 		ArrayList<Double> scores = instances.gather(Double.class);
 		System.out.printf("Received %d scores.\n", scores.size());
+		Collections.sort(scores);
 		
-		if (scores.size() == 0) {
+		if (scores.size() == 0 || exhaust < scores.get(0)) {
 			System.out.println("Found optimum point!");
 			instances.broadcast(0.0);
 			return false;
 		}
 		
-		Collections.sort(scores);
+		exhaust = scores.get(0);
+		
 		Double beamcut = scores.get(Math.min(scores.size() - 1, beamLength - 1));
 		System.out.printf("Beam cut at %.6f.\n", beamcut);
 		
