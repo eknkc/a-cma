@@ -33,8 +33,9 @@ if ($_POST['algorithm'] && $_POST['algorithm'] == 'Start SBS') {
 	$population = intval($_POST['sbspopulation']);
 	$randomDepth = intval($_POST['sbsrandomDepth']);
 	$iterations = intval($_POST['sbsiterations']);
+	$boltzman = $_POST['sbsdistribution'] == "Boltzman" ? true : false;
 	
-	if ($acma->startRefactoring(array('algorithm' => 'SBS', 'population' => $population, 'randomDepth' => $randomDepth, 'iterations' => $iterations))) {
+	if ($acma->startRefactoring(array('algorithm' => 'SBS', 'population' => $population, 'randomDepth' => $randomDepth, 'iterations' => $iterations, 'boltzman' => $boltzman))) {
 		header('Location: index.php?page=refactoring');
 	}
 }
@@ -138,7 +139,11 @@ if ($_POST['algorithm'] && $_POST['algorithm'] == 'Start SBS') {
 					<tr>
 						<th class="align-right width-half">Iterations:</th>
 						<td><select name="sbsiterations"><option selected>100</option><option>250</option><option>500</option><option>750</option><option>1000</option></td>	
-					</tr>						
+					</tr>
+					<tr>
+						<th class="align-right width-half">Distribution:</th>
+						<td><select name="sbsdistribution"><option selected>Gibb's</option><option>Boltzman</option></td>	
+					</tr>					
 					<tr>
 						<td colspan="2" class="align-center"><input type="submit" name="algorithm" value="Start SBS"></td>	
 					</tr>				

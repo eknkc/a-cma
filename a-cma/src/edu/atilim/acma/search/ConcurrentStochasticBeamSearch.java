@@ -28,10 +28,11 @@ public class ConcurrentStochasticBeamSearch extends ConcurrentAlgorithm {
 	private int randomDepth;
 	private int runCount;
 	private int iterations;
+	private boolean useBoltzman;
 	
 	public ConcurrentStochasticBeamSearch() {
 	}
-
+	
 	public ConcurrentStochasticBeamSearch(String name, RunConfig config, Design initialDesign, int beamLength, int randomDepth, int iterations, int runCount) {
 		super(name, config, initialDesign);
 		
@@ -39,6 +40,17 @@ public class ConcurrentStochasticBeamSearch extends ConcurrentAlgorithm {
 		this.randomDepth = randomDepth;
 		this.runCount = runCount;
 		this.iterations = iterations;
+		this.useBoltzman = false;
+	}
+
+	public ConcurrentStochasticBeamSearch(String name, RunConfig config, Design initialDesign, int beamLength, int randomDepth, int iterations, int runCount, boolean useBoltzman) {
+		super(name, config, initialDesign);
+		
+		this.beamLength = beamLength;
+		this.randomDepth = randomDepth;
+		this.runCount = runCount;
+		this.iterations = iterations;
+		this.useBoltzman = useBoltzman;
 	}
 	
 	@Override
@@ -126,10 +138,23 @@ public class ConcurrentStochasticBeamSearch extends ConcurrentAlgorithm {
 		}
 		
 		average /= designs.size();
-		
 		average -= min;
+		double z;
 		
-		double z = (beamLength) / (Math.exp(-1) * designs.size());
+		if (!useBoltzman)
+			z = (beamLength) / (Math.exp(-1) * designs.size());
+		else
+		{
+			z = 0;
+			
+			for (int i = 0; i < designs.size(); i++) {
+				FoundDesignHandle cur = designs.get(i);
+				z += Math.exp(-(cur.score - min) / average);
+			}
+			
+			z = beamLength / z;
+			//z *= beamLength;
+		}
 			
 		for (int i = 0; i < designs.size(); i++) {
 			FoundDesignHandle cur = designs.get(i);
@@ -256,21 +281,28 @@ public class ConcurrentStochasticBeamSearch extends ConcurrentAlgorithm {
 	public void writeExternal(ObjectOutput out) throws IOException {
 		super.writeExternal(out);
 		
-		out.writeInt(0); //version
+		out.writeInt(1); //version
 		out.writeInt(beamLength);
 		out.writeInt(randomDepth);
 		out.writeInt(runCount);
 		out.writeInt(iterations);
+		out.writeBoolean(useBoltzman);
 	}
 	
 	@Override
 	public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
 		super.readExternal(in);
 		
-		in.readInt();
+		int version = in.readInt();
+		
 		beamLength = in.readInt();
 		randomDepth = in.readInt();
 		runCount = in.readInt();
 		iterations = in.readInt();
+		
+		useBoltzman = false;
+		
+		if (version >= 1)
+			useBoltzman = in.readBoolean();
 	}
 }

@@ -115,9 +115,10 @@ public class WebService {
 			int population = (Integer)parameters.get("population");
 			int randomDepth = (Integer)parameters.get("randomDepth");
 			int iterations = (Integer)parameters.get("iterations");
+			boolean boltzman = (Boolean)parameters.get("boltzman");
 			
-			task = new ConcurrentStochasticBeamSearch(context, c.getRunConfig(), c.getDesign(), population, randomDepth, iterations, 1);
-			name = String.format("Stochastic Beam Search [%d Population] [%d Depth] [%d Iterations]", population, randomDepth, iterations);
+			task = new ConcurrentStochasticBeamSearch(context, c.getRunConfig(), c.getDesign(), population, randomDepth, iterations, 1, boltzman);
+			name = String.format("Stochastic Beam Search [%d Population] [%d Depth] [%d Iterations] [%s]", population, randomDepth, iterations, boltzman ? "Boltzman" : "Gibb's");
 		}
 		
 		if (task == null)
